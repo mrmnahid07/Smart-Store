@@ -2,7 +2,7 @@
 <html lang="bn">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Smart Store</title>
 
 <style>
@@ -10,137 +10,69 @@
     box-sizing:border-box;
     margin:0;
     padding:0;
-    font-family:Arial,"Noto Sans Bengali",sans-serif;
+    font-family:Arial, sans-serif;
 }
 
 body{
-    background:#f4f6f9;
-    color:#222;
-}
-
-/* LOGIN */
-#loginPage{
-    min-height:100vh;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    background:linear-gradient(135deg,#1e3c72,#2a5298);
-    padding:20px;
-}
-
-.login-box{
-    width:100%;
-    max-width:400px;
-    background:#fff;
-    padding:35px;
-    border-radius:18px;
-    box-shadow:0 15px 40px rgba(0,0,0,.25);
-}
-
-.login-box h1{
-    text-align:center;
-    margin-bottom:8px;
-}
-
-.login-box p{
-    text-align:center;
-    color:#777;
-    margin-bottom:25px;
-}
-
-.login-box input{
-    width:100%;
-    padding:13px;
-    border:1px solid #ddd;
-    border-radius:8px;
-    margin-bottom:15px;
-    font-size:15px;
-}
-
-.login-btn{
-    width:100%;
-    padding:13px;
-    border:0;
-    border-radius:8px;
-    background:#2563eb;
-    color:white;
-    font-size:16px;
-    cursor:pointer;
-}
-
-/* APP */
-#app{
-    display:none;
-    min-height:100vh;
+    background:#f1f5f9;
+    color:#1e293b;
 }
 
 .sidebar{
-    width:240px;
-    background:#172033;
-    color:white;
     position:fixed;
     left:0;
     top:0;
-    bottom:0;
-    padding:20px 12px;
+    width:230px;
+    height:100vh;
+    background:#0f172a;
+    color:white;
+    padding:20px 10px;
     overflow-y:auto;
 }
 
 .logo{
     text-align:center;
-    font-size:23px;
+    font-size:24px;
     font-weight:bold;
-    margin-bottom:25px;
+    padding:15px 5px 25px;
+    color:#38bdf8;
 }
 
 .menu button{
     width:100%;
-    border:0;
+    display:block;
+    border:none;
     background:transparent;
-    color:#ddd;
-    padding:13px 15px;
-    margin:3px 0;
+    color:#cbd5e1;
+    padding:14px 12px;
     text-align:left;
-    border-radius:8px;
     cursor:pointer;
+    border-radius:8px;
+    margin-bottom:4px;
     font-size:15px;
 }
 
 .menu button:hover,
 .menu button.active{
-    background:#2563eb;
+    background:#1e293b;
     color:white;
 }
 
-.logout-btn{
-    margin-top:20px!important;
-    background:#dc2626!important;
-    color:#fff!important;
-}
-
 .main{
-    margin-left:240px;
-    width:calc(100% - 240px);
+    margin-left:230px;
+    padding:20px;
 }
 
 .topbar{
-    background:#fff;
-    padding:18px 25px;
-    border-bottom:1px solid #ddd;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    position:sticky;
-    top:0;
-    z-index:5;
+    background:white;
+    padding:18px;
+    border-radius:12px;
+    margin-bottom:20px;
+    box-shadow:0 2px 8px rgba(0,0,0,.06);
 }
 
-.topbar h2{
-    font-size:21px;
-}
-
-.content{
-    padding:25px;
+.topbar h1{
+    font-size:25px;
 }
 
 .page{
@@ -151,75 +83,80 @@ body{
     display:block;
 }
 
-/* DASHBOARD */
 .cards{
     display:grid;
-    grid-template-columns:repeat(4,1fr);
+    grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
     gap:15px;
     margin-bottom:20px;
 }
 
 .card{
-    background:#fff;
-    border-radius:12px;
+    background:white;
     padding:20px;
-    box-shadow:0 3px 12px rgba(0,0,0,.06);
+    border-radius:12px;
+    box-shadow:0 2px 8px rgba(0,0,0,.06);
 }
 
-.card h4{
-    color:#666;
+.card h3{
+    color:#64748b;
+    font-size:14px;
     margin-bottom:10px;
 }
 
-.card strong{
-    font-size:22px;
+.card .number{
+    font-size:25px;
+    font-weight:bold;
 }
 
-/* FORMS */
-.form-box{
-    background:#fff;
+.panel{
+    background:white;
     padding:20px;
     border-radius:12px;
     margin-bottom:20px;
-    box-shadow:0 3px 12px rgba(0,0,0,.05);
+    box-shadow:0 2px 8px rgba(0,0,0,.06);
+}
+
+.panel h2{
+    margin-bottom:15px;
 }
 
 .form-grid{
     display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:14px;
+    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+    gap:12px;
 }
 
-.form-group{
-    display:flex;
-    flex-direction:column;
-    gap:6px;
-}
-
-.form-group label{
-    font-size:14px;
+label{
+    display:block;
+    margin-bottom:5px;
     font-weight:bold;
+    font-size:13px;
 }
 
-input,select,textarea{
+input,
+textarea{
     width:100%;
-    padding:10px;
-    border:1px solid #ddd;
+    padding:11px;
+    border:1px solid #cbd5e1;
     border-radius:7px;
-    font-size:14px;
+    outline:none;
+}
+
+input:focus,
+textarea:focus{
+    border-color:#2563eb;
 }
 
 textarea{
-    min-height:80px;
     resize:vertical;
 }
 
 .btn{
-    border:0;
-    padding:9px 13px;
-    border-radius:6px;
+    border:none;
+    padding:11px 16px;
+    border-radius:7px;
     cursor:pointer;
-    margin:2px;
+    font-weight:bold;
 }
 
 .btn-primary{
@@ -227,92 +164,102 @@ textarea{
     color:white;
 }
 
-.btn-warning{
-    background:#f59e0b;
-    color:#fff;
+.btn-success{
+    background:#16a34a;
+    color:white;
 }
 
 .btn-danger{
     background:#dc2626;
-    color:#fff;
+    color:white;
 }
 
-.btn-success{
-    background:#16a34a;
-    color:#fff;
+.btn-warning{
+    background:#f59e0b;
+    color:white;
 }
 
-/* TABLE */
-.table-box{
-    background:#fff;
-    border-radius:12px;
-    padding:15px;
-    overflow-x:auto;
-    box-shadow:0 3px 12px rgba(0,0,0,.05);
+.btn-secondary{
+    background:#475569;
+    color:white;
+}
+
+.action-buttons{
+    display:flex;
+    gap:6px;
+    flex-wrap:wrap;
 }
 
 table{
     width:100%;
     border-collapse:collapse;
-    min-width:700px;
+    margin-top:15px;
 }
 
-th,td{
-    padding:11px 9px;
-    border-bottom:1px solid #eee;
+th,
+td{
+    padding:10px;
+    border-bottom:1px solid #e2e8f0;
     text-align:left;
     font-size:14px;
 }
 
 th{
-    background:#f7f7f7;
+    background:#f8fafc;
+}
+
+.table-wrap{
+    overflow-x:auto;
+}
+
+.badge{
+    padding:4px 8px;
+    border-radius:5px;
+    font-size:12px;
+}
+
+.badge-green{
+    background:#dcfce7;
+    color:#166534;
+}
+
+.badge-red{
+    background:#fee2e2;
+    color:#991b1b;
+}
+
+.report-filter{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    align-items:end;
+    margin-bottom:20px;
+}
+
+.report-filter div{
+    min-width:160px;
 }
 
 .empty{
     text-align:center;
-    color:#999;
-    padding:25px;
-}
-
-/* REPORT */
-.report-buttons{
-    margin-bottom:20px;
-}
-
-@media(max-width:1000px){
-    .cards{
-        grid-template-columns:repeat(2,1fr);
-    }
-
-    .form-grid{
-        grid-template-columns:repeat(2,1fr);
-    }
+    padding:20px;
+    color:#64748b;
 }
 
 @media(max-width:700px){
     .sidebar{
-        width:190px;
+        position:relative;
+        width:100%;
+        height:auto;
     }
 
     .main{
-        margin-left:190px;
-        width:calc(100% - 190px);
+        margin-left:0;
+        padding:10px;
     }
 
-    .content{
-        padding:15px;
-    }
-
-    .cards{
-        grid-template-columns:1fr;
-    }
-
-    .form-grid{
-        grid-template-columns:1fr;
-    }
-
-    .topbar h2{
-        font-size:16px;
+    .logo{
+        padding-bottom:10px;
     }
 }
 </style>
@@ -320,109 +267,29 @@ th{
 
 <body>
 
-<!-- ================= LOGIN ================= -->
-<div id="loginPage">
+<!-- SIDEBAR -->
+<div class="sidebar">
 
-    <div class="login-box">
+    <div class="logo">🏪 Smart Store</div>
 
-        <h1>🏪 Smart Store</h1>
-        <p>Store Management System</p>
-
-        <form id="loginForm">
-
-            <input
-                type="text"
-                id="loginUsername"
-                placeholder="Username"
-                autocomplete="username"
-                required
-            >
-
-            <input
-                type="password"
-                id="loginPassword"
-                placeholder="Password"
-                autocomplete="current-password"
-                required
-            >
-
-            <button class="login-btn" type="submit">
-                🔐 Login
-            </button>
-
-        </form>
-
+    <div class="menu">
+        <button class="active" onclick="showPage('dashboard',this)">🏠 Dashboard</button>
+        <button onclick="showPage('products',this)">📦 Products</button>
+        <button onclick="showPage('sales',this)">🛒 Sales</button>
+        <button onclick="showPage('purchase',this)">🚚 Purchase</button>
+        <button onclick="showPage('customers',this)">👥 Customers</button>
+        <button onclick="showPage('expenses',this)">💸 Expenses</button>
+        <button onclick="showPage('reports',this)">📊 Reports</button>
     </div>
 
 </div>
 
+<!-- MAIN -->
+<div class="main">
 
-<!-- ================= APP ================= -->
-<div id="app">
-
-    <!-- SIDEBAR -->
-    <aside class="sidebar">
-
-        <div class="logo">
-            🏪 Smart Store
-        </div>
-
-        <div class="menu">
-
-            <button onclick="showPage('dashboard',this)" class="active">
-                🏠 Dashboard
-            </button>
-
-            <button onclick="showPage('products',this)">
-                📦 Products
-            </button>
-
-            <button onclick="showPage('sales',this)">
-                🛒 Sales
-            </button>
-
-            <button onclick="showPage('purchase',this)">
-                🚚 Purchase
-            </button>
-
-            <button onclick="showPage('customers',this)">
-                👥 Customers
-            </button>
-
-            <button onclick="showPage('expenses',this)">
-                💸 Expenses
-            </button>
-
-            <button onclick="showPage('reports',this)">
-                📊 Reports
-            </button>
-
-            <button class="logout-btn" onclick="logout()">
-                🚪 Logout
-            </button>
-
-        </div>
-
-    </aside>
-
-
-    <!-- MAIN -->
-    <main class="main">
-
-        <header class="topbar">
-
-            <h2 id="pageTitle">
-                🏠 Dashboard
-            </h2>
-
-            <div>
-                👤 <b>Admin</b>
-            </div>
-
-        </header>
-
-
-        <div class="content">
+<div class="topbar">
+    <h1 id="pageTitle">🏠 Dashboard</h1>
+</div>
 
 
 <!-- ================= DASHBOARD ================= -->
@@ -431,76 +298,69 @@ th{
     <div class="cards">
 
         <div class="card">
-            <h4>💰 Total Sales</h4>
-            <strong id="dashSales">৳0.00</strong>
+            <h3>Total Sales</h3>
+            <div class="number" id="dashSales">৳0</div>
         </div>
 
         <div class="card">
-            <h4>🚚 Total Purchase</h4>
-            <strong id="dashPurchase">৳0.00</strong>
+            <h3>Total Purchase</h3>
+            <div class="number" id="dashPurchase">৳0</div>
         </div>
 
         <div class="card">
-            <h4>📈 Gross Profit</h4>
-            <strong id="dashGross">৳0.00</strong>
+            <h3>Gross Profit</h3>
+            <div class="number" id="dashGross">৳0</div>
         </div>
 
         <div class="card">
-            <h4>💸 Expense</h4>
-            <strong id="dashExpense">৳0.00</strong>
+            <h3>Expenses</h3>
+            <div class="number" id="dashExpense">৳0</div>
         </div>
 
         <div class="card">
-            <h4>💵 Net Profit</h4>
-            <strong id="dashNet">৳0.00</strong>
+            <h3>Net Profit</h3>
+            <div class="number" id="dashNet">৳0</div>
         </div>
 
         <div class="card">
-            <h4>📌 Due</h4>
-            <strong id="dashDue">৳0.00</strong>
+            <h3>Total Due</h3>
+            <div class="number" id="dashDue">৳0</div>
         </div>
 
         <div class="card">
-            <h4>📦 Stock Value</h4>
-            <strong id="dashStock">৳0.00</strong>
+            <h3>Stock Value</h3>
+            <div class="number" id="dashStock">৳0</div>
         </div>
 
         <div class="card">
-            <h4>💳 Cash</h4>
-            <strong id="dashCash">৳0.00</strong>
+            <h3>Cash / Balance</h3>
+            <div class="number" id="dashCash">৳0</div>
         </div>
 
         <div class="card">
-            <h4>📦 Products</h4>
-            <strong id="dashProducts">0</strong>
+            <h3>Total Products</h3>
+            <div class="number" id="dashProducts">0</div>
         </div>
 
     </div>
 
-
-    <div class="table-box">
-
-        <h3 style="margin-bottom:15px">
-            🛒 Recent Sales
-        </h3>
-
-        <table>
-
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Product</th>
-                    <th>Qty</th>
-                    <th>Total</th>
-                    <th>Paid</th>
-                    <th>Due</th>
-                </tr>
-            </thead>
-
-            <tbody id="recentSales"></tbody>
-
-        </table>
-
+    <div class="panel">
+        <h2>📋 Recent Sales</h2>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Product</th>
+                        <th>Qty</th>
+                        <th>Total</th>
+                        <th>Paid</th>
+                        <th>Due</th>
+                    </tr>
+                </thead>
+                <tbody id="recentSales"></tbody>
+            </table>
+        </div>
     </div>
 
 </section>
@@ -509,11 +369,8 @@ th{
 <!-- ================= PRODUCTS ================= -->
 <section id="products" class="page">
 
-    <div class="form-box">
-
-        <h3 style="margin-bottom:15px">
-            📦 Add / Update Product
-        </h3>
+    <div class="panel">
+        <h2>📦 Add Product</h2>
 
         <form id="productForm">
 
@@ -521,80 +378,68 @@ th{
 
             <div class="form-grid">
 
-                <div class="form-group">
+                <div>
                     <label>Product Name</label>
-                    <input id="productName" required>
+                    <input id="productName" type="text" placeholder="Product Name লিখুন" required>
                 </div>
 
-                <div class="form-group">
+                <div>
                     <label>Product Code</label>
-                    <input id="productCode">
+                    <input id="productCode" type="text" placeholder="Code লিখুন">
                 </div>
 
-                <div class="form-group">
-                    <label>Buy Price</label>
-                    <input id="productBuy" type="number" min="0" step="0.01">
+                <div>
+                    <label>Purchase Price</label>
+                    <input id="productBuy" type="number" step="0.01" placeholder="ক্রয় মূল্য" required>
                 </div>
 
-                <div class="form-group">
-                    <label>Sell Price</label>
-                    <input id="productSell" type="number" min="0" step="0.01">
+                <div>
+                    <label>Sale Price</label>
+                    <input id="productSell" type="number" step="0.01" placeholder="বিক্রয় মূল্য" required>
                 </div>
 
-                <div class="form-group">
+                <div>
                     <label>Stock</label>
-                    <input id="productStock" type="number" min="0">
+                    <input id="productStock" type="number" step="1" placeholder="Stock">
                 </div>
 
             </div>
 
             <br>
 
-            <button
-                type="submit"
-                id="productSubmit"
-                class="btn btn-primary"
-            >
+            <button class="btn btn-primary" type="submit" id="productSubmit">
                 ➕ Add Product
             </button>
 
-            <button
-                type="button"
-                class="btn"
-                onclick="resetProductForm()"
-            >
+            <button class="btn btn-secondary" type="button" onclick="resetProductForm()">
                 Clear
             </button>
 
         </form>
-
     </div>
 
 
-    <div class="table-box">
+    <div class="panel">
+        <h2>📋 Product List</h2>
 
-        <h3>Product List</h3>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Code</th>
+                        <th>Buy</th>
+                        <th>Sell</th>
+                        <th>Stock</th>
+                        <th>Stock Value</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
 
-        <br>
+                <tbody id="productTable"></tbody>
 
-        <table>
-
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Code</th>
-                    <th>Buy</th>
-                    <th>Sell</th>
-                    <th>Stock</th>
-                    <th>Stock Value</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-
-            <tbody id="productTable"></tbody>
-
-        </table>
-
+            </table>
+        </div>
     </div>
 
 </section>
@@ -603,11 +448,9 @@ th{
 <!-- ================= SALES ================= -->
 <section id="sales" class="page">
 
-    <div class="form-box">
+    <div class="panel">
 
-        <h3 style="margin-bottom:15px">
-            🛒 Add / Update Sale
-        </h3>
+        <h2>🛒 Add Sale</h2>
 
         <form id="salesForm">
 
@@ -615,70 +458,91 @@ th{
 
             <div class="form-grid">
 
-                <div class="form-group">
+                <div>
                     <label>Date</label>
-                    <input type="date" id="saleDate" required>
+                    <input id="saleDate" type="date" required>
                 </div>
 
-                <div class="form-group">
-                    <label>Product</label>
-                    <select id="saleProduct" required>
-                        <option value="">Select Product</option>
-                    </select>
+                <div>
+                    <label>Product Name</label>
+
+                    <!-- SELECT নেই -->
+                    <input
+                        id="saleProduct"
+                        type="text"
+                        placeholder="Product Name লিখুন"
+                        required
+                        oninput="autoSalePrice()"
+                    >
                 </div>
 
-                <div class="form-group">
+                <div>
                     <label>Quantity</label>
-                    <input id="saleQty" type="number" min="1" value="1" required>
+                    <input
+                        id="saleQty"
+                        type="number"
+                        min="1"
+                        step="1"
+                        placeholder="Quantity"
+                        required
+                        oninput="calculateSale()"
+                    >
                 </div>
 
-                <div class="form-group">
+                <div>
                     <label>Sale Price</label>
-                    <input id="salePrice" type="number" min="0" step="0.01" required>
+                    <input
+                        id="salePrice"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        placeholder="Sale Price"
+                        required
+                        oninput="calculateSale()"
+                    >
                 </div>
 
-                <div class="form-group">
+                <div>
                     <label>Customer</label>
-                    <input id="saleCustomer">
+                    <input id="saleCustomer" type="text" placeholder="Customer Name">
                 </div>
 
-                <div class="form-group">
+                <div>
                     <label>Paid</label>
-                    <input id="salePaid" type="number" min="0" step="0.01" value="0">
+                    <input
+                        id="salePaid"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value="0"
+                        oninput="calculateSale()"
+                    >
                 </div>
 
-                <div class="form-group">
+                <div>
                     <label>Total</label>
-                    <input id="saleTotal" readonly value="0">
+                    <input id="saleTotal" type="number" readonly>
                 </div>
 
-                <div class="form-group">
+                <div>
                     <label>Due</label>
-                    <input id="saleDue" readonly value="0">
+                    <input id="saleDue" type="number" readonly>
                 </div>
 
-                <div class="form-group">
-                    <label>Cost</label>
-                    <input id="saleCost" readonly value="0">
+                <div>
+                    <label>Cost Price</label>
+                    <input id="saleCost" type="number" readonly>
                 </div>
 
             </div>
 
             <br>
 
-            <button
-                type="submit"
-                id="saleSubmit"
-                class="btn btn-primary"
-            >
+            <button class="btn btn-success" type="submit" id="saleSubmit">
                 ➕ Add Sale
             </button>
 
-            <button
-                type="button"
-                class="btn"
-                onclick="resetSaleForm()"
-            >
+            <button class="btn btn-secondary" type="button" onclick="resetSaleForm()">
                 Clear
             </button>
 
@@ -687,31 +551,33 @@ th{
     </div>
 
 
-    <div class="table-box">
+    <div class="panel">
 
-        <h3>Sales List</h3>
+        <h2>📋 Sales List</h2>
 
-        <br>
+        <div class="table-wrap">
 
-        <table>
+            <table>
 
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Product</th>
-                    <th>Qty</th>
-                    <th>Price</th>
-                    <th>Total</th>
-                    <th>Customer</th>
-                    <th>Paid</th>
-                    <th>Due</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Product</th>
+                        <th>Qty</th>
+                        <th>Price</th>
+                        <th>Total</th>
+                        <th>Customer</th>
+                        <th>Paid</th>
+                        <th>Due</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
 
-            <tbody id="salesTable"></tbody>
+                <tbody id="salesTable"></tbody>
 
-        </table>
+            </table>
+
+        </div>
 
     </div>
 
@@ -721,11 +587,9 @@ th{
 <!-- ================= PURCHASE ================= -->
 <section id="purchase" class="page">
 
-    <div class="form-box">
+    <div class="panel">
 
-        <h3 style="margin-bottom:15px">
-            🚚 Add / Update Purchase
-        </h3>
+        <h2>🚚 Add Purchase</h2>
 
         <form id="purchaseForm">
 
@@ -733,53 +597,73 @@ th{
 
             <div class="form-grid">
 
-                <div class="form-group">
+                <div>
                     <label>Date</label>
-                    <input type="date" id="purchaseDate" required>
+                    <input id="purchaseDate" type="date" required>
                 </div>
 
-                <div class="form-group">
-                    <label>Product</label>
-                    <input id="purchaseProduct" required>
+                <div>
+                    <label>Product Name</label>
+
+                    <!-- SELECT নেই -->
+                    <input
+                        id="purchaseProduct"
+                        type="text"
+                        placeholder="Product Name লিখুন"
+                        required
+                        oninput="autoPurchasePrice()"
+                    >
                 </div>
 
-                <div class="form-group">
+                <div>
                     <label>Quantity</label>
-                    <input id="purchaseQty" type="number" min="1" required>
+                    <input
+                        id="purchaseQty"
+                        type="number"
+                        min="1"
+                        step="1"
+                        placeholder="Quantity"
+                        required
+                    >
                 </div>
 
-                <div class="form-group">
+                <div>
                     <label>Purchase Price</label>
-                    <input id="purchasePrice" type="number" min="0" step="0.01">
+                    <input
+                        id="purchasePrice"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        placeholder="Purchase Price"
+                        required
+                    >
                 </div>
 
-                <div class="form-group">
-                    <label>Sell Price</label>
-                    <input id="purchaseSell" type="number" min="0" step="0.01">
+                <div>
+                    <label>Sale Price</label>
+                    <input
+                        id="purchaseSell"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        placeholder="New Product Sale Price"
+                    >
                 </div>
 
-                <div class="form-group">
+                <div>
                     <label>Supplier</label>
-                    <input id="purchaseSupplier">
+                    <input id="purchaseSupplier" type="text" placeholder="Supplier Name">
                 </div>
 
             </div>
 
             <br>
 
-            <button
-                type="submit"
-                id="purchaseSubmit"
-                class="btn btn-primary"
-            >
+            <button class="btn btn-success" type="submit" id="purchaseSubmit">
                 ➕ Add Purchase
             </button>
 
-            <button
-                type="button"
-                class="btn"
-                onclick="resetPurchaseForm()"
-            >
+            <button class="btn btn-secondary" type="button" onclick="resetPurchaseForm()">
                 Clear
             </button>
 
@@ -788,29 +672,31 @@ th{
     </div>
 
 
-    <div class="table-box">
+    <div class="panel">
 
-        <h3>Purchase List</h3>
+        <h2>📋 Purchase List</h2>
 
-        <br>
+        <div class="table-wrap">
 
-        <table>
+            <table>
 
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Product</th>
-                    <th>Qty</th>
-                    <th>Price</th>
-                    <th>Total</th>
-                    <th>Supplier</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Product</th>
+                        <th>Qty</th>
+                        <th>Price</th>
+                        <th>Total</th>
+                        <th>Supplier</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
 
-            <tbody id="purchaseTable"></tbody>
+                <tbody id="purchaseTable"></tbody>
 
-        </table>
+            </table>
+
+        </div>
 
     </div>
 
@@ -820,11 +706,9 @@ th{
 <!-- ================= CUSTOMERS ================= -->
 <section id="customers" class="page">
 
-    <div class="form-box">
+    <div class="panel">
 
-        <h3 style="margin-bottom:15px">
-            👥 Add / Update Customer
-        </h3>
+        <h2>👥 Customer</h2>
 
         <form id="customerForm">
 
@@ -832,49 +716,45 @@ th{
 
             <div class="form-grid">
 
-                <div class="form-group">
+                <div>
                     <label>Date</label>
-                    <input type="date" id="customerDate">
+                    <input id="customerDate" type="date" required>
                 </div>
 
-                <div class="form-group">
-                    <label>Name</label>
-                    <input id="customerName" required>
+                <div>
+                    <label>Customer Name</label>
+                    <input id="customerName" type="text" required placeholder="Customer Name">
                 </div>
 
-                <div class="form-group">
+                <div>
                     <label>Mobile</label>
-                    <input id="customerMobile">
+                    <input id="customerMobile" type="text" placeholder="Mobile">
                 </div>
 
-                <div class="form-group">
+                <div>
                     <label>Address</label>
-                    <input id="customerAddress">
+                    <input id="customerAddress" type="text" placeholder="Address">
                 </div>
 
-                <div class="form-group">
-                    <label>Due</label>
-                    <input id="customerDue" type="number" min="0" step="0.01" value="0">
+                <div>
+                    <label>Opening Due</label>
+                    <input id="customerDue" type="number" step="0.01" value="0">
                 </div>
 
-                <div class="form-group">
-                    <label>Payment</label>
-                    <input id="customerPayment" type="number" min="0" step="0.01" value="0">
+                <div>
+                    <label>Payment / Collection</label>
+                    <input id="customerPayment" type="number" step="0.01" value="0">
                 </div>
 
             </div>
 
             <br>
 
-            <button type="submit" class="btn btn-primary">
+            <button class="btn btn-primary" type="submit">
                 ➕ Save Customer
             </button>
 
-            <button
-                type="button"
-                class="btn"
-                onclick="resetCustomerForm()"
-            >
+            <button class="btn btn-secondary" type="button" onclick="resetCustomerForm()">
                 Clear
             </button>
 
@@ -883,30 +763,32 @@ th{
     </div>
 
 
-    <div class="table-box">
+    <div class="panel">
 
-        <h3>Customer List</h3>
+        <h2>📋 Customer List</h2>
 
-        <br>
+        <div class="table-wrap">
 
-        <table>
+            <table>
 
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Name</th>
-                    <th>Mobile</th>
-                    <th>Address</th>
-                    <th>Due</th>
-                    <th>Payment</th>
-                    <th>Balance</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Name</th>
+                        <th>Mobile</th>
+                        <th>Address</th>
+                        <th>Opening Due</th>
+                        <th>Payment</th>
+                        <th>Balance</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
 
-            <tbody id="customerTable"></tbody>
+                <tbody id="customerTable"></tbody>
 
-        </table>
+            </table>
+
+        </div>
 
     </div>
 
@@ -916,11 +798,9 @@ th{
 <!-- ================= EXPENSE ================= -->
 <section id="expenses" class="page">
 
-    <div class="form-box">
+    <div class="panel">
 
-        <h3 style="margin-bottom:15px">
-            💸 Add / Update Expense
-        </h3>
+        <h2>💸 Add Expense</h2>
 
         <form id="expenseForm">
 
@@ -928,39 +808,35 @@ th{
 
             <div class="form-grid">
 
-                <div class="form-group">
+                <div>
                     <label>Date</label>
-                    <input type="date" id="expenseDate">
+                    <input id="expenseDate" type="date" required>
                 </div>
 
-                <div class="form-group">
+                <div>
                     <label>Expense Name</label>
-                    <input id="expenseName" required>
+                    <input id="expenseName" type="text" required placeholder="Expense Name">
                 </div>
 
-                <div class="form-group">
+                <div>
                     <label>Amount</label>
-                    <input id="expenseAmount" type="number" min="0" step="0.01" required>
+                    <input id="expenseAmount" type="number" min="0" step="0.01" required placeholder="Amount">
                 </div>
 
-                <div class="form-group">
+                <div>
                     <label>Note</label>
-                    <textarea id="expenseNote"></textarea>
+                    <input id="expenseNote" type="text" placeholder="Note">
                 </div>
 
             </div>
 
             <br>
 
-            <button type="submit" class="btn btn-primary">
-                ➕ Save Expense
+            <button class="btn btn-danger" type="submit">
+                ➕ Add Expense
             </button>
 
-            <button
-                type="button"
-                class="btn"
-                onclick="resetExpenseForm()"
-            >
+            <button class="btn btn-secondary" type="button" onclick="resetExpenseForm()">
                 Clear
             </button>
 
@@ -969,27 +845,29 @@ th{
     </div>
 
 
-    <div class="table-box">
+    <div class="panel">
 
-        <h3>Expense List</h3>
+        <h2>📋 Expense List</h2>
 
-        <br>
+        <div class="table-wrap">
 
-        <table>
+            <table>
 
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Name</th>
-                    <th>Amount</th>
-                    <th>Note</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Expense</th>
+                        <th>Amount</th>
+                        <th>Note</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
 
-            <tbody id="expenseTable"></tbody>
+                <tbody id="expenseTable"></tbody>
 
-        </table>
+            </table>
+
+        </div>
 
     </div>
 
@@ -999,55 +877,35 @@ th{
 <!-- ================= REPORTS ================= -->
 <section id="reports" class="page">
 
-    <div class="form-box">
+    <div class="panel">
 
-        <h3>📊 Sales & Business Report</h3>
+        <h2>📊 Reports</h2>
 
-        <br>
+        <div class="report-filter">
 
-        <div class="form-grid">
-
-            <div class="form-group">
-                <label>From</label>
+            <div>
+                <label>From Date</label>
                 <input type="date" id="reportFrom">
             </div>
 
-            <div class="form-group">
-                <label>To</label>
+            <div>
+                <label>To Date</label>
                 <input type="date" id="reportTo">
             </div>
 
-        </div>
-
-        <br>
-
-        <div class="report-buttons">
-
-            <button
-                class="btn btn-primary"
-                onclick="generateReport()"
-            >
-                🔎 Generate
+            <button class="btn btn-primary" onclick="generateReport()">
+                🔍 Search
             </button>
 
-            <button
-                class="btn btn-success"
-                onclick="reportToday()"
-            >
+            <button class="btn btn-secondary" onclick="reportToday()">
                 Today
             </button>
 
-            <button
-                class="btn btn-warning"
-                onclick="reportMonth()"
-            >
+            <button class="btn btn-warning" onclick="reportMonth()">
                 This Month
             </button>
 
-            <button
-                class="btn"
-                onclick="reportAll()"
-            >
+            <button class="btn btn-success" onclick="reportAll()">
                 All
             </button>
 
@@ -1059,292 +917,123 @@ th{
     <div class="cards">
 
         <div class="card">
-            <h4>Sales</h4>
-            <strong id="reportSales">৳0.00</strong>
+            <h3>Total Sales</h3>
+            <div class="number" id="reportSales">৳0</div>
         </div>
 
         <div class="card">
-            <h4>Purchase</h4>
-            <strong id="reportPurchase">৳0.00</strong>
+            <h3>Total Purchase</h3>
+            <div class="number" id="reportPurchase">৳0</div>
         </div>
 
         <div class="card">
-            <h4>Gross Profit</h4>
-            <strong id="reportGross">৳0.00</strong>
+            <h3>Gross Profit</h3>
+            <div class="number" id="reportGross">৳0</div>
         </div>
 
         <div class="card">
-            <h4>Expense</h4>
-            <strong id="reportExpense">৳0.00</strong>
+            <h3>Expenses</h3>
+            <div class="number" id="reportExpense">৳0</div>
         </div>
 
         <div class="card">
-            <h4>Net Profit</h4>
-            <strong id="reportNet">৳0.00</strong>
+            <h3>Net Profit</h3>
+            <div class="number" id="reportNet">৳0</div>
         </div>
 
         <div class="card">
-            <h4>Due</h4>
-            <strong id="reportDue">৳0.00</strong>
+            <h3>Total Due</h3>
+            <div class="number" id="reportDue">৳0</div>
         </div>
 
         <div class="card">
-            <h4>Stock</h4>
-            <strong id="reportStock">৳0.00</strong>
+            <h3>Stock Value</h3>
+            <div class="number" id="reportStock">৳0</div>
         </div>
 
         <div class="card">
-            <h4>Cash</h4>
-            <strong id="reportCash">৳0.00</strong>
+            <h3>Cash / Balance</h3>
+            <div class="number" id="reportCash">৳0</div>
         </div>
 
         <div class="card">
-            <h4>Products</h4>
-            <strong id="reportProducts">0</strong>
+            <h3>Total Products</h3>
+            <div class="number" id="reportProducts">0</div>
         </div>
 
     </div>
 
 </section>
 
-
-        </div>
-
-    </main>
-
 </div>
 
 
 <script>
-"use strict";
 
 /* =====================================================
-   SMART STORE
-   FIREBASE FREE
-   LOCAL STORAGE DATABASE
+   DATABASE
 ===================================================== */
 
-const DB_KEY = "smartStoreDB";
-const AUTH_KEY = "smartStoreLoggedIn";
+let db = JSON.parse(localStorage.getItem("smartStoreDB")) || {
 
-const $ = id => document.getElementById(id);
+    products: [],
+    sales: [],
+    purchases: [],
+    customers: [],
+    expenses: []
 
-
-/* ================= AUTH ================= */
-
-function isLoggedIn(){
-    return localStorage.getItem(AUTH_KEY) === "true";
-}
-
-function loginUser(e){
-
-    if(e) e.preventDefault();
-
-    const username = $("loginUsername").value.trim();
-    const password = $("loginPassword").value;
-
-    if(username === "admin" && password === "123456"){
-
-        localStorage.setItem(AUTH_KEY,"true");
-
-        showApp();
-
-    }else{
-
-        alert("❌ Username অথবা Password ভুল!");
-
-    }
-}
-
-function logout(){
-
-    if(confirm("আপনি কি Logout করতে চান?")){
-
-        localStorage.removeItem(AUTH_KEY);
-
-        showLogin();
-
-    }
-
-}
-
-function showApp(){
-
-    $("loginPage").style.display = "none";
-    $("app").style.display = "block";
-
-    showPage("dashboard");
-
-    renderAll();
-
-}
-
-function showLogin(){
-
-    $("loginPage").style.display = "flex";
-    $("app").style.display = "none";
-
-    $("loginUsername").value = "";
-    $("loginPassword").value = "";
-
-    setTimeout(()=>{
-        $("loginUsername").focus();
-    },100);
-
-}
+};
 
 
-/* ================= DATABASE ================= */
-
-function defaultDB(){
-
-    return {
-        products:[],
-        sales:[],
-        purchases:[],
-        customers:[],
-        expenses:[]
-    };
-
-}
-
-function loadDB(){
-
-    try{
-
-        const saved = localStorage.getItem(DB_KEY);
-
-        if(!saved){
-            return defaultDB();
-        }
-
-        const data = JSON.parse(saved);
-
-        return {
-
-            products:Array.isArray(data.products)
-                ? data.products : [],
-
-            sales:Array.isArray(data.sales)
-                ? data.sales : [],
-
-            purchases:Array.isArray(data.purchases)
-                ? data.purchases : [],
-
-            customers:Array.isArray(data.customers)
-                ? data.customers : [],
-
-            expenses:Array.isArray(data.expenses)
-                ? data.expenses : []
-
-        };
-
-    }catch(error){
-
-        console.error(error);
-
-        return defaultDB();
-
-    }
-
-}
-
-let db = loadDB();
-
+/* =====================================================
+   SAVE
+===================================================== */
 
 function save(){
 
-    try{
+    localStorage.setItem(
+        "smartStoreDB",
+        JSON.stringify(db)
+    );
 
-        localStorage.setItem(
-            DB_KEY,
-            JSON.stringify(db)
-        );
-
-        renderAll();
-
-    }catch(error){
-
-        console.error(error);
-
-        alert("❌ Data save করা যাচ্ছে না!");
-
-    }
-
+    renderAll();
 }
 
 
-/* ================= HELPERS ================= */
+/* =====================================================
+   TODAY
+===================================================== */
 
 function today(){
 
-    const d = new Date();
+    let d = new Date();
 
-    return d.getFullYear()+"-"+
-        String(d.getMonth()+1).padStart(2,"0")+"-"+
-        String(d.getDate()).padStart(2,"0");
+    let month = String(d.getMonth()+1).padStart(2,"0");
+    let day = String(d.getDate()).padStart(2,"0");
 
-}
-
-function money(value){
-
-    return "৳"+Number(value||0)
-        .toLocaleString("en-BD",{
-            minimumFractionDigits:2,
-            maximumFractionDigits:2
-        });
-
-}
-
-function escapeHTML(value){
-
-    return String(value ?? "")
-        .replace(/&/g,"&amp;")
-        .replace(/</g,"&lt;")
-        .replace(/>/g,"&gt;")
-        .replace(/"/g,"&quot;")
-        .replace(/'/g,"&#039;");
-
+    return d.getFullYear()+"-"+month+"-"+day;
 }
 
 
-/* ================= PAGE ================= */
+/* =====================================================
+   PAGE NAVIGATION
+===================================================== */
 
 function showPage(page,button){
 
-    document.querySelectorAll(".page")
-        .forEach(p=>p.classList.remove("active"));
+    document.querySelectorAll(".page").forEach(p=>{
+        p.classList.remove("active");
+    });
 
-    const target = $(page);
+    document.getElementById(page).classList.add("active");
 
-    if(target){
-        target.classList.add("active");
-    }
+    document.querySelectorAll(".menu button").forEach(b=>{
+        b.classList.remove("active");
+    });
 
-    document.querySelectorAll(".menu button")
-        .forEach(b=>b.classList.remove("active"));
+    button.classList.add("active");
 
-    if(button){
-        button.classList.add("active");
-    }else{
-
-        document.querySelectorAll(".menu button")
-            .forEach(b=>{
-
-                if(
-                    b.getAttribute("onclick") &&
-                    b.getAttribute("onclick").includes(
-                        "showPage('"+page+"'"
-                    )
-                ){
-                    b.classList.add("active");
-                }
-
-            });
-
-    }
-
-    const titles = {
+    let titles = {
 
         dashboard:"🏠 Dashboard",
         products:"📦 Products",
@@ -1356,77 +1045,69 @@ function showPage(page,button){
 
     };
 
-    $("pageTitle").innerText =
-        titles[page] || "Smart Store";
+    document.getElementById("pageTitle").innerText =
+        titles[page];
 
 }
 
 
-/* ================= PRODUCT ================= */
+/* =====================================================
+   MONEY
+===================================================== */
 
-function findProduct(name){
+function money(n){
 
-    const n = String(name||"")
-        .trim()
-        .toLowerCase();
-
-    return db.products.find(
-        p =>
-        String(p.name||"")
-        .trim()
-        .toLowerCase() === n
+    return "৳" + Number(n || 0).toLocaleString(
+        "en-BD",
+        {
+            minimumFractionDigits:2,
+            maximumFractionDigits:2
+        }
     );
 
 }
 
 
-function resetProductForm(){
+/* =====================================================
+   PRODUCT
+===================================================== */
 
-    $("productForm").reset();
-
-    $("productId").value = "";
-
-    $("productSubmit").innerText =
-        "➕ Add Product";
-
-}
-
-
-function saveProduct(e){
+productForm.addEventListener("submit",function(e){
 
     e.preventDefault();
 
-    const id = $("productId").value;
-    const name = $("productName").value.trim();
+    let id = productId.value;
 
-    if(!name){
+    let product = {
+
+        id:id || Date.now().toString(),
+
+        name:productName.value.trim(),
+
+        code:productCode.value.trim(),
+
+        buy:Number(productBuy.value || 0),
+
+        sell:Number(productSell.value || 0),
+
+        stock:Number(productStock.value || 0)
+
+    };
+
+
+    if(!product.name){
 
         alert("Product Name লিখুন");
         return;
 
     }
 
-    const product = {
-
-        id:id || Date.now().toString(),
-
-        name:name,
-
-        code:$("productCode").value.trim(),
-
-        buy:Number($("productBuy").value||0),
-
-        sell:Number($("productSell").value||0),
-
-        stock:Number($("productStock").value||0)
-
-    };
-
 
     if(id){
 
-        const index =
-            db.products.findIndex(p=>p.id===id);
+        let index = db.products.findIndex(
+            p => p.id === id
+        );
 
         if(index !== -1){
 
@@ -1436,50 +1117,46 @@ function saveProduct(e){
 
     }else{
 
-        if(findProduct(name)){
-
-            alert("❌ এই Product আগে থেকেই আছে!");
-            return;
-
-        }
-
         db.products.push(product);
 
     }
+
 
     resetProductForm();
 
     save();
 
-    alert("✅ Product Saved");
+    alert("Product Successfully Saved");
 
-}
+});
 
 
 function editProduct(id){
 
-    const p = db.products.find(x=>x.id===id);
+    let p = db.products.find(x=>x.id===id);
 
     if(!p) return;
 
-    $("productId").value = p.id;
-    $("productName").value = p.name;
-    $("productCode").value = p.code || "";
-    $("productBuy").value = p.buy || 0;
-    $("productSell").value = p.sell || 0;
-    $("productStock").value = p.stock || 0;
+    productId.value=p.id;
+    productName.value=p.name;
+    productCode.value=p.code;
+    productBuy.value=p.buy;
+    productSell.value=p.sell;
+    productStock.value=p.stock;
 
-    $("productSubmit").innerText =
-        "💾 Update Product";
+    productSubmit.innerText="💾 Update Product";
 
-    showPage("products");
+    window.scrollTo({
+        top:0,
+        behavior:"smooth"
+    });
 
 }
 
 
 function deleteProduct(id){
 
-    if(!confirm("Product Delete করবেন?")) return;
+    if(!confirm("এই Product Delete করতে চান?")) return;
 
     db.products =
         db.products.filter(p=>p.id!==id);
@@ -1489,51 +1166,40 @@ function deleteProduct(id){
 }
 
 
-/* ================= SALES ================= */
+function resetProductForm(){
 
-function updateSaleProductOptions(){
+    productForm.reset();
 
-    const select = $("saleProduct");
+    productId.value="";
 
-    if(!select) return;
+    productSubmit.innerText="➕ Add Product";
 
-    const current = select.value;
+}
 
-    let html =
-        `<option value="">Select Product</option>`;
 
-    db.products.forEach(p=>{
+/* =====================================================
+   SALES AUTO PRICE
+===================================================== */
 
-        html += `
-            <option value="${escapeHTML(p.name)}">
-                ${escapeHTML(p.name)}
-                (Stock: ${p.stock})
-            </option>
-        `;
+function findProduct(name){
 
-    });
-
-    select.innerHTML = html;
-
-    if(
-        [...select.options]
-        .some(o=>o.value===current)
-    ){
-        select.value=current;
-    }
+    return db.products.find(
+        p => p.name.trim().toLowerCase() ===
+             name.trim().toLowerCase()
+    );
 
 }
 
 
 function autoSalePrice(){
 
-    const p =
-        findProduct($("saleProduct").value);
+    let p = findProduct(saleProduct.value);
 
     if(p){
 
-        $("salePrice").value = p.sell;
-        $("saleCost").value = p.buy;
+        salePrice.value=p.sell;
+
+        saleCost.value=p.buy;
 
     }
 
@@ -1544,88 +1210,57 @@ function autoSalePrice(){
 
 function calculateSale(){
 
-    const qty =
-        Number($("saleQty").value||0);
+    let qty=Number(saleQty.value||0);
+    let price=Number(salePrice.value||0);
+    let paid=Number(salePaid.value||0);
 
-    const price =
-        Number($("salePrice").value||0);
+    let total=qty*price;
 
-    const paid =
-        Number($("salePaid").value||0);
+    let due=Math.max(0,total-paid);
 
-    const total = qty * price;
+    saleTotal.value=total.toFixed(2);
 
-    const due =
-        Math.max(0,total-paid);
+    saleDue.value=due.toFixed(2);
 
-    $("saleTotal").value =
-        total.toFixed(2);
-
-    $("saleDue").value =
-        due.toFixed(2);
-
-    const p =
-        findProduct($("saleProduct").value);
+    let p=findProduct(saleProduct.value);
 
     if(p){
 
-        $("saleCost").value =
-            p.buy;
-
-    }else{
-
-        $("saleCost").value = 0;
+        saleCost.value=p.buy;
 
     }
 
 }
 
 
-function resetSaleForm(){
+/* =====================================================
+   SALES
+===================================================== */
 
-    $("salesForm").reset();
-
-    $("saleId").value="";
-    $("saleDate").value=today();
-    $("saleQty").value=1;
-    $("salePaid").value=0;
-    $("saleTotal").value=0;
-    $("saleDue").value=0;
-    $("saleCost").value=0;
-
-    $("saleSubmit").innerText =
-        "➕ Add Sale";
-
-}
-
-
-function saveSale(e){
+salesForm.addEventListener("submit",function(e){
 
     e.preventDefault();
 
-    const id = $("saleId").value;
+    let id=saleId.value;
 
-    const name =
-        $("saleProduct").value.trim();
+    let name=saleProduct.value.trim();
 
-    const qty =
-        Number($("saleQty").value||0);
+    let qty=Number(saleQty.value);
 
-    const price =
-        Number($("salePrice").value||0);
+    let price=Number(salePrice.value);
 
-    const paid =
-        Number($("salePaid").value||0);
+    let paid=Number(salePaid.value||0);
 
-    const product =
-        findProduct(name);
+    let product=findProduct(name);
 
-    if(!product){
 
-        alert("❌ Product পাওয়া যায়নি");
+    if(!name){
+
+        alert("Product Name লিখুন");
         return;
 
     }
+
 
     if(qty<=0){
 
@@ -1634,32 +1269,33 @@ function saveSale(e){
 
     }
 
-    const total = qty*price;
+
+    let total=qty*price;
+
 
     if(paid>total){
 
-        alert("Paid বেশি হতে পারবে না");
+        alert("Paid Total-এর চেয়ে বেশি হতে পারবে না");
         return;
 
     }
 
 
-    /* EDIT */
+    /* EDIT হলে পুরোনো stock ফেরত */
 
     if(id){
 
-        const old =
-            db.sales.find(s=>s.id===id);
+        let old=db.sales.find(
+            s=>s.id===id
+        );
 
         if(old){
 
-            const oldProduct =
-                findProduct(old.product);
+            let oldProduct=findProduct(old.product);
 
             if(oldProduct){
 
-                oldProduct.stock +=
-                    Number(old.qty||0);
+                oldProduct.stock += Number(old.qty);
 
             }
 
@@ -1668,44 +1304,67 @@ function saveSale(e){
     }
 
 
-    if(product.stock < qty){
+    /* নতুন stock check */
 
-        if(id){
+    product=findProduct(name);
 
-            const old =
-                db.sales.find(s=>s.id===id);
+    let cost=0;
 
-            if(old){
 
-                const oldProduct =
-                    findProduct(old.product);
+    if(product){
 
-                if(oldProduct){
+        if(product.stock < qty){
 
-                    oldProduct.stock -=
-                        Number(old.qty||0);
+            alert(
+                "Stock পর্যাপ্ত নেই। Current Stock: "
+                + product.stock
+            );
+
+            /* EDIT reverse undo */
+
+            if(id){
+
+                let old=db.sales.find(
+                    s=>s.id===id
+                );
+
+                if(old){
+
+                    let oldProduct=findProduct(old.product);
+
+                    if(oldProduct){
+
+                        oldProduct.stock -= Number(old.qty);
+
+                    }
 
                 }
 
             }
 
+            return;
+
         }
 
-        alert("❌ Stock পর্যাপ্ত নেই");
-        return;
+
+        product.stock -= qty;
+
+        cost=qty*product.buy;
+
+    }else{
+
+        /* Product না থাকলে sale cost 0 */
+
+        cost=0;
 
     }
 
 
-    product.stock -= qty;
-
-
-    const sale = {
+    let sale={
 
         id:id || Date.now().toString(),
 
-        date:
-            $("saleDate").value || today(),
+        date:saleDate.value,
 
         product:name,
 
@@ -1717,22 +1376,20 @@ function saveSale(e){
 
         paid:paid,
 
-        due:
-            Math.max(0,total-paid),
+        due:Math.max(0,total-paid),
 
-        customer:
-            $("saleCustomer").value.trim(),
+        customer:saleCustomer.value.trim(),
 
-        cost:
-            qty * Number(product.buy||0)
+        cost:cost
 
     };
 
 
     if(id){
 
-        const index =
-            db.sales.findIndex(s=>s.id===id);
+        let index=db.sales.findIndex(
+            s=>s.id===id
+        );
 
         if(index!==-1){
 
@@ -1751,115 +1408,136 @@ function saveSale(e){
 
     save();
 
-    alert("✅ Sale Saved");
+    alert("Sale Successfully Saved");
 
-}
+});
 
 
 function editSale(id){
 
-    const s =
-        db.sales.find(x=>x.id===id);
+    let s=db.sales.find(
+        x=>x.id===id
+    );
 
     if(!s) return;
 
-    $("saleId").value=s.id;
-    $("saleDate").value=s.date;
-    $("saleProduct").value=s.product;
-    $("saleQty").value=s.qty;
-    $("salePrice").value=s.price;
-    $("saleCustomer").value=s.customer||"";
-    $("salePaid").value=s.paid;
-    $("saleTotal").value=s.total;
-    $("saleDue").value=s.due;
-    $("saleCost").value=s.cost;
 
-    $("saleSubmit").innerText =
-        "💾 Update Sale";
+    saleId.value=s.id;
+    saleDate.value=s.date;
+    saleProduct.value=s.product;
+    saleQty.value=s.qty;
+    salePrice.value=s.price;
+    saleCustomer.value=s.customer;
+    salePaid.value=s.paid;
+    saleTotal.value=s.total;
+    saleDue.value=s.due;
+    saleCost.value=s.cost;
 
-    showPage("sales");
+
+    saleSubmit.innerText="💾 Update Sale";
+
+    showPage(
+        "sales",
+        document.querySelectorAll(".menu button")[2]
+    );
 
 }
 
 
 function deleteSale(id){
 
-    if(!confirm("Sale Delete করবেন?")) return;
+    if(!confirm("এই Sale Delete করতে চান?")) return;
 
-    const sale =
-        db.sales.find(s=>s.id===id);
+
+    let sale=db.sales.find(
+        s=>s.id===id
+    );
+
 
     if(sale){
 
-        const product =
-            findProduct(sale.product);
+        let product=findProduct(sale.product);
 
         if(product){
 
-            product.stock +=
-                Number(sale.qty||0);
+            /* Sale delete হলে stock + */
+
+            product.stock += Number(sale.qty);
 
         }
 
     }
 
-    db.sales =
-        db.sales.filter(s=>s.id!==id);
+
+    db.sales=db.sales.filter(
+        s=>s.id!==id
+    );
+
 
     save();
 
 }
 
 
-/* ================= PURCHASE ================= */
+function resetSaleForm(){
+
+    salesForm.reset();
+
+    saleId.value="";
+
+    saleDate.value=today();
+
+    salePaid.value=0;
+
+    saleTotal.value=0;
+
+    saleDue.value=0;
+
+    saleCost.value=0;
+
+    saleSubmit.innerText="➕ Add Sale";
+
+}
+
+
+/* =====================================================
+   PURCHASE AUTO PRICE
+===================================================== */
 
 function autoPurchasePrice(){
 
-    const p =
-        findProduct(
-            $("purchaseProduct").value
-        );
+    let p=findProduct(
+        purchaseProduct.value
+    );
 
     if(p){
 
-        $("purchasePrice").value=p.buy;
-        $("purchaseSell").value=p.sell;
+        purchasePrice.value=p.buy;
+
+        purchaseSell.value=p.sell;
 
     }
 
 }
 
 
-function resetPurchaseForm(){
+/* =====================================================
+   PURCHASE
+===================================================== */
 
-    $("purchaseForm").reset();
-
-    $("purchaseId").value="";
-    $("purchaseDate").value=today();
-    $("purchaseSubmit").innerText =
-        "➕ Add Purchase";
-
-}
-
-
-function savePurchase(e){
+purchaseForm.addEventListener("submit",function(e){
 
     e.preventDefault();
 
-    const id =
-        $("purchaseId").value;
+    let id=purchaseId.value;
 
-    const name =
-        $("purchaseProduct").value.trim();
+    let name=purchaseProduct.value.trim();
 
-    const qty =
-        Number($("purchaseQty").value||0);
+    let qty=Number(purchaseQty.value);
 
-    const price =
-        Number($("purchasePrice").value||0);
+    let price=Number(purchasePrice.value);
 
-    const sell =
-        Number($("purchaseSell").value||0);
+    let sell=Number(purchaseSell.value||0);
 
 
     if(!name){
@@ -1869,6 +1547,7 @@ function savePurchase(e){
 
     }
 
+
     if(qty<=0){
 
         alert("Quantity সঠিকভাবে লিখুন");
@@ -1877,26 +1556,21 @@ function savePurchase(e){
     }
 
 
-    /* EDIT OLD STOCK */
+    /* EDIT হলে পুরোনো purchase reverse */
 
     if(id){
 
-        const old =
-            db.purchases.find(p=>p.id===id);
+        let old=db.purchases.find(
+            p=>p.id===id
+        );
 
         if(old){
 
-            const oldProduct =
-                findProduct(old.product);
+            let oldProduct=findProduct(old.product);
 
             if(oldProduct){
 
-                oldProduct.stock =
-                    Math.max(
-                        0,
-                        Number(oldProduct.stock||0) -
-                        Number(old.qty||0)
-                    );
+                oldProduct.stock -= Number(old.qty);
 
             }
 
@@ -1905,22 +1579,26 @@ function savePurchase(e){
     }
 
 
-    let product =
-        findProduct(name);
+    let product=findProduct(name);
 
 
     if(product){
 
         product.stock += qty;
-        product.buy = price;
+
+        product.buy=price;
 
         if(sell>0){
-            product.sell = sell;
+
+            product.sell=sell;
+
         }
 
     }else{
 
-        product = {
+        /* নতুন product automatic create */
+
+        product={
 
             id:Date.now().toString(),
 
@@ -1936,17 +1614,17 @@ function savePurchase(e){
 
         };
 
+
         db.products.push(product);
 
     }
 
 
-    const purchase = {
+    let purchase={
 
         id:id || Date.now().toString(),
 
-        date:
-            $("purchaseDate").value || today(),
+        date:purchaseDate.value,
 
         product:name,
 
@@ -1956,18 +1634,16 @@ function savePurchase(e){
 
         total:qty*price,
 
-        supplier:
-            $("purchaseSupplier").value.trim()
+        supplier:purchaseSupplier.value.trim()
 
     };
 
 
     if(id){
 
-        const index =
-            db.purchases.findIndex(
-                p=>p.id===id
-            );
+        let index=db.purchases.findIndex(
+            p=>p.id===id
+        );
 
         if(index!==-1){
 
@@ -1986,99 +1662,131 @@ function savePurchase(e){
 
     save();
 
-    alert("✅ Purchase Saved");
+    alert("Purchase Successfully Saved");
 
-}
+});
 
 
 function editPurchase(id){
 
-    const p =
-        db.purchases.find(x=>x.id===id);
+    let p=db.purchases.find(
+        x=>x.id===id
+    );
 
     if(!p) return;
 
-    $("purchaseId").value=p.id;
-    $("purchaseDate").value=p.date;
-    $("purchaseProduct").value=p.product;
-    $("purchaseQty").value=p.qty;
-    $("purchasePrice").value=p.price;
-    $("purchaseSupplier").value=
-        p.supplier||"";
 
-    const product =
-        findProduct(p.product);
+    purchaseId.value=p.id;
+    purchaseDate.value=p.date;
+    purchaseProduct.value=p.product;
+    purchaseQty.value=p.qty;
+    purchasePrice.value=p.price;
+    purchaseSupplier.value=p.supplier;
 
-    $("purchaseSell").value =
+
+    let product=findProduct(p.product);
+
+    purchaseSell.value=
         product ? product.sell : "";
 
-    $("purchaseSubmit").innerText =
+
+    purchaseSubmit.innerText=
         "💾 Update Purchase";
 
-    showPage("purchase");
+
+    showPage(
+        "purchase",
+        document.querySelectorAll(".menu button")[3]
+    );
 
 }
 
 
 function deletePurchase(id){
 
-    if(!confirm("Purchase Delete করবেন?"))
-        return;
+    if(!confirm("এই Purchase Delete করতে চান?")) return;
 
-    const purchase =
-        db.purchases.find(p=>p.id===id);
+
+    let purchase=db.purchases.find(
+        p=>p.id===id
+    );
+
 
     if(purchase){
 
-        const product =
-            findProduct(purchase.product);
+        let product=findProduct(
+            purchase.product
+        );
 
         if(product){
 
-            product.stock =
-                Math.max(
-                    0,
-                    Number(product.stock||0) -
-                    Number(purchase.qty||0)
-                );
+            /* Purchase delete হলে stock - */
+
+            product.stock -= Number(
+                purchase.qty
+            );
 
         }
 
     }
 
-    db.purchases =
-        db.purchases.filter(p=>p.id!==id);
+
+    db.purchases=db.purchases.filter(
+        p=>p.id!==id
+    );
+
 
     save();
 
 }
 
 
-/* ================= CUSTOMER ================= */
+function resetPurchaseForm(){
 
-function resetCustomerForm(){
+    purchaseForm.reset();
 
-    $("customerForm").reset();
+    purchaseId.value="";
 
-    $("customerId").value="";
-    $("customerDate").value=today();
-    $("customerDue").value=0;
-    $("customerPayment").value=0;
+    purchaseDate.value=today();
+
+    purchaseSubmit.innerText=
+        "➕ Add Purchase";
 
 }
 
 
-function saveCustomer(e){
+/* =====================================================
+   CUSTOMER
+===================================================== */
+
+customerForm.addEventListener("submit",function(e){
 
     e.preventDefault();
 
-    const id =
-        $("customerId").value;
 
-    const name =
-        $("customerName").value.trim();
+    let id=customerId.value;
 
-    if(!name){
+
+    let customer={
+
+        id:id || Date.now().toString(),
+
+        date:customerDate.value,
+
+        name:customerName.value.trim(),
+
+        mobile:customerMobile.value.trim(),
+
+        address:customerAddress.value.trim(),
+
+        due:Number(customerDue.value||0),
+
+        payment:Number(customerPayment.value||0)
+
+    };
+
+
+    if(!customer.name){
 
         alert("Customer Name লিখুন");
         return;
@@ -2086,36 +1794,11 @@ function saveCustomer(e){
     }
 
 
-    const customer = {
-
-        id:id || Date.now().toString(),
-
-        date:
-            $("customerDate").value || today(),
-
-        name:name,
-
-        mobile:
-            $("customerMobile").value.trim(),
-
-        address:
-            $("customerAddress").value.trim(),
-
-        due:
-            Number($("customerDue").value||0),
-
-        payment:
-            Number($("customerPayment").value||0)
-
-    };
-
-
     if(id){
 
-        const index =
-            db.customers.findIndex(
-                c=>c.id===id
-            );
+        let index=db.customers.findIndex(
+            c=>c.id===id
+        );
 
         if(index!==-1){
 
@@ -2134,78 +1817,99 @@ function saveCustomer(e){
 
     save();
 
-    alert("✅ Customer Saved");
+    alert("Customer Saved");
 
-}
+});
 
 
 function editCustomer(id){
 
-    const c =
-        db.customers.find(x=>x.id===id);
+    let c=db.customers.find(
+        x=>x.id===id
+    );
 
     if(!c) return;
 
-    $("customerId").value=c.id;
-    $("customerDate").value=c.date;
-    $("customerName").value=c.name;
-    $("customerMobile").value=c.mobile||"";
-    $("customerAddress").value=c.address||"";
-    $("customerDue").value=c.due||0;
-    $("customerPayment").value=c.payment||0;
 
-    showPage("customers");
+    customerId.value=c.id;
+    customerDate.value=c.date;
+    customerName.value=c.name;
+    customerMobile.value=c.mobile;
+    customerAddress.value=c.address;
+    customerDue.value=c.due;
+    customerPayment.value=c.payment;
 
 }
 
 
 function deleteCustomer(id){
 
-    if(!confirm("Customer Delete করবেন?"))
+    if(!confirm("Customer Delete করতে চান?"))
         return;
 
-    db.customers =
-        db.customers.filter(c=>c.id!==id);
+
+    db.customers=
+        db.customers.filter(
+            c=>c.id!==id
+        );
+
 
     save();
 
 }
 
 
-/* ================= EXPENSE ================= */
+function resetCustomerForm(){
 
-function resetExpenseForm(){
+    customerForm.reset();
 
-    $("expenseForm").reset();
+    customerId.value="";
 
-    $("expenseId").value="";
-    $("expenseDate").value=today();
+    customerDate.value=today();
+
+    customerDue.value=0;
+
+    customerPayment.value=0;
 
 }
 
 
-function saveExpense(e){
+/* =====================================================
+   EXPENSE
+===================================================== */
+
+expenseForm.addEventListener("submit",function(e){
 
     e.preventDefault();
 
-    const id =
-        $("expenseId").value;
 
-    const name =
-        $("expenseName").value.trim();
-
-    const amount =
-        Number($("expenseAmount").value||0);
+    let id=expenseId.value;
 
 
-    if(!name){
+    let expense={
+
+        id:id || Date.now().toString(),
+
+        date:expenseDate.value,
+
+        name:expenseName.value.trim(),
+
+        amount:Number(expenseAmount.value||0),
+
+        note:expenseNote.value.trim()
+
+    };
+
+
+    if(!expense.name){
 
         alert("Expense Name লিখুন");
         return;
 
     }
 
-    if(amount<=0){
+
+    if(expense.amount<=0){
 
         alert("Amount লিখুন");
         return;
@@ -2213,29 +1917,11 @@ function saveExpense(e){
     }
 
 
-    const expense = {
-
-        id:id || Date.now().toString(),
-
-        date:
-            $("expenseDate").value || today(),
-
-        name:name,
-
-        amount:amount,
-
-        note:
-            $("expenseNote").value.trim()
-
-    };
-
-
     if(id){
 
-        const index =
-            db.expenses.findIndex(
-                e=>e.id===id
-            );
+        let index=db.expenses.findIndex(
+            x=>x.id===id
+        );
 
         if(index!==-1){
 
@@ -2254,529 +1940,574 @@ function saveExpense(e){
 
     save();
 
-    alert("✅ Expense Saved");
+    alert("Expense Saved");
 
-}
+});
 
 
 function editExpense(id){
 
-    const e =
-        db.expenses.find(x=>x.id===id);
+    let e=db.expenses.find(
+        x=>x.id===id
+    );
 
     if(!e) return;
 
-    $("expenseId").value=e.id;
-    $("expenseDate").value=e.date;
-    $("expenseName").value=e.name;
-    $("expenseAmount").value=e.amount;
-    $("expenseNote").value=e.note||"";
 
-    showPage("expenses");
+    expenseId.value=e.id;
+    expenseDate.value=e.date;
+    expenseName.value=e.name;
+    expenseAmount.value=e.amount;
+    expenseNote.value=e.note;
 
 }
 
 
 function deleteExpense(id){
 
-    if(!confirm("Expense Delete করবেন?"))
+    if(!confirm("Expense Delete করতে চান?"))
         return;
 
-    db.expenses =
-        db.expenses.filter(e=>e.id!==id);
+
+    db.expenses=db.expenses.filter(
+        e=>e.id!==id
+    );
+
 
     save();
 
 }
 
 
-/* ================= RENDER PRODUCTS ================= */
+function resetExpenseForm(){
 
-function renderProducts(){
+    expenseForm.reset();
 
-    const table =
-        $("productTable");
+    expenseId.value="";
 
-    if(!table) return;
-
-
-    if(!db.products.length){
-
-        table.innerHTML =
-            `<tr>
-                <td colspan="7" class="empty">
-                    কোনো Product নেই
-                </td>
-            </tr>`;
-
-        return;
-
-    }
-
-
-    let html="";
-
-
-    db.products.forEach(p=>{
-
-        html += `
-
-        <tr>
-
-            <td>${escapeHTML(p.name)}</td>
-
-            <td>${escapeHTML(p.code||"-")}</td>
-
-            <td>${money(p.buy)}</td>
-
-            <td>${money(p.sell)}</td>
-
-            <td>${p.stock}</td>
-
-            <td>
-                ${money(
-                    Number(p.stock||0) *
-                    Number(p.buy||0)
-                )}
-            </td>
-
-            <td>
-
-                <button
-                    class="btn btn-warning"
-                    onclick="editProduct('${p.id}')"
-                >
-                    Edit
-                </button>
-
-                <button
-                    class="btn btn-danger"
-                    onclick="deleteProduct('${p.id}')"
-                >
-                    Delete
-                </button>
-
-            </td>
-
-        </tr>
-
-        `;
-
-    });
-
-
-    table.innerHTML=html;
+    expenseDate.value=today();
 
 }
 
 
-/* ================= RENDER SALES ================= */
+/* =====================================================
+   RENDER PRODUCTS
+===================================================== */
 
-function renderSales(){
-
-    const table=$("salesTable");
-
-    if(!table) return;
+function renderProducts(){
 
     let html="";
 
 
-    [...db.sales].reverse()
-        .forEach(s=>{
+    if(db.products.length===0){
 
-        html += `
-
+        html=`
         <tr>
-
-            <td>${escapeHTML(s.date)}</td>
-
-            <td>${escapeHTML(s.product)}</td>
-
-            <td>${s.qty}</td>
-
-            <td>${money(s.price)}</td>
-
-            <td>${money(s.total)}</td>
-
-            <td>${escapeHTML(s.customer||"-")}</td>
-
-            <td>${money(s.paid)}</td>
-
-            <td>${money(s.due)}</td>
-
-            <td>
-
-                <button
-                    class="btn btn-warning"
-                    onclick="editSale('${s.id}')"
-                >
-                    Edit
-                </button>
-
-                <button
-                    class="btn btn-danger"
-                    onclick="deleteSale('${s.id}')"
-                >
-                    Delete
-                </button>
-
+            <td colspan="7" class="empty">
+                কোনো Product নেই
             </td>
+        </tr>`;
 
-        </tr>
+    }else{
 
-        `;
+        db.products.forEach(p=>{
 
-    });
+            html+=`
+
+            <tr>
+
+                <td>${escapeHTML(p.name)}</td>
+
+                <td>${escapeHTML(p.code || "-")}</td>
+
+                <td>${money(p.buy)}</td>
+
+                <td>${money(p.sell)}</td>
+
+                <td>
+                    <span class="badge ${
+                        p.stock>0
+                        ?"badge-green"
+                        :"badge-red"
+                    }">
+                        ${p.stock}
+                    </span>
+                </td>
+
+                <td>
+                    ${money(p.stock*p.buy)}
+                </td>
+
+                <td>
+
+                    <div class="action-buttons">
+
+                        <button
+                            class="btn btn-warning"
+                            onclick="editProduct('${p.id}')">
+                            Edit
+                        </button>
+
+                        <button
+                            class="btn btn-danger"
+                            onclick="deleteProduct('${p.id}')">
+                            Delete
+                        </button>
+
+                    </div>
+
+                </td>
+
+            </tr>
+
+            `;
+
+        });
+
+    }
 
 
-    table.innerHTML =
-        html ||
-        `<tr>
+    productTable.innerHTML=html;
+
+}
+
+
+/* =====================================================
+   RENDER SALES
+===================================================== */
+
+function renderSales(){
+
+    let html="";
+
+
+    if(db.sales.length===0){
+
+        html=`
+        <tr>
             <td colspan="9" class="empty">
                 কোনো Sale নেই
             </td>
         </tr>`;
 
+    }else{
+
+        [...db.sales]
+        .reverse()
+        .forEach(s=>{
+
+            html+=`
+
+            <tr>
+
+                <td>${s.date}</td>
+
+                <td>${escapeHTML(s.product)}</td>
+
+                <td>${s.qty}</td>
+
+                <td>${money(s.price)}</td>
+
+                <td>${money(s.total)}</td>
+
+                <td>${escapeHTML(s.customer || "-")}</td>
+
+                <td>${money(s.paid)}</td>
+
+                <td>
+                    <span class="badge ${
+                        s.due>0
+                        ?"badge-red"
+                        :"badge-green"
+                    }">
+                        ${money(s.due)}
+                    </span>
+                </td>
+
+                <td>
+
+                    <div class="action-buttons">
+
+                        <button
+                            class="btn btn-warning"
+                            onclick="editSale('${s.id}')">
+                            Edit
+                        </button>
+
+                        <button
+                            class="btn btn-danger"
+                            onclick="deleteSale('${s.id}')">
+                            Delete
+                        </button>
+
+                    </div>
+
+                </td>
+
+            </tr>
+
+            `;
+
+        });
+
+    }
+
+
+    salesTable.innerHTML=html;
+
 }
 
 
-/* ================= RENDER PURCHASE ================= */
+/* =====================================================
+   RENDER PURCHASE
+===================================================== */
 
 function renderPurchases(){
-
-    const table=$("purchaseTable");
-
-    if(!table) return;
 
     let html="";
 
 
-    [...db.purchases].reverse()
-        .forEach(p=>{
+    if(db.purchases.length===0){
 
-        html += `
-
+        html=`
         <tr>
-
-            <td>${escapeHTML(p.date)}</td>
-
-            <td>${escapeHTML(p.product)}</td>
-
-            <td>${p.qty}</td>
-
-            <td>${money(p.price)}</td>
-
-            <td>${money(p.total)}</td>
-
-            <td>${escapeHTML(p.supplier||"-")}</td>
-
-            <td>
-
-                <button
-                    class="btn btn-warning"
-                    onclick="editPurchase('${p.id}')"
-                >
-                    Edit
-                </button>
-
-                <button
-                    class="btn btn-danger"
-                    onclick="deletePurchase('${p.id}')"
-                >
-                    Delete
-                </button>
-
-            </td>
-
-        </tr>
-
-        `;
-
-    });
-
-
-    table.innerHTML =
-        html ||
-        `<tr>
             <td colspan="7" class="empty">
                 কোনো Purchase নেই
             </td>
         </tr>`;
 
+    }else{
+
+        [...db.purchases]
+        .reverse()
+        .forEach(p=>{
+
+            html+=`
+
+            <tr>
+
+                <td>${p.date}</td>
+
+                <td>${escapeHTML(p.product)}</td>
+
+                <td>${p.qty}</td>
+
+                <td>${money(p.price)}</td>
+
+                <td>${money(p.total)}</td>
+
+                <td>${escapeHTML(p.supplier || "-")}</td>
+
+                <td>
+
+                    <div class="action-buttons">
+
+                        <button
+                            class="btn btn-warning"
+                            onclick="editPurchase('${p.id}')">
+                            Edit
+                        </button>
+
+                        <button
+                            class="btn btn-danger"
+                            onclick="deletePurchase('${p.id}')">
+                            Delete
+                        </button>
+
+                    </div>
+
+                </td>
+
+            </tr>
+
+            `;
+
+        });
+
+    }
+
+
+    purchaseTable.innerHTML=html;
+
 }
 
 
-/* ================= RENDER CUSTOMERS ================= */
+/* =====================================================
+   RENDER CUSTOMERS
+===================================================== */
 
 function renderCustomers(){
-
-    const table=$("customerTable");
-
-    if(!table) return;
 
     let html="";
 
 
-    [...db.customers].reverse()
-        .forEach(c=>{
+    if(db.customers.length===0){
 
-        const balance =
-            Number(c.due||0) -
-            Number(c.payment||0);
-
-
-        html += `
-
+        html=`
         <tr>
-
-            <td>${escapeHTML(c.date)}</td>
-
-            <td>${escapeHTML(c.name)}</td>
-
-            <td>${escapeHTML(c.mobile||"-")}</td>
-
-            <td>${escapeHTML(c.address||"-")}</td>
-
-            <td>${money(c.due)}</td>
-
-            <td>${money(c.payment)}</td>
-
-            <td>${money(balance)}</td>
-
-            <td>
-
-                <button
-                    class="btn btn-warning"
-                    onclick="editCustomer('${c.id}')"
-                >
-                    Edit
-                </button>
-
-                <button
-                    class="btn btn-danger"
-                    onclick="deleteCustomer('${c.id}')"
-                >
-                    Delete
-                </button>
-
-            </td>
-
-        </tr>
-
-        `;
-
-    });
-
-
-    table.innerHTML =
-        html ||
-        `<tr>
             <td colspan="8" class="empty">
                 কোনো Customer নেই
             </td>
         </tr>`;
 
+    }else{
+
+        [...db.customers]
+        .reverse()
+        .forEach(c=>{
+
+            let balance=
+                Number(c.due||0)
+                -
+                Number(c.payment||0);
+
+
+            html+=`
+
+            <tr>
+
+                <td>${c.date}</td>
+
+                <td>${escapeHTML(c.name)}</td>
+
+                <td>${escapeHTML(c.mobile || "-")}</td>
+
+                <td>${escapeHTML(c.address || "-")}</td>
+
+                <td>${money(c.due)}</td>
+
+                <td>${money(c.payment)}</td>
+
+                <td>
+
+                    <span class="badge ${
+                        balance>0
+                        ?"badge-red"
+                        :"badge-green"
+                    }">
+
+                        ${money(balance)}
+
+                    </span>
+
+                </td>
+
+                <td>
+
+                    <div class="action-buttons">
+
+                        <button
+                            class="btn btn-warning"
+                            onclick="editCustomer('${c.id}')">
+                            Edit
+                        </button>
+
+                        <button
+                            class="btn btn-danger"
+                            onclick="deleteCustomer('${c.id}')">
+                            Delete
+                        </button>
+
+                    </div>
+
+                </td>
+
+            </tr>
+
+            `;
+
+        });
+
+    }
+
+
+    customerTable.innerHTML=html;
+
 }
 
 
-/* ================= RENDER EXPENSE ================= */
+/* =====================================================
+   RENDER EXPENSES
+===================================================== */
 
 function renderExpenses(){
-
-    const table=$("expenseTable");
-
-    if(!table) return;
 
     let html="";
 
 
-    [...db.expenses].reverse()
-        .forEach(e=>{
+    if(db.expenses.length===0){
 
-        html += `
-
+        html=`
         <tr>
-
-            <td>${escapeHTML(e.date)}</td>
-
-            <td>${escapeHTML(e.name)}</td>
-
-            <td>${money(e.amount)}</td>
-
-            <td>${escapeHTML(e.note||"-")}</td>
-
-            <td>
-
-                <button
-                    class="btn btn-warning"
-                    onclick="editExpense('${e.id}')"
-                >
-                    Edit
-                </button>
-
-                <button
-                    class="btn btn-danger"
-                    onclick="deleteExpense('${e.id}')"
-                >
-                    Delete
-                </button>
-
-            </td>
-
-        </tr>
-
-        `;
-
-    });
-
-
-    table.innerHTML =
-        html ||
-        `<tr>
             <td colspan="5" class="empty">
                 কোনো Expense নেই
             </td>
         </tr>`;
 
+    }else{
+
+        [...db.expenses]
+        .reverse()
+        .forEach(e=>{
+
+            html+=`
+
+            <tr>
+
+                <td>${e.date}</td>
+
+                <td>${escapeHTML(e.name)}</td>
+
+                <td>${money(e.amount)}</td>
+
+                <td>${escapeHTML(e.note || "-")}</td>
+
+                <td>
+
+                    <div class="action-buttons">
+
+                        <button
+                            class="btn btn-warning"
+                            onclick="editExpense('${e.id}')">
+                            Edit
+                        </button>
+
+                        <button
+                            class="btn btn-danger"
+                            onclick="deleteExpense('${e.id}')">
+                            Delete
+                        </button>
+
+                    </div>
+
+                </td>
+
+            </tr>
+
+            `;
+
+        });
+
+    }
+
+
+    expenseTable.innerHTML=html;
+
 }
 
 
-/* ================= DASHBOARD ================= */
+/* =====================================================
+   DASHBOARD CALCULATION
+===================================================== */
 
 function calculateDashboard(){
 
-    const sales =
+    let sales=
         db.sales.reduce(
-            (a,s)=>a+Number(s.total||0),
+            (sum,s)=>sum+Number(s.total||0),
             0
         );
 
-    const purchase =
+
+    let purchase=
         db.purchases.reduce(
-            (a,p)=>a+Number(p.total||0),
+            (sum,p)=>sum+Number(p.total||0),
             0
         );
 
-    const gross =
+
+    let gross=
         db.sales.reduce(
-            (a,s)=>
-                a+
+            (sum,s)=>
+                sum+
                 Number(s.total||0)-
                 Number(s.cost||0),
             0
         );
 
-    const expense =
+
+    let expenses=
         db.expenses.reduce(
-            (a,e)=>a+Number(e.amount||0),
+            (sum,e)=>sum+Number(e.amount||0),
             0
         );
 
-    const net =
-        gross-expense;
+
+    let net=gross-expenses;
 
 
-    const saleDue =
+    let salesDue=
         db.sales.reduce(
-            (a,s)=>a+Number(s.due||0),
+            (sum,s)=>sum+Number(s.due||0),
             0
         );
 
-    const customerDue =
+
+    let customerDue=
         db.customers.reduce(
-            (a,c)=>
-                a+
+            (sum,c)=>
+                sum+
                 Number(c.due||0)-
                 Number(c.payment||0),
             0
         );
 
-    const due =
-        saleDue+customerDue;
+
+    let totalDue=
+        salesDue+customerDue;
 
 
-    const stock =
+    let stockValue=
         db.products.reduce(
-            (a,p)=>
-                a+
+            (sum,p)=>
+                sum+
                 Number(p.stock||0)*
                 Number(p.buy||0),
             0
         );
 
 
-    const paid =
+    let paidSales=
         db.sales.reduce(
-            (a,s)=>a+Number(s.paid||0),
+            (sum,s)=>sum+Number(s.paid||0),
             0
         );
 
 
-    const customerPayments =
-        db.customers.reduce(
-            (a,c)=>
-                a+Number(c.payment||0),
-            0
-        );
-
-
-    const cash =
-        paid+
-        customerPayments-
+    let cash=
+        paidSales-
         purchase-
-        expense;
+        expenses;
 
 
-    $("dashSales").innerText =
-        money(sales);
-
-    $("dashPurchase").innerText =
-        money(purchase);
-
-    $("dashGross").innerText =
-        money(gross);
-
-    $("dashExpense").innerText =
-        money(expense);
-
-    $("dashNet").innerText =
-        money(net);
-
-    $("dashDue").innerText =
-        money(due);
-
-    $("dashStock").innerText =
-        money(stock);
-
-    $("dashCash").innerText =
-        money(cash);
-
-    $("dashProducts").innerText =
-        db.products.length;
+    dashSales.innerText=money(sales);
+    dashPurchase.innerText=money(purchase);
+    dashGross.innerText=money(gross);
+    dashExpense.innerText=money(expenses);
+    dashNet.innerText=money(net);
+    dashDue.innerText=money(totalDue);
+    dashStock.innerText=money(stockValue);
+    dashCash.innerText=money(cash);
+    dashProducts.innerText=db.products.length;
 
 
-    let html="";
+    let recent="";
 
 
     [...db.sales]
-        .reverse()
-        .slice(0,10)
-        .forEach(s=>{
+    .reverse()
+    .slice(0,10)
+    .forEach(s=>{
 
-        html += `
+        recent+=`
 
         <tr>
 
-            <td>${escapeHTML(s.date)}</td>
-
+            <td>${s.date}</td>
             <td>${escapeHTML(s.product)}</td>
-
             <td>${s.qty}</td>
-
             <td>${money(s.total)}</td>
-
             <td>${money(s.paid)}</td>
-
             <td>${money(s.due)}</td>
 
         </tr>
@@ -2786,18 +2517,26 @@ function calculateDashboard(){
     });
 
 
-    $("recentSales").innerHTML =
-        html ||
-        `<tr>
+    if(!recent){
+
+        recent=`
+        <tr>
             <td colspan="6" class="empty">
                 কোনো Sale নেই
             </td>
         </tr>`;
 
+    }
+
+
+    recentSales.innerHTML=recent;
+
 }
 
 
-/* ================= REPORT ================= */
+/* =====================================================
+   REPORT
+===================================================== */
 
 function dateInRange(date,from,to){
 
@@ -2814,137 +2553,138 @@ function dateInRange(date,from,to){
 
 function generateReport(){
 
-    const from =
-        $("reportFrom").value;
-
-    const to =
-        $("reportTo").value;
+    let from=reportFrom.value;
+    let to=reportTo.value;
 
 
-    const sales =
-        db.sales.filter(
-            s=>dateInRange(s.date,from,to)
-        );
-
-    const purchases =
-        db.purchases.filter(
-            p=>dateInRange(p.date,from,to)
-        );
-
-    const expenses =
-        db.expenses.filter(
-            e=>dateInRange(e.date,from,to)
-        );
+    let sales=db.sales.filter(
+        s=>dateInRange(s.date,from,to)
+    );
 
 
-    const totalSales =
+    let purchases=db.purchases.filter(
+        p=>dateInRange(p.date,from,to)
+    );
+
+
+    let expenses=db.expenses.filter(
+        e=>dateInRange(e.date,from,to)
+    );
+
+
+    let totalSales=
         sales.reduce(
-            (a,s)=>a+Number(s.total||0),
+            (sum,s)=>sum+Number(s.total||0),
             0
         );
 
 
-    const totalPurchase =
+    let totalPurchase=
         purchases.reduce(
-            (a,p)=>a+Number(p.total||0),
+            (sum,p)=>sum+Number(p.total||0),
             0
         );
 
 
-    const gross =
+    let gross=
         sales.reduce(
-            (a,s)=>
-                a+
+            (sum,s)=>
+                sum+
                 Number(s.total||0)-
                 Number(s.cost||0),
             0
         );
 
 
-    const totalExpense =
+    let totalExpense=
         expenses.reduce(
-            (a,e)=>a+Number(e.amount||0),
+            (sum,e)=>sum+Number(e.amount||0),
             0
         );
 
 
-    const net =
-        gross-totalExpense;
+    let net=gross-totalExpense;
 
 
-    const due =
+    let salesDue=
         db.sales.reduce(
-            (a,s)=>a+Number(s.due||0),
+            (sum,s)=>sum+Number(s.due||0),
             0
-        )+
+        );
+
+
+    let customerDue=
         db.customers.reduce(
-            (a,c)=>
-                a+
+            (sum,c)=>
+                sum+
                 Number(c.due||0)-
                 Number(c.payment||0),
             0
         );
 
 
-    const stock =
+    let totalDue=
+        salesDue+customerDue;
+
+
+    let stockValue=
         db.products.reduce(
-            (a,p)=>
-                a+
+            (sum,p)=>
+                sum+
                 Number(p.stock||0)*
                 Number(p.buy||0),
             0
         );
 
 
-    const paid =
+    let paidSales=
         sales.reduce(
-            (a,s)=>a+Number(s.paid||0),
+            (sum,s)=>sum+Number(s.paid||0),
             0
         );
 
 
-    const cash =
-        paid-
+    let cash=
+        paidSales-
         totalPurchase-
         totalExpense;
 
 
-    $("reportSales").innerText =
-        money(totalSales);
+    reportSales.innerText=money(totalSales);
 
-    $("reportPurchase").innerText =
+    reportPurchase.innerText=
         money(totalPurchase);
 
-    $("reportGross").innerText =
-        money(gross);
+    reportGross.innerText=money(gross);
 
-    $("reportExpense").innerText =
+    reportExpense.innerText=
         money(totalExpense);
 
-    $("reportNet").innerText =
-        money(net);
+    reportNet.innerText=money(net);
 
-    $("reportDue").innerText =
-        money(due);
+    reportDue.innerText=money(totalDue);
 
-    $("reportStock").innerText =
-        money(stock);
+    reportStock.innerText=
+        money(stockValue);
 
-    $("reportCash").innerText =
-        money(cash);
+    reportCash.innerText=money(cash);
 
-    $("reportProducts").innerText =
+    reportProducts.innerText=
         db.products.length;
 
 }
 
 
+/* =====================================================
+   REPORT BUTTONS
+===================================================== */
+
 function reportToday(){
 
-    const d=today();
+    let d=today();
 
-    $("reportFrom").value=d;
-    $("reportTo").value=d;
+    reportFrom.value=d;
+    reportTo.value=d;
 
     generateReport();
 
@@ -2953,15 +2693,19 @@ function reportToday(){
 
 function reportMonth(){
 
-    const d=new Date();
+    let d=new Date();
 
-    const from =
-        d.getFullYear()+"-"+
-        String(d.getMonth()+1).padStart(2,"0")+
-        "-01";
+    let year=d.getFullYear();
 
-    $("reportFrom").value=from;
-    $("reportTo").value=today();
+    let month=String(
+        d.getMonth()+1
+    ).padStart(2,"0");
+
+
+    reportFrom.value=
+        year+"-"+month+"-01";
+
+    reportTo.value=today();
 
     generateReport();
 
@@ -2970,154 +2714,72 @@ function reportMonth(){
 
 function reportAll(){
 
-    $("reportFrom").value="";
-    $("reportTo").value="";
+    reportFrom.value="";
+    reportTo.value="";
 
     generateReport();
 
 }
 
 
-/* ================= RENDER ALL ================= */
+/* =====================================================
+   ESCAPE HTML
+===================================================== */
 
-function renderAll(){
+function escapeHTML(value){
 
-    try{
-
-        updateSaleProductOptions();
-
-        renderProducts();
-
-        renderSales();
-
-        renderPurchases();
-
-        renderCustomers();
-
-        renderExpenses();
-
-        calculateDashboard();
-
-        generateReport();
-
-    }catch(error){
-
-        console.error(
-            "Render Error:",
-            error
-        );
-
-    }
+    return String(value ?? "")
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
 
 }
 
 
-/* ================= START ================= */
+/* =====================================================
+   RENDER ALL
+===================================================== */
 
-document.addEventListener(
-    "DOMContentLoaded",
-    ()=>{
+function renderAll(){
 
-        $("loginForm")
-            .addEventListener(
-                "submit",
-                loginUser
-            );
+    renderProducts();
 
+    renderSales();
 
-        $("productForm")
-            .addEventListener(
-                "submit",
-                saveProduct
-            );
+    renderPurchases();
 
+    renderCustomers();
 
-        $("salesForm")
-            .addEventListener(
-                "submit",
-                saveSale
-            );
+    renderExpenses();
+
+    calculateDashboard();
+
+    generateReport();
+
+}
 
 
-        $("purchaseForm")
-            .addEventListener(
-                "submit",
-                savePurchase
-            );
+/* =====================================================
+   INITIAL DATE
+===================================================== */
+
+saleDate.value=today();
+
+purchaseDate.value=today();
+
+customerDate.value=today();
+
+expenseDate.value=today();
 
 
-        $("customerForm")
-            .addEventListener(
-                "submit",
-                saveCustomer
-            );
+/* =====================================================
+   START
+===================================================== */
 
+renderAll();
 
-        $("expenseForm")
-            .addEventListener(
-                "submit",
-                saveExpense
-            );
-
-
-        $("saleProduct")
-            .addEventListener(
-                "change",
-                autoSalePrice
-            );
-
-
-        $("saleQty")
-            .addEventListener(
-                "input",
-                calculateSale
-            );
-
-
-        $("salePrice")
-            .addEventListener(
-                "input",
-                calculateSale
-            );
-
-
-        $("salePaid")
-            .addEventListener(
-                "input",
-                calculateSale
-            );
-
-
-        $("purchaseProduct")
-            .addEventListener(
-                "input",
-                autoPurchasePrice
-            );
-
-
-        $("saleDate").value=today();
-        $("purchaseDate").value=today();
-        $("customerDate").value=today();
-        $("expenseDate").value=today();
-
-
-        if(isLoggedIn()){
-
-            showApp();
-
-        }else{
-
-            showLogin();
-
-        }
-
-
-        console.log(
-            "✅ Smart Store Ready - Firebase Free"
-        );
-
-    }
-);
 </script>
 
 </body>
