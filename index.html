@@ -413,32 +413,195 @@ th{
 
 <body>
 
-<!-- LOGIN -->
+<!-- LOGIN SCREEN -->
 <div id="loginScreen">
+
     <div class="loginBox">
 
+        <!-- ================= LOGIN FORM ================= -->
+
         <div id="loginForm">
+
             <h1>🏪 Smart Store</h1>
+
             <p>Account Login</p>
 
-            <input id="loginEmail" type="email" placeholder="Email">
-            <input id="loginPassword" type="password" placeholder="Password">
+            <input
+                id="loginEmail"
+                type="email"
+                placeholder="Email"
+            >
 
-            <button onclick="loginAccount()">🔐 Login</button>
-            <button class="linkBtn" onclick="showCreateAccount()">Create New Account</button>
+            <input
+                id="loginPassword"
+                type="password"
+                placeholder="Password"
+            >
+
+            <button onclick="loginAccount()">
+                🔐 Login
+            </button>
+
+            <button
+                class="linkBtn"
+                onclick="showCreateAccount()">
+
+                Create New Account
+
+            </button>
+
+            <!-- FORGOT PASSWORD -->
+            <button
+                class="linkBtn"
+                onclick="showForgotPassword()">
+
+                🔑 Forgot Account / Password?
+
+            </button>
+
         </div>
 
-        <div id="createForm" style="display:none">
+
+        <!-- ================= CREATE ACCOUNT ================= -->
+
+        <div
+            id="createForm"
+            style="display:none"
+        >
+
             <h1>🏪 Smart Store</h1>
+
             <p>Create Account</p>
 
-            <input id="createName" placeholder="Your Name">
-            <input id="createEmail" type="email" placeholder="Email">
-            <input id="createPassword" type="password" placeholder="Password">
-            <input id="createPassword2" type="password" placeholder="Confirm Password">
+            <input
+                id="createName"
+                placeholder="Your Name"
+            >
 
-            <button onclick="createAccount()">Create Account</button>
-            <button class="linkBtn" onclick="showLogin()">Already have account? Login</button>
+            <input
+                id="createEmail"
+                type="email"
+                placeholder="Email"
+            >
+
+            <input
+                id="createPassword"
+                type="password"
+                placeholder="Password"
+            >
+
+            <input
+                id="createPassword2"
+                type="password"
+                placeholder="Confirm Password"
+            >
+
+            <button onclick="createAccount()">
+                Create Account
+            </button>
+
+            <button
+                class="linkBtn"
+                onclick="showLogin()">
+
+                Already have account? Login
+
+            </button>
+
+        </div>
+
+
+        <!-- ================= FORGOT PASSWORD ================= -->
+
+        <div
+            id="forgotForm"
+            style="display:none"
+        >
+
+            <h1>🏪 Smart Store</h1>
+
+            <p>Reset Your Password</p>
+
+
+            <!-- Gmail -->
+
+            <input
+                id="forgotEmail"
+                type="email"
+                placeholder="Enter your Gmail"
+            >
+
+
+            <button onclick="sendResetCode()">
+
+                📧 Send Verification Code
+
+            </button>
+
+
+            <!-- OTP + NEW PASSWORD -->
+
+            <div
+                id="codeSection"
+                style="display:none"
+            >
+
+                <p>
+                    📩 Check your Gmail for the
+                    6-digit code
+                </p>
+
+
+                <input
+                    id="verificationCode"
+                    type="text"
+                    inputmode="numeric"
+                    maxlength="6"
+                    placeholder="Enter 6-digit Code"
+                >
+
+
+                <input
+                    id="newPassword"
+                    type="password"
+                    placeholder="New Password"
+                >
+
+
+                <input
+                    id="newPassword2"
+                    type="password"
+                    placeholder="Confirm New Password"
+                >
+
+
+                <button onclick="resetPassword()">
+
+                    🔄 Reset Password
+
+                </button>
+
+            </div>
+
+
+            <button
+                class="linkBtn"
+                onclick="showLogin()">
+
+                ← Back to Login
+
+            </button>
+
+        </div>
+
+
+        <!-- MESSAGE -->
+
+        <div id="message"></div>
+
+    </div>
+
+</div>
         </div>
 
     </div>
