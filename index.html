@@ -1,36 +1,135 @@
 <script>
 "use strict";
 
+/* =========================================================
+   SMART STORE - FIREBASE FREE
+   Login + Logout + LocalStorage Database
+========================================================= */
+
 const DB_KEY = "smartStoreDB";
+const AUTH_KEY = "smartStoreLoggedIn";
 
 const $ = id => document.getElementById(id);
 
+/* =========================================================
+   LOGIN SYSTEM
+========================================================= */
+
+function isLoggedIn(){
+    return localStorage.getItem(AUTH_KEY) === "true";
+}
+
+function loginUser(e){
+    if(e) e.preventDefault();
+
+    const username = $("loginUsername")?.value.trim();
+    const password = $("loginPassword")?.value;
+
+    /*
+      Default Login:
+      Username: admin
+      Password: 123456
+    */
+
+    if(username === "admin" && password === "123456"){
+
+        localStorage.setItem(AUTH_KEY,"true");
+
+        showApp();
+
+    }else{
+
+        alert("❌ Username অথবা Password ভুল!");
+    }
+}
+
+function logout(){
+
+    if(confirm("আপনি কি Logout করতে চান?")){
+
+        /* শুধু Login বন্ধ হবে */
+        localStorage.removeItem(AUTH_KEY);
+
+        location.reload();
+    }
+}
+
+function showApp(){
+
+    const loginPage = $("loginPage");
+    const app = $("app");
+
+    if(loginPage)
+        loginPage.style.display="none";
+
+    if(app)
+        app.style.display="flex";
+
+    showPage("dashboard");
+
+    renderAll();
+}
+
+function showLogin(){
+
+    const loginPage = $("loginPage");
+    const app = $("app");
+
+    if(loginPage)
+        loginPage.style.display="flex";
+
+    if(app)
+        app.style.display="none";
+}
+
+/* =========================================================
+   DATABASE
+========================================================= */
+
 function defaultDB(){
+
     return {
-        products: [],
-        sales: [],
-        purchases: [],
-        customers: [],
-        expenses: []
+        products:[],
+        sales:[],
+        purchases:[],
+        customers:[],
+        expenses:[]
     };
 }
 
 function loadDB(){
+
     try{
+
         const saved = localStorage.getItem(DB_KEY);
-        if(!saved) return defaultDB();
+
+        if(!saved)
+            return defaultDB();
 
         const data = JSON.parse(saved);
 
         return {
-            products: Array.isArray(data.products) ? data.products : [],
-            sales: Array.isArray(data.sales) ? data.sales : [],
-            purchases: Array.isArray(data.purchases) ? data.purchases : [],
-            customers: Array.isArray(data.customers) ? data.customers : [],
-            expenses: Array.isArray(data.expenses) ? data.expenses : []
+
+            products:Array.isArray(data.products)
+                ? data.products : [],
+
+            sales:Array.isArray(data.sales)
+                ? data.sales : [],
+
+            purchases:Array.isArray(data.purchases)
+                ? data.purchases : [],
+
+            customers:Array.isArray(data.customers)
+                ? data.customers : [],
+
+            expenses:Array.isArray(data.expenses)
+                ? data.expenses : []
         };
-    }catch(e){
-        console.error(e);
+
+    }catch(error){
+
+        console.error("Database Error:",error);
+
         return defaultDB();
     }
 }
@@ -38,29 +137,51 @@ function loadDB(){
 let db = loadDB();
 
 function save(){
+
     try{
-        localStorage.setItem(DB_KEY, JSON.stringify(db));
+
+        localStorage.setItem(
+            DB_KEY,
+            JSON.stringify(db)
+        );
+
         renderAll();
-    }catch(e){
-        alert("Data save করা যাচ্ছে না!");
-        console.error(e);
+
+    }catch(error){
+
+        console.error(error);
+
+        alert("❌ Data save করা যাচ্ছে না!");
     }
 }
 
+/* =========================================================
+   HELPERS
+========================================================= */
+
 function today(){
+
     const d = new Date();
-    return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+
+    return d.getFullYear()+"-"+
+        String(d.getMonth()+1).padStart(2,"0")+"-"+
+        String(d.getDate()).padStart(2,"0");
 }
 
-function money(v){
-    return "৳"+Number(v||0).toLocaleString("en-BD",{
-        minimumFractionDigits:2,
-        maximumFractionDigits:2
-    });
+function money(value){
+
+    return "৳"+Number(value||0).toLocaleString(
+        "en-BD",
+        {
+            minimumFractionDigits:2,
+            maximumFractionDigits:2
+        }
+    );
 }
 
-function escapeHTML(v){
-    return String(v ?? "")
+function escapeHTML(value){
+
+    return String(value ?? "")
         .replace(/&/g,"&amp;")
         .replace(/</g,"&lt;")
         .replace(/>/g,"&gt;")
@@ -68,9 +189,9 @@ function escapeHTML(v){
         .replace(/'/g,"&#039;");
 }
 
-/* =========================
+/* =========================================================
    PAGE SYSTEM
-========================= */
+========================================================= */
 
 function showPage(page,button){
 
@@ -79,15 +200,19 @@ function showPage(page,button){
     });
 
     const target=$(page);
-    if(target) target.classList.add("active");
+
+    if(target)
+        target.classList.add("active");
 
     document.querySelectorAll(".menu button").forEach(b=>{
         b.classList.remove("active");
     });
 
-    if(button) button.classList.add("active");
+    if(button)
+        button.classList.add("active");
 
     const titles={
+
         dashboard:"🏠 Dashboard",
         products:"📦 Products",
         sales:"🛒 Sales",
@@ -98,32 +223,24 @@ function showPage(page,button){
     };
 
     if($("pageTitle"))
-        $("pageTitle").innerText=titles[page]||"Smart Store";
+        $("pageTitle").innerText =
+            titles[page] || "Smart Store";
 }
 
-/* =========================
-   LOGOUT
-========================= */
-
-function logout(){
-
-    if(confirm("আপনি কি Logout করতে চান?")){
-
-        localStorage.removeItem("smartStoreLoggedIn");
-
-        location.reload();
-    }
-}
-
-/* =========================
+/* =========================================================
    PRODUCT
-========================= */
+========================================================= */
 
 function findProduct(name){
-    const n=String(name||"").trim().toLowerCase();
+
+    const n=String(name||"")
+        .trim()
+        .toLowerCase();
 
     return db.products.find(p=>
-        String(p.name||"").trim().toLowerCase()===n
+        String(p.name||"")
+        .trim()
+        .toLowerCase()===n
     );
 }
 
@@ -131,7 +248,8 @@ function resetProductForm(){
 
     $("productForm")?.reset();
 
-    if($("productId")) $("productId").value="";
+    if($("productId"))
+        $("productId").value="";
 
     if($("productSubmit"))
         $("productSubmit").innerText="➕ Add Product";
@@ -145,30 +263,42 @@ function saveProduct(e){
     const name=$("productName").value.trim();
 
     if(!name){
+
         alert("Product Name লিখুন");
         return;
     }
 
     const product={
+
         id:id||Date.now().toString(),
+
         name:name,
+
         code:$("productCode").value.trim(),
+
         buy:Number($("productBuy").value||0),
+
         sell:Number($("productSell").value||0),
+
         stock:Number($("productStock").value||0)
     };
 
     if(id){
 
-        const i=db.products.findIndex(p=>p.id===id);
+        const index=db.products.findIndex(
+            p=>p.id===id
+        );
 
-        if(i!==-1) db.products[i]=product;
+        if(index!==-1)
+            db.products[index]=product;
 
     }else{
+
         db.products.push(product);
     }
 
     resetProductForm();
+
     save();
 
     alert("✅ Product Saved");
@@ -177,6 +307,7 @@ function saveProduct(e){
 function editProduct(id){
 
     const p=db.products.find(x=>x.id===id);
+
     if(!p)return;
 
     $("productId").value=p.id;
@@ -193,22 +324,30 @@ function editProduct(id){
 
 function deleteProduct(id){
 
-    if(!confirm("Product Delete করবেন?"))return;
+    if(!confirm("Product Delete করবেন?"))
+        return;
 
-    db.products=db.products.filter(p=>p.id!==id);
+    db.products=db.products.filter(
+        p=>p.id!==id
+    );
+
     save();
 }
 
-/* =========================
+/* =========================================================
    SALES
-========================= */
+========================================================= */
 
 function autoSalePrice(){
 
-    const p=findProduct($("saleProduct").value);
+    const p=findProduct(
+        $("saleProduct").value
+    );
 
     if(p){
+
         $("salePrice").value=p.sell;
+
         $("saleCost").value=p.buy;
     }
 
@@ -217,33 +356,63 @@ function autoSalePrice(){
 
 function calculateSale(){
 
-    const qty=Number($("saleQty").value||0);
-    const price=Number($("salePrice").value||0);
-    const paid=Number($("salePaid").value||0);
+    const qty=Number(
+        $("saleQty").value||0
+    );
+
+    const price=Number(
+        $("salePrice").value||0
+    );
+
+    const paid=Number(
+        $("salePaid").value||0
+    );
 
     const total=qty*price;
-    const due=Math.max(0,total-paid);
 
-    $("saleTotal").value=total.toFixed(2);
-    $("saleDue").value=due.toFixed(2);
+    const due=Math.max(
+        0,
+        total-paid
+    );
 
-    const p=findProduct($("saleProduct").value);
+    if($("saleTotal"))
+        $("saleTotal").value=total.toFixed(2);
 
-    if(p) $("saleCost").value=p.buy;
+    if($("saleDue"))
+        $("saleDue").value=due.toFixed(2);
+
+    const p=findProduct(
+        $("saleProduct").value
+    );
+
+    if(p && $("saleCost"))
+        $("saleCost").value=p.buy;
 }
 
 function resetSaleForm(){
 
     $("salesForm")?.reset();
 
-    $("saleId").value="";
-    $("saleDate").value=today();
-    $("salePaid").value=0;
-    $("saleTotal").value=0;
-    $("saleDue").value=0;
-    $("saleCost").value=0;
+    if($("saleId"))
+        $("saleId").value="";
 
-    $("saleSubmit").innerText="➕ Add Sale";
+    if($("saleDate"))
+        $("saleDate").value=today();
+
+    if($("salePaid"))
+        $("salePaid").value=0;
+
+    if($("saleTotal"))
+        $("saleTotal").value=0;
+
+    if($("saleDue"))
+        $("saleDue").value=0;
+
+    if($("saleCost"))
+        $("saleCost").value=0;
+
+    if($("saleSubmit"))
+        $("saleSubmit").innerText="➕ Add Sale";
 }
 
 function saveSale(e){
@@ -251,19 +420,32 @@ function saveSale(e){
     e.preventDefault();
 
     const id=$("saleId").value;
-    const name=$("saleProduct").value.trim();
-    const qty=Number($("saleQty").value||0);
-    const price=Number($("salePrice").value||0);
-    const paid=Number($("salePaid").value||0);
+
+    const name=$("saleProduct")
+        .value.trim();
+
+    const qty=Number(
+        $("saleQty").value||0
+    );
+
+    const price=Number(
+        $("salePrice").value||0
+    );
+
+    const paid=Number(
+        $("salePaid").value||0
+    );
 
     const product=findProduct(name);
 
     if(!product){
+
         alert("❌ Product পাওয়া যায়নি");
         return;
     }
 
     if(qty<=0){
+
         alert("Quantity সঠিকভাবে লিখুন");
         return;
     }
@@ -271,36 +453,49 @@ function saveSale(e){
     const total=qty*price;
 
     if(paid>total){
+
         alert("Paid বেশি হতে পারবে না");
         return;
     }
 
-    /* Edit হলে পুরোনো stock ফেরত */
+    /* Edit Sale হলে আগের stock ফেরত */
+
+    let old=null;
+
     if(id){
 
-        const old=db.sales.find(s=>s.id===id);
+        old=db.sales.find(
+            s=>s.id===id
+        );
 
         if(old){
 
-            const oldProduct=findProduct(old.product);
+            const oldProduct=findProduct(
+                old.product
+            );
 
-            if(oldProduct)
-                oldProduct.stock+=Number(old.qty||0);
+            if(oldProduct){
+
+                oldProduct.stock +=
+                    Number(old.qty||0);
+            }
         }
     }
 
+    /* নতুন stock check */
+
     if(product.stock<qty){
 
-        if(id){
+        if(old){
 
-            const old=db.sales.find(s=>s.id===id);
+            const oldProduct=findProduct(
+                old.product
+            );
 
-            if(old){
+            if(oldProduct){
 
-                const oldProduct=findProduct(old.product);
-
-                if(oldProduct)
-                    oldProduct.stock-=Number(old.qty||0);
+                oldProduct.stock -=
+                    Number(old.qty||0);
             }
         }
 
@@ -311,29 +506,49 @@ function saveSale(e){
     product.stock-=qty;
 
     const sale={
+
         id:id||Date.now().toString(),
+
         date:$("saleDate").value||today(),
+
         product:name,
+
         qty:qty,
+
         price:price,
+
         total:total,
+
         paid:paid,
-        due:Math.max(0,total-paid),
-        customer:$("saleCustomer").value.trim(),
-        cost:qty*Number(product.buy||0)
+
+        due:Math.max(
+            0,
+            total-paid
+        ),
+
+        customer:
+            $("saleCustomer").value.trim(),
+
+        cost:
+            qty*Number(product.buy||0)
     };
 
     if(id){
 
-        const i=db.sales.findIndex(s=>s.id===id);
+        const index=db.sales.findIndex(
+            s=>s.id===id
+        );
 
-        if(i!==-1)db.sales[i]=sale;
+        if(index!==-1)
+            db.sales[index]=sale;
 
     }else{
+
         db.sales.push(sale);
     }
 
     resetSaleForm();
+
     save();
 
     alert("✅ Sale Saved");
@@ -341,7 +556,10 @@ function saveSale(e){
 
 function editSale(id){
 
-    const s=db.sales.find(x=>x.id===id);
+    const s=db.sales.find(
+        x=>x.id===id
+    );
+
     if(!s)return;
 
     $("saleId").value=s.id;
@@ -355,40 +573,55 @@ function editSale(id){
     $("saleDue").value=s.due;
     $("saleCost").value=s.cost;
 
-    $("saleSubmit").innerText="💾 Update Sale";
+    $("saleSubmit").innerText=
+        "💾 Update Sale";
 
     showPage("sales");
 }
 
 function deleteSale(id){
 
-    if(!confirm("Sale Delete করবেন?"))return;
+    if(!confirm("Sale Delete করবেন?"))
+        return;
 
-    const s=db.sales.find(x=>x.id===id);
+    const sale=db.sales.find(
+        s=>s.id===id
+    );
 
-    if(s){
+    if(sale){
 
-        const p=findProduct(s.product);
+        const product=findProduct(
+            sale.product
+        );
 
-        if(p)p.stock+=Number(s.qty||0);
+        if(product){
+
+            product.stock +=
+                Number(sale.qty||0);
+        }
     }
 
-    db.sales=db.sales.filter(s=>s.id!==id);
+    db.sales=db.sales.filter(
+        s=>s.id!==id
+    );
 
     save();
 }
 
-/* =========================
+/* =========================================================
    PURCHASE
-========================= */
+========================================================= */
 
 function autoPurchasePrice(){
 
-    const p=findProduct($("purchaseProduct").value);
+    const p=findProduct(
+        $("purchaseProduct").value
+    );
 
     if(p){
 
         $("purchasePrice").value=p.buy;
+
         $("purchaseSell").value=p.sell;
     }
 }
@@ -398,9 +631,11 @@ function resetPurchaseForm(){
     $("purchaseForm")?.reset();
 
     $("purchaseId").value="";
+
     $("purchaseDate").value=today();
 
-    $("purchaseSubmit").innerText="➕ Add Purchase";
+    $("purchaseSubmit").innerText=
+        "➕ Add Purchase";
 }
 
 function savePurchase(e){
@@ -408,31 +643,53 @@ function savePurchase(e){
     e.preventDefault();
 
     const id=$("purchaseId").value;
-    const name=$("purchaseProduct").value.trim();
-    const qty=Number($("purchaseQty").value||0);
-    const price=Number($("purchasePrice").value||0);
-    const sell=Number($("purchaseSell").value||0);
+
+    const name=$("purchaseProduct")
+        .value.trim();
+
+    const qty=Number(
+        $("purchaseQty").value||0
+    );
+
+    const price=Number(
+        $("purchasePrice").value||0
+    );
+
+    const sell=Number(
+        $("purchaseSell").value||0
+    );
 
     if(!name){
+
         alert("Product Name লিখুন");
         return;
     }
 
     if(qty<=0){
+
         alert("Quantity সঠিকভাবে লিখুন");
         return;
     }
 
+    /* Edit হলে আগের stock remove */
+
     if(id){
 
-        const old=db.purchases.find(p=>p.id===id);
+        const old=db.purchases.find(
+            p=>p.id===id
+        );
 
         if(old){
 
-            const oldProduct=findProduct(old.product);
+            const oldProduct=findProduct(
+                old.product
+            );
 
-            if(oldProduct)
-                oldProduct.stock-=Number(old.qty||0);
+            if(oldProduct){
+
+                oldProduct.stock -=
+                    Number(old.qty||0);
+            }
         }
     }
 
@@ -440,7 +697,8 @@ function savePurchase(e){
 
     if(product){
 
-        product.stock+=qty;
+        product.stock += qty;
+
         product.buy=price;
 
         if(sell>0)
@@ -449,11 +707,17 @@ function savePurchase(e){
     }else{
 
         product={
+
             id:Date.now().toString(),
+
             name:name,
+
             code:"",
+
             buy:price,
+
             sell:sell||price,
+
             stock:qty
         };
 
@@ -461,26 +725,41 @@ function savePurchase(e){
     }
 
     const purchase={
+
         id:id||Date.now().toString(),
-        date:$("purchaseDate").value||today(),
+
+        date:
+            $("purchaseDate").value||today(),
+
         product:name,
+
         qty:qty,
+
         price:price,
+
         total:qty*price,
-        supplier:$("purchaseSupplier").value.trim()
+
+        supplier:
+            $("purchaseSupplier")
+            .value.trim()
     };
 
     if(id){
 
-        const i=db.purchases.findIndex(p=>p.id===id);
+        const index=db.purchases.findIndex(
+            p=>p.id===id
+        );
 
-        if(i!==-1)db.purchases[i]=purchase;
+        if(index!==-1)
+            db.purchases[index]=purchase;
 
     }else{
+
         db.purchases.push(purchase);
     }
 
     resetPurchaseForm();
+
     save();
 
     alert("✅ Purchase Saved");
@@ -488,7 +767,10 @@ function savePurchase(e){
 
 function editPurchase(id){
 
-    const p=db.purchases.find(x=>x.id===id);
+    const p=db.purchases.find(
+        x=>x.id===id
+    );
+
     if(!p)return;
 
     $("purchaseId").value=p.id;
@@ -496,50 +778,68 @@ function editPurchase(id){
     $("purchaseProduct").value=p.product;
     $("purchaseQty").value=p.qty;
     $("purchasePrice").value=p.price;
-    $("purchaseSupplier").value=p.supplier||"";
+    $("purchaseSupplier").value=
+        p.supplier||"";
 
-    const product=findProduct(p.product);
+    const product=findProduct(
+        p.product
+    );
 
-    $("purchaseSell").value=product?product.sell:"";
+    $("purchaseSell").value=
+        product ? product.sell : "";
 
-    $("purchaseSubmit").innerText="💾 Update Purchase";
+    $("purchaseSubmit").innerText=
+        "💾 Update Purchase";
 
     showPage("purchase");
 }
 
 function deletePurchase(id){
 
-    if(!confirm("Purchase Delete করবেন?"))return;
+    if(!confirm("Purchase Delete করবেন?"))
+        return;
 
-    const p=db.purchases.find(x=>x.id===id);
+    const purchase=db.purchases.find(
+        p=>p.id===id
+    );
 
-    if(p){
+    if(purchase){
 
-        const product=findProduct(p.product);
+        const product=findProduct(
+            purchase.product
+        );
 
-        if(product)
+        if(product){
+
             product.stock=Math.max(
                 0,
-                Number(product.stock||0)-Number(p.qty||0)
+                Number(product.stock||0)-
+                Number(purchase.qty||0)
             );
+        }
     }
 
-    db.purchases=db.purchases.filter(p=>p.id!==id);
+    db.purchases=db.purchases.filter(
+        p=>p.id!==id
+    );
 
     save();
 }
 
-/* =========================
+/* =========================================================
    CUSTOMER
-========================= */
+========================================================= */
 
 function resetCustomerForm(){
 
     $("customerForm")?.reset();
 
     $("customerId").value="";
+
     $("customerDate").value=today();
+
     $("customerDue").value=0;
+
     $("customerPayment").value=0;
 }
 
@@ -548,34 +848,56 @@ function saveCustomer(e){
     e.preventDefault();
 
     const id=$("customerId").value;
-    const name=$("customerName").value.trim();
+
+    const name=$("customerName")
+        .value.trim();
 
     if(!name){
+
         alert("Customer Name লিখুন");
         return;
     }
 
     const customer={
+
         id:id||Date.now().toString(),
-        date:$("customerDate").value||today(),
+
+        date:
+            $("customerDate").value||today(),
+
         name:name,
-        mobile:$("customerMobile").value.trim(),
-        address:$("customerAddress").value.trim(),
-        due:Number($("customerDue").value||0),
-        payment:Number($("customerPayment").value||0)
+
+        mobile:
+            $("customerMobile").value.trim(),
+
+        address:
+            $("customerAddress").value.trim(),
+
+        due:
+            Number($("customerDue").value||0),
+
+        payment:
+            Number(
+                $("customerPayment").value||0
+            )
     };
 
     if(id){
 
-        const i=db.customers.findIndex(c=>c.id===id);
+        const index=db.customers.findIndex(
+            c=>c.id===id
+        );
 
-        if(i!==-1)db.customers[i]=customer;
+        if(index!==-1)
+            db.customers[index]=customer;
 
     }else{
+
         db.customers.push(customer);
     }
 
     resetCustomerForm();
+
     save();
 
     alert("✅ Customer Saved");
@@ -583,7 +905,10 @@ function saveCustomer(e){
 
 function editCustomer(id){
 
-    const c=db.customers.find(x=>x.id===id);
+    const c=db.customers.find(
+        x=>x.id===id
+    );
+
     if(!c)return;
 
     $("customerId").value=c.id;
@@ -592,29 +917,34 @@ function editCustomer(id){
     $("customerMobile").value=c.mobile||"";
     $("customerAddress").value=c.address||"";
     $("customerDue").value=c.due||0;
-    $("customerPayment").value=c.payment||0;
+    $("customerPayment").value=
+        c.payment||0;
 
     showPage("customers");
 }
 
 function deleteCustomer(id){
 
-    if(!confirm("Customer Delete করবেন?"))return;
+    if(!confirm("Customer Delete করবেন?"))
+        return;
 
-    db.customers=db.customers.filter(c=>c.id!==id);
+    db.customers=db.customers.filter(
+        c=>c.id!==id
+    );
 
     save();
 }
 
-/* =========================
+/* =========================================================
    EXPENSE
-========================= */
+========================================================= */
 
 function resetExpenseForm(){
 
     $("expenseForm")?.reset();
 
     $("expenseId").value="";
+
     $("expenseDate").value=today();
 }
 
@@ -623,38 +953,57 @@ function saveExpense(e){
     e.preventDefault();
 
     const id=$("expenseId").value;
-    const name=$("expenseName").value.trim();
-    const amount=Number($("expenseAmount").value||0);
+
+    const name=$("expenseName")
+        .value.trim();
+
+    const amount=Number(
+        $("expenseAmount").value||0
+    );
 
     if(!name){
+
         alert("Expense Name লিখুন");
         return;
     }
 
     if(amount<=0){
+
         alert("Amount লিখুন");
         return;
     }
 
     const expense={
+
         id:id||Date.now().toString(),
-        date:$("expenseDate").value||today(),
+
+        date:
+            $("expenseDate").value||today(),
+
         name:name,
+
         amount:amount,
-        note:$("expenseNote").value.trim()
+
+        note:
+            $("expenseNote").value.trim()
     };
 
     if(id){
 
-        const i=db.expenses.findIndex(e=>e.id===id);
+        const index=db.expenses.findIndex(
+            e=>e.id===id
+        );
 
-        if(i!==-1)db.expenses[i]=expense;
+        if(index!==-1)
+            db.expenses[index]=expense;
 
     }else{
+
         db.expenses.push(expense);
     }
 
     resetExpenseForm();
+
     save();
 
     alert("✅ Expense Saved");
@@ -662,7 +1011,10 @@ function saveExpense(e){
 
 function editExpense(id){
 
-    const e=db.expenses.find(x=>x.id===id);
+    const e=db.expenses.find(
+        x=>x.id===id
+    );
+
     if(!e)return;
 
     $("expenseId").value=e.id;
@@ -676,16 +1028,19 @@ function editExpense(id){
 
 function deleteExpense(id){
 
-    if(!confirm("Expense Delete করবেন?"))return;
+    if(!confirm("Expense Delete করবেন?"))
+        return;
 
-    db.expenses=db.expenses.filter(e=>e.id!==id);
+    db.expenses=db.expenses.filter(
+        e=>e.id!==id
+    );
 
     save();
 }
 
-/* =========================
-   RENDER
-========================= */
+/* =========================================================
+   RENDER PRODUCTS
+========================================================= */
 
 function renderProducts(){
 
@@ -695,7 +1050,12 @@ function renderProducts(){
 
     if(!db.products.length){
 
-        html=`<tr><td colspan="7" class="empty">কোনো Product নেই</td></tr>`;
+        html=`
+        <tr>
+            <td colspan="7" class="empty">
+                কোনো Product নেই
+            </td>
+        </tr>`;
 
     }else{
 
@@ -703,16 +1063,50 @@ function renderProducts(){
 
             html+=`
             <tr>
-                <td>${escapeHTML(p.name)}</td>
-                <td>${escapeHTML(p.code||"-")}</td>
-                <td>${money(p.buy)}</td>
-                <td>${money(p.sell)}</td>
-                <td>${p.stock}</td>
-                <td>${money(Number(p.stock)*Number(p.buy))}</td>
+
                 <td>
-                    <button class="btn btn-warning" onclick="editProduct('${p.id}')">Edit</button>
-                    <button class="btn btn-danger" onclick="deleteProduct('${p.id}')">Delete</button>
+                    ${escapeHTML(p.name)}
                 </td>
+
+                <td>
+                    ${escapeHTML(p.code||"-")}
+                </td>
+
+                <td>
+                    ${money(p.buy)}
+                </td>
+
+                <td>
+                    ${money(p.sell)}
+                </td>
+
+                <td>
+                    ${p.stock}
+                </td>
+
+                <td>
+                    ${money(
+                        Number(p.stock)*
+                        Number(p.buy)
+                    )}
+                </td>
+
+                <td>
+
+                    <button
+                        class="btn btn-warning"
+                        onclick="editProduct('${p.id}')">
+                        Edit
+                    </button>
+
+                    <button
+                        class="btn btn-danger"
+                        onclick="deleteProduct('${p.id}')">
+                        Delete
+                    </button>
+
+                </td>
+
             </tr>`;
         });
     }
@@ -720,36 +1114,76 @@ function renderProducts(){
     $("productTable").innerHTML=html;
 }
 
+/* =========================================================
+   RENDER SALES
+========================================================= */
+
 function renderSales(){
 
     if(!$("salesTable"))return;
 
     let html="";
 
-    [...db.sales].reverse().forEach(s=>{
+    [...db.sales]
+        .reverse()
+        .forEach(s=>{
 
         html+=`
         <tr>
+
             <td>${escapeHTML(s.date)}</td>
+
             <td>${escapeHTML(s.product)}</td>
+
             <td>${s.qty}</td>
+
             <td>${money(s.price)}</td>
+
             <td>${money(s.total)}</td>
-            <td>${escapeHTML(s.customer||"-")}</td>
+
+            <td>${escapeHTML(
+                s.customer||"-"
+            )}</td>
+
             <td>${money(s.paid)}</td>
+
             <td>${money(s.due)}</td>
+
             <td>
-                <button class="btn btn-warning" onclick="editSale('${s.id}')">Edit</button>
-                <button class="btn btn-danger" onclick="deleteSale('${s.id}')">Delete</button>
+
+                <button
+                    class="btn btn-warning"
+                    onclick="editSale('${s.id}')">
+                    Edit
+                </button>
+
+                <button
+                    class="btn btn-danger"
+                    onclick="deleteSale('${s.id}')">
+                    Delete
+                </button>
+
             </td>
+
         </tr>`;
     });
 
-    if(!html)
-        html=`<tr><td colspan="9" class="empty">কোনো Sale নেই</td></tr>`;
+    if(!html){
+
+        html=`
+        <tr>
+            <td colspan="9" class="empty">
+                কোনো Sale নেই
+            </td>
+        </tr>`;
+    }
 
     $("salesTable").innerHTML=html;
 }
+
+/* =========================================================
+   RENDER PURCHASE
+========================================================= */
 
 function renderPurchases(){
 
@@ -757,28 +1191,62 @@ function renderPurchases(){
 
     let html="";
 
-    [...db.purchases].reverse().forEach(p=>{
+    [...db.purchases]
+        .reverse()
+        .forEach(p=>{
 
         html+=`
         <tr>
+
             <td>${escapeHTML(p.date)}</td>
+
             <td>${escapeHTML(p.product)}</td>
+
             <td>${p.qty}</td>
+
             <td>${money(p.price)}</td>
+
             <td>${money(p.total)}</td>
-            <td>${escapeHTML(p.supplier||"-")}</td>
+
+            <td>${escapeHTML(
+                p.supplier||"-"
+            )}</td>
+
             <td>
-                <button class="btn btn-warning" onclick="editPurchase('${p.id}')">Edit</button>
-                <button class="btn btn-danger" onclick="deletePurchase('${p.id}')">Delete</button>
+
+                <button
+                    class="btn btn-warning"
+                    onclick="editPurchase('${p.id}')">
+                    Edit
+                </button>
+
+                <button
+                    class="btn btn-danger"
+                    onclick="deletePurchase('${p.id}')">
+                    Delete
+                </button>
+
             </td>
+
         </tr>`;
     });
 
-    if(!html)
-        html=`<tr><td colspan="7" class="empty">কোনো Purchase নেই</td></tr>`;
+    if(!html){
+
+        html=`
+        <tr>
+            <td colspan="7" class="empty">
+                কোনো Purchase নেই
+            </td>
+        </tr>`;
+    }
 
     $("purchaseTable").innerHTML=html;
 }
+
+/* =========================================================
+   RENDER CUSTOMERS
+========================================================= */
 
 function renderCustomers(){
 
@@ -786,32 +1254,70 @@ function renderCustomers(){
 
     let html="";
 
-    [...db.customers].reverse().forEach(c=>{
+    [...db.customers]
+        .reverse()
+        .forEach(c=>{
 
         const balance=
-            Number(c.due||0)-Number(c.payment||0);
+            Number(c.due||0)-
+            Number(c.payment||0);
 
         html+=`
         <tr>
+
             <td>${escapeHTML(c.date)}</td>
+
             <td>${escapeHTML(c.name)}</td>
-            <td>${escapeHTML(c.mobile||"-")}</td>
-            <td>${escapeHTML(c.address||"-")}</td>
+
+            <td>${escapeHTML(
+                c.mobile||"-"
+            )}</td>
+
+            <td>${escapeHTML(
+                c.address||"-"
+            )}</td>
+
             <td>${money(c.due)}</td>
+
             <td>${money(c.payment)}</td>
+
             <td>${money(balance)}</td>
+
             <td>
-                <button class="btn btn-warning" onclick="editCustomer('${c.id}')">Edit</button>
-                <button class="btn btn-danger" onclick="deleteCustomer('${c.id}')">Delete</button>
+
+                <button
+                    class="btn btn-warning"
+                    onclick="editCustomer('${c.id}')">
+                    Edit
+                </button>
+
+                <button
+                    class="btn btn-danger"
+                    onclick="deleteCustomer('${c.id}')">
+                    Delete
+                </button>
+
             </td>
+
         </tr>`;
     });
 
-    if(!html)
-        html=`<tr><td colspan="8" class="empty">কোনো Customer নেই</td></tr>`;
+    if(!html){
+
+        html=`
+        <tr>
+            <td colspan="8" class="empty">
+                কোনো Customer নেই
+            </td>
+        </tr>`;
+    }
 
     $("customerTable").innerHTML=html;
 }
+
+/* =========================================================
+   RENDER EXPENSE
+========================================================= */
 
 function renderExpenses(){
 
@@ -819,170 +1325,347 @@ function renderExpenses(){
 
     let html="";
 
-    [...db.expenses].reverse().forEach(e=>{
+    [...db.expenses]
+        .reverse()
+        .forEach(e=>{
 
         html+=`
         <tr>
+
             <td>${escapeHTML(e.date)}</td>
+
             <td>${escapeHTML(e.name)}</td>
+
             <td>${money(e.amount)}</td>
-            <td>${escapeHTML(e.note||"-")}</td>
+
+            <td>${escapeHTML(
+                e.note||"-"
+            )}</td>
+
             <td>
-                <button class="btn btn-warning" onclick="editExpense('${e.id}')">Edit</button>
-                <button class="btn btn-danger" onclick="deleteExpense('${e.id}')">Delete</button>
+
+                <button
+                    class="btn btn-warning"
+                    onclick="editExpense('${e.id}')">
+                    Edit
+                </button>
+
+                <button
+                    class="btn btn-danger"
+                    onclick="deleteExpense('${e.id}')">
+                    Delete
+                </button>
+
             </td>
+
         </tr>`;
     });
 
-    if(!html)
-        html=`<tr><td colspan="5" class="empty">কোনো Expense নেই</td></tr>`;
+    if(!html){
+
+        html=`
+        <tr>
+            <td colspan="5" class="empty">
+                কোনো Expense নেই
+            </td>
+        </tr>`;
+    }
 
     $("expenseTable").innerHTML=html;
 }
 
-/* =========================
+/* =========================================================
    DASHBOARD
-========================= */
+========================================================= */
 
 function calculateDashboard(){
 
-    const sales=db.sales.reduce((a,s)=>a+Number(s.total||0),0);
+    const sales=db.sales.reduce(
+        (a,s)=>a+Number(s.total||0),0
+    );
 
-    const purchase=db.purchases.reduce((a,p)=>a+Number(p.total||0),0);
+    const purchase=db.purchases.reduce(
+        (a,p)=>a+Number(p.total||0),0
+    );
 
     const gross=db.sales.reduce(
-        (a,s)=>a+Number(s.total||0)-Number(s.cost||0),0
+        (a,s)=>
+            a+
+            Number(s.total||0)-
+            Number(s.cost||0),
+        0
     );
 
     const expense=db.expenses.reduce(
-        (a,e)=>a+Number(e.amount||0),0
+        (a,e)=>a+Number(e.amount||0),
+        0
     );
 
     const net=gross-expense;
 
-    const due=db.sales.reduce(
-        (a,s)=>a+Number(s.due||0),0
-    )+
-    db.customers.reduce(
-        (a,c)=>a+Number(c.due||0)-Number(c.payment||0),0
-    );
+    const due=
+
+        db.sales.reduce(
+            (a,s)=>a+Number(s.due||0),
+            0
+        )
+
+        +
+
+        db.customers.reduce(
+            (a,c)=>
+                a+
+                Number(c.due||0)-
+                Number(c.payment||0),
+            0
+        );
 
     const stock=db.products.reduce(
-        (a,p)=>a+Number(p.stock||0)*Number(p.buy||0),0
+        (a,p)=>
+            a+
+            Number(p.stock||0)*
+            Number(p.buy||0),
+        0
     );
 
     const paid=db.sales.reduce(
-        (a,s)=>a+Number(s.paid||0),0
+        (a,s)=>a+Number(s.paid||0),
+        0
     );
 
-    const cash=paid-purchase-expense;
+    const cash=
+        paid-
+        purchase-
+        expense;
 
-    if($("dashSales"))$("dashSales").innerText=money(sales);
-    if($("dashPurchase"))$("dashPurchase").innerText=money(purchase);
-    if($("dashGross"))$("dashGross").innerText=money(gross);
-    if($("dashExpense"))$("dashExpense").innerText=money(expense);
-    if($("dashNet"))$("dashNet").innerText=money(net);
-    if($("dashDue"))$("dashDue").innerText=money(due);
-    if($("dashStock"))$("dashStock").innerText=money(stock);
-    if($("dashCash"))$("dashCash").innerText=money(cash);
-    if($("dashProducts"))$("dashProducts").innerText=db.products.length;
+    if($("dashSales"))
+        $("dashSales").innerText=money(sales);
+
+    if($("dashPurchase"))
+        $("dashPurchase").innerText=
+            money(purchase);
+
+    if($("dashGross"))
+        $("dashGross").innerText=
+            money(gross);
+
+    if($("dashExpense"))
+        $("dashExpense").innerText=
+            money(expense);
+
+    if($("dashNet"))
+        $("dashNet").innerText=
+            money(net);
+
+    if($("dashDue"))
+        $("dashDue").innerText=
+            money(due);
+
+    if($("dashStock"))
+        $("dashStock").innerText=
+            money(stock);
+
+    if($("dashCash"))
+        $("dashCash").innerText=
+            money(cash);
+
+    if($("dashProducts"))
+        $("dashProducts").innerText=
+            db.products.length;
 
     if($("recentSales")){
 
         let html="";
 
-        [...db.sales].reverse().slice(0,10).forEach(s=>{
+        [...db.sales]
+            .reverse()
+            .slice(0,10)
+            .forEach(s=>{
 
             html+=`
             <tr>
+
                 <td>${escapeHTML(s.date)}</td>
+
                 <td>${escapeHTML(s.product)}</td>
+
                 <td>${s.qty}</td>
+
                 <td>${money(s.total)}</td>
+
                 <td>${money(s.paid)}</td>
+
                 <td>${money(s.due)}</td>
+
             </tr>`;
         });
 
         $("recentSales").innerHTML=
-            html||
-            `<tr><td colspan="6" class="empty">কোনো Sale নেই</td></tr>`;
+            html ||
+            `
+            <tr>
+                <td colspan="6"
+                    class="empty">
+                    কোনো Sale নেই
+                </td>
+            </tr>`;
     }
 }
 
-/* =========================
+/* =========================================================
    REPORT
-========================= */
+========================================================= */
 
 function dateInRange(date,from,to){
 
-    if(from && date<from)return false;
-    if(to && date>to)return false;
+    if(from && date<from)
+        return false;
+
+    if(to && date>to)
+        return false;
 
     return true;
 }
 
 function generateReport(){
 
-    if(!$("reportFrom"))return;
+    if(!$("reportFrom"))
+        return;
 
     const from=$("reportFrom").value;
+
     const to=$("reportTo").value;
 
-    const sales=db.sales.filter(s=>dateInRange(s.date,from,to));
+    const sales=db.sales.filter(
+        s=>dateInRange(
+            s.date,
+            from,
+            to
+        )
+    );
 
-    const purchases=db.purchases.filter(p=>dateInRange(p.date,from,to));
+    const purchases=db.purchases.filter(
+        p=>dateInRange(
+            p.date,
+            from,
+            to
+        )
+    );
 
-    const expenses=db.expenses.filter(e=>dateInRange(e.date,from,to));
+    const expenses=db.expenses.filter(
+        e=>dateInRange(
+            e.date,
+            from,
+            to
+        )
+    );
 
-    const totalSales=sales.reduce((a,s)=>a+Number(s.total||0),0);
+    const totalSales=sales.reduce(
+        (a,s)=>a+Number(s.total||0),
+        0
+    );
 
-    const totalPurchase=purchases.reduce((a,p)=>a+Number(p.total||0),0);
+    const totalPurchase=purchases.reduce(
+        (a,p)=>a+Number(p.total||0),
+        0
+    );
 
     const gross=sales.reduce(
-        (a,s)=>a+Number(s.total||0)-Number(s.cost||0),0
+        (a,s)=>
+            a+
+            Number(s.total||0)-
+            Number(s.cost||0),
+        0
     );
 
     const totalExpense=expenses.reduce(
-        (a,e)=>a+Number(e.amount||0),0
+        (a,e)=>a+Number(e.amount||0),
+        0
     );
 
     const net=gross-totalExpense;
 
-    const due=db.sales.reduce(
-        (a,s)=>a+Number(s.due||0),0
-    )+
-    db.customers.reduce(
-        (a,c)=>a+Number(c.due||0)-Number(c.payment||0),0
-    );
+    const due=
+
+        db.sales.reduce(
+            (a,s)=>a+Number(s.due||0),
+            0
+        )
+
+        +
+
+        db.customers.reduce(
+            (a,c)=>
+                a+
+                Number(c.due||0)-
+                Number(c.payment||0),
+            0
+        );
 
     const stock=db.products.reduce(
-        (a,p)=>a+Number(p.stock||0)*Number(p.buy||0),0
+        (a,p)=>
+            a+
+            Number(p.stock||0)*
+            Number(p.buy||0),
+        0
     );
 
     const paid=sales.reduce(
-        (a,s)=>a+Number(s.paid||0),0
+        (a,s)=>a+Number(s.paid||0),
+        0
     );
 
-    const cash=paid-totalPurchase-totalExpense;
+    const cash=
+        paid-
+        totalPurchase-
+        totalExpense;
 
-    if($("reportSales"))$("reportSales").innerText=money(totalSales);
-    if($("reportPurchase"))$("reportPurchase").innerText=money(totalPurchase);
-    if($("reportGross"))$("reportGross").innerText=money(gross);
-    if($("reportExpense"))$("reportExpense").innerText=money(totalExpense);
-    if($("reportNet"))$("reportNet").innerText=money(net);
-    if($("reportDue"))$("reportDue").innerText=money(due);
-    if($("reportStock"))$("reportStock").innerText=money(stock);
-    if($("reportCash"))$("reportCash").innerText=money(cash);
-    if($("reportProducts"))$("reportProducts").innerText=db.products.length;
+    if($("reportSales"))
+        $("reportSales").innerText=
+            money(totalSales);
+
+    if($("reportPurchase"))
+        $("reportPurchase").innerText=
+            money(totalPurchase);
+
+    if($("reportGross"))
+        $("reportGross").innerText=
+            money(gross);
+
+    if($("reportExpense"))
+        $("reportExpense").innerText=
+            money(totalExpense);
+
+    if($("reportNet"))
+        $("reportNet").innerText=
+            money(net);
+
+    if($("reportDue"))
+        $("reportDue").innerText=
+            money(due);
+
+    if($("reportStock"))
+        $("reportStock").innerText=
+            money(stock);
+
+    if($("reportCash"))
+        $("reportCash").innerText=
+            money(cash);
+
+    if($("reportProducts"))
+        $("reportProducts").innerText=
+            db.products.length;
 }
 
 function reportToday(){
 
     const d=today();
 
-    $("reportFrom").value=d;
-    $("reportTo").value=d;
+    if($("reportFrom"))
+        $("reportFrom").value=d;
+
+    if($("reportTo"))
+        $("reportTo").value=d;
 
     generateReport();
 }
@@ -993,9 +1676,12 @@ function reportMonth(){
 
     const from=
         d.getFullYear()+"-"+
-        String(d.getMonth()+1).padStart(2,"0")+"-01";
+        String(d.getMonth()+1)
+            .padStart(2,"0")+
+        "-01";
 
     $("reportFrom").value=from;
+
     $("reportTo").value=today();
 
     generateReport();
@@ -1004,49 +1690,142 @@ function reportMonth(){
 function reportAll(){
 
     $("reportFrom").value="";
+
     $("reportTo").value="";
 
     generateReport();
 }
 
-/* =========================
+/* =========================================================
    RENDER ALL
-========================= */
+========================================================= */
 
 function renderAll(){
 
     try{
+
         renderProducts();
+
         renderSales();
+
         renderPurchases();
+
         renderCustomers();
+
         renderExpenses();
+
         calculateDashboard();
+
         generateReport();
-    }catch(e){
-        console.error("Render Error:",e);
+
+    }catch(error){
+
+        console.error(
+            "Render Error:",
+            error
+        );
     }
 }
 
-/* =========================
+/* =========================================================
    START
-========================= */
+========================================================= */
 
-document.addEventListener("DOMContentLoaded",()=>{
+document.addEventListener(
+    "DOMContentLoaded",
+    ()=>{
 
-    $("productForm")?.addEventListener("submit",saveProduct);
-    $("salesForm")?.addEventListener("submit",saveSale);
-    $("purchaseForm")?.addEventListener("submit",savePurchase);
-    $("customerForm")?.addEventListener("submit",saveCustomer);
-    $("expenseForm")?.addEventListener("submit",saveExpense);
+        /* Login form */
 
-    if($("saleDate"))$("saleDate").value=today();
-    if($("purchaseDate"))$("purchaseDate").value=today();
-    if($("customerDate"))$("customerDate").value=today();
-    if($("expenseDate"))$("expenseDate").value=today();
+        $("loginForm")?.addEventListener(
+            "submit",
+            loginUser
+        );
 
-    renderAll();
+        /* Main forms */
 
-    console.log("✅ Smart Store Ready");
-});
+        $("productForm")?.addEventListener(
+            "submit",
+            saveProduct
+        );
+
+        $("salesForm")?.addEventListener(
+            "submit",
+            saveSale
+        );
+
+        $("purchaseForm")?.addEventListener(
+            "submit",
+            savePurchase
+        );
+
+        $("customerForm")?.addEventListener(
+            "submit",
+            saveCustomer
+        );
+
+        $("expenseForm")?.addEventListener(
+            "submit",
+            saveExpense
+        );
+
+        /* Sale calculation */
+
+        $("saleProduct")?.addEventListener(
+            "input",
+            autoSalePrice
+        );
+
+        $("saleQty")?.addEventListener(
+            "input",
+            calculateSale
+        );
+
+        $("salePrice")?.addEventListener(
+            "input",
+            calculateSale
+        );
+
+        $("salePaid")?.addEventListener(
+            "input",
+            calculateSale
+        );
+
+        /* Purchase price */
+
+        $("purchaseProduct")?.addEventListener(
+            "input",
+            autoPurchasePrice
+        );
+
+        /* Dates */
+
+        if($("saleDate"))
+            $("saleDate").value=today();
+
+        if($("purchaseDate"))
+            $("purchaseDate").value=today();
+
+        if($("customerDate"))
+            $("customerDate").value=today();
+
+        if($("expenseDate"))
+            $("expenseDate").value=today();
+
+        /* Login state */
+
+        if(isLoggedIn()){
+
+            showApp();
+
+        }else{
+
+            showLogin();
+        }
+
+        console.log(
+            "✅ Smart Store Ready - Firebase Free"
+        );
+    }
+);
 </script>
