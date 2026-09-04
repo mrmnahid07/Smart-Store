@@ -1,20 +1,9 @@
 <script>
 "use strict";
 
-/* =====================================================
-   SMART STORE - FIREBASE FREE
-   LOCAL STORAGE DATABASE
-===================================================== */
-
 const DB_KEY = "smartStoreDB";
 
-function $(id){
-    return document.getElementById(id);
-}
-
-/* =====================================================
-   SAFE DATABASE LOAD
-===================================================== */
+const $ = id => document.getElementById(id);
 
 function defaultDB(){
     return {
@@ -27,20 +16,11 @@ function defaultDB(){
 }
 
 function loadDB(){
-
     try{
-
         const saved = localStorage.getItem(DB_KEY);
-
-        if(!saved){
-            return defaultDB();
-        }
+        if(!saved) return defaultDB();
 
         const data = JSON.parse(saved);
-
-        if(!data || typeof data !== "object"){
-            return defaultDB();
-        }
 
         return {
             products: Array.isArray(data.products) ? data.products : [],
@@ -49,83 +29,38 @@ function loadDB(){
             customers: Array.isArray(data.customers) ? data.customers : [],
             expenses: Array.isArray(data.expenses) ? data.expenses : []
         };
-
-    }catch(error){
-
-        console.error("Database Load Error:", error);
-
+    }catch(e){
+        console.error(e);
         return defaultDB();
     }
 }
 
 let db = loadDB();
 
-/* =====================================================
-   SAVE DATABASE
-===================================================== */
-
 function save(){
-
     try{
-
-        localStorage.setItem(
-            DB_KEY,
-            JSON.stringify(db)
-        );
-
+        localStorage.setItem(DB_KEY, JSON.stringify(db));
         renderAll();
-
-    }catch(error){
-
-        console.error("Database Save Error:", error);
-
-        alert("Data save করা যায়নি। Browser storage check করুন।");
+    }catch(e){
+        alert("Data save করা যাচ্ছে না!");
+        console.error(e);
     }
 }
 
-/* =====================================================
-   TODAY
-===================================================== */
-
 function today(){
-
     const d = new Date();
-
-    const month = String(
-        d.getMonth()+1
-    ).padStart(2,"0");
-
-    const day = String(
-        d.getDate()
-    ).padStart(2,"0");
-
-    return d.getFullYear()+"-"+month+"-"+day;
+    return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
 }
 
-/* =====================================================
-   MONEY
-===================================================== */
-
-function money(value){
-
-    const n = Number(value || 0);
-
-    return "৳" + n.toLocaleString(
-        "en-BD",
-        {
-            minimumFractionDigits:2,
-            maximumFractionDigits:2
-        }
-    );
+function money(v){
+    return "৳"+Number(v||0).toLocaleString("en-BD",{
+        minimumFractionDigits:2,
+        maximumFractionDigits:2
+    });
 }
 
-/* =====================================================
-   ESCAPE HTML
-===================================================== */
-
-function escapeHTML(value){
-
-    return String(value ?? "")
+function escapeHTML(v){
+    return String(v ?? "")
         .replace(/&/g,"&amp;")
         .replace(/</g,"&lt;")
         .replace(/>/g,"&gt;")
@@ -133,32 +68,26 @@ function escapeHTML(value){
         .replace(/'/g,"&#039;");
 }
 
-/* =====================================================
-   PAGE NAVIGATION
-===================================================== */
+/* =========================
+   PAGE SYSTEM
+========================= */
 
-function showPage(page, button){
+function showPage(page,button){
 
-    document.querySelectorAll(".page").forEach(function(p){
+    document.querySelectorAll(".page").forEach(p=>{
         p.classList.remove("active");
     });
 
-    const target = $(page);
+    const target=$(page);
+    if(target) target.classList.add("active");
 
-    if(target){
-        target.classList.add("active");
-    }
-
-    document.querySelectorAll(".menu button").forEach(function(b){
+    document.querySelectorAll(".menu button").forEach(b=>{
         b.classList.remove("active");
     });
 
-    if(button){
-        button.classList.add("active");
-    }
+    if(button) button.classList.add("active");
 
-    const titles = {
-
+    const titles={
         dashboard:"🏠 Dashboard",
         products:"📦 Products",
         sales:"🛒 Sales",
@@ -166,178 +95,121 @@ function showPage(page, button){
         customers:"👥 Customers",
         expenses:"💸 Expenses",
         reports:"📊 Reports"
-
     };
 
-    if($("pageTitle")){
-        $("pageTitle").innerText =
-            titles[page] || "Smart Store";
+    if($("pageTitle"))
+        $("pageTitle").innerText=titles[page]||"Smart Store";
+}
+
+/* =========================
+   LOGOUT
+========================= */
+
+function logout(){
+
+    if(confirm("আপনি কি Logout করতে চান?")){
+
+        localStorage.removeItem("smartStoreLoggedIn");
+
+        location.reload();
     }
 }
 
-/* =====================================================
-   FIND PRODUCT
-===================================================== */
+/* =========================
+   PRODUCT
+========================= */
 
 function findProduct(name){
+    const n=String(name||"").trim().toLowerCase();
 
-    const search = String(name || "")
-        .trim()
-        .toLowerCase();
-
-    return db.products.find(function(p){
-
-        return String(p.name || "")
-            .trim()
-            .toLowerCase() === search;
-
-    });
-}
-
-/* =====================================================
-   PRODUCT
-===================================================== */
-
-function resetProductForm(){
-
-    const form = $("productForm");
-
-    if(form){
-        form.reset();
-    }
-
-    if($("productId")){
-        $("productId").value = "";
-    }
-
-    if($("productSubmit")){
-        $("productSubmit").innerText =
-            "➕ Add Product";
-    }
-}
-
-function editProduct(id){
-
-    const p = db.products.find(function(x){
-        return x.id === id;
-    });
-
-    if(!p) return;
-
-    $("productId").value = p.id;
-    $("productName").value = p.name || "";
-    $("productCode").value = p.code || "";
-    $("productBuy").value = p.buy || 0;
-    $("productSell").value = p.sell || 0;
-    $("productStock").value = p.stock || 0;
-
-    $("productSubmit").innerText =
-        "💾 Update Product";
-
-    showPage(
-        "products",
-        document.querySelectorAll(".menu button")[1]
+    return db.products.find(p=>
+        String(p.name||"").trim().toLowerCase()===n
     );
 }
 
-function deleteProduct(id){
+function resetProductForm(){
 
-    if(!confirm("এই Product Delete করতে চান?")){
-        return;
-    }
+    $("productForm")?.reset();
 
-    db.products = db.products.filter(function(p){
-        return p.id !== id;
-    });
+    if($("productId")) $("productId").value="";
 
-    save();
+    if($("productSubmit"))
+        $("productSubmit").innerText="➕ Add Product";
 }
 
 function saveProduct(e){
 
     e.preventDefault();
 
-    const id = $("productId").value;
-
-    const name = $("productName").value.trim();
-
-    const code = $("productCode").value.trim();
-
-    const buy = Number(
-        $("productBuy").value || 0
-    );
-
-    const sell = Number(
-        $("productSell").value || 0
-    );
-
-    const stock = Number(
-        $("productStock").value || 0
-    );
+    const id=$("productId").value;
+    const name=$("productName").value.trim();
 
     if(!name){
-
         alert("Product Name লিখুন");
         return;
     }
 
-    const product = {
-
-        id: id || Date.now().toString(),
-
-        name: name,
-
-        code: code,
-
-        buy: buy,
-
-        sell: sell,
-
-        stock: stock
-
+    const product={
+        id:id||Date.now().toString(),
+        name:name,
+        code:$("productCode").value.trim(),
+        buy:Number($("productBuy").value||0),
+        sell:Number($("productSell").value||0),
+        stock:Number($("productStock").value||0)
     };
 
     if(id){
 
-        const index = db.products.findIndex(
-            function(p){
-                return p.id === id;
-            }
-        );
+        const i=db.products.findIndex(p=>p.id===id);
 
-        if(index !== -1){
-            db.products[index] = product;
-        }
+        if(i!==-1) db.products[i]=product;
 
     }else{
-
         db.products.push(product);
     }
 
     resetProductForm();
-
     save();
 
-    alert("Product Successfully Saved");
+    alert("✅ Product Saved");
 }
 
-/* =====================================================
-   SALE PRICE
-===================================================== */
+function editProduct(id){
+
+    const p=db.products.find(x=>x.id===id);
+    if(!p)return;
+
+    $("productId").value=p.id;
+    $("productName").value=p.name;
+    $("productCode").value=p.code||"";
+    $("productBuy").value=p.buy||0;
+    $("productSell").value=p.sell||0;
+    $("productStock").value=p.stock||0;
+
+    $("productSubmit").innerText="💾 Update Product";
+
+    showPage("products");
+}
+
+function deleteProduct(id){
+
+    if(!confirm("Product Delete করবেন?"))return;
+
+    db.products=db.products.filter(p=>p.id!==id);
+    save();
+}
+
+/* =========================
+   SALES
+========================= */
 
 function autoSalePrice(){
 
-    const product = findProduct(
-        $("saleProduct").value
-    );
+    const p=findProduct($("saleProduct").value);
 
-    if(product){
-
-        $("salePrice").value =
-            product.sell;
-
-        $("saleCost").value =
-            product.buy;
+    if(p){
+        $("salePrice").value=p.sell;
+        $("saleCost").value=p.buy;
     }
 
     calculateSale();
@@ -345,1659 +217,836 @@ function autoSalePrice(){
 
 function calculateSale(){
 
-    const qty = Number(
-        $("saleQty").value || 0
-    );
+    const qty=Number($("saleQty").value||0);
+    const price=Number($("salePrice").value||0);
+    const paid=Number($("salePaid").value||0);
 
-    const price = Number(
-        $("salePrice").value || 0
-    );
+    const total=qty*price;
+    const due=Math.max(0,total-paid);
 
-    const paid = Number(
-        $("salePaid").value || 0
-    );
+    $("saleTotal").value=total.toFixed(2);
+    $("saleDue").value=due.toFixed(2);
 
-    const total = qty * price;
+    const p=findProduct($("saleProduct").value);
 
-    const due = Math.max(
-        0,
-        total - paid
-    );
-
-    $("saleTotal").value =
-        total.toFixed(2);
-
-    $("saleDue").value =
-        due.toFixed(2);
-
-    const product = findProduct(
-        $("saleProduct").value
-    );
-
-    if(product){
-
-        $("saleCost").value =
-            product.buy;
-    }
+    if(p) $("saleCost").value=p.buy;
 }
-
-/* =====================================================
-   SALE
-===================================================== */
 
 function resetSaleForm(){
 
-    const form = $("salesForm");
+    $("salesForm")?.reset();
 
-    if(form){
-        form.reset();
-    }
+    $("saleId").value="";
+    $("saleDate").value=today();
+    $("salePaid").value=0;
+    $("saleTotal").value=0;
+    $("saleDue").value=0;
+    $("saleCost").value=0;
 
-    $("saleId").value = "";
-
-    $("saleDate").value = today();
-
-    $("salePaid").value = 0;
-
-    $("saleTotal").value = 0;
-
-    $("saleDue").value = 0;
-
-    $("saleCost").value = 0;
-
-    $("saleSubmit").innerText =
-        "➕ Add Sale";
+    $("saleSubmit").innerText="➕ Add Sale";
 }
 
 function saveSale(e){
 
     e.preventDefault();
 
-    const id = $("saleId").value;
+    const id=$("saleId").value;
+    const name=$("saleProduct").value.trim();
+    const qty=Number($("saleQty").value||0);
+    const price=Number($("salePrice").value||0);
+    const paid=Number($("salePaid").value||0);
 
-    const name =
-        $("saleProduct").value.trim();
+    const product=findProduct(name);
 
-    const qty =
-        Number($("saleQty").value || 0);
-
-    const price =
-        Number($("salePrice").value || 0);
-
-    const paid =
-        Number($("salePaid").value || 0);
-
-    const product =
-        findProduct(name);
-
-    if(!name){
-
-        alert("Product Name লিখুন");
+    if(!product){
+        alert("❌ Product পাওয়া যায়নি");
         return;
     }
 
-    if(qty <= 0){
-
+    if(qty<=0){
         alert("Quantity সঠিকভাবে লিখুন");
         return;
     }
 
-    if(price < 0){
+    const total=qty*price;
 
-        alert("Sale Price সঠিক নয়");
+    if(paid>total){
+        alert("Paid বেশি হতে পারবে না");
         return;
     }
 
-    const total = qty * price;
-
-    if(paid > total){
-
-        alert(
-            "Paid Total-এর চেয়ে বেশি হতে পারবে না"
-        );
-
-        return;
-    }
-
-    /* EDIT হলে পুরোনো stock ফেরত */
-
+    /* Edit হলে পুরোনো stock ফেরত */
     if(id){
 
-        const oldSale =
-            db.sales.find(function(s){
-                return s.id === id;
-            });
+        const old=db.sales.find(s=>s.id===id);
 
-        if(oldSale){
+        if(old){
 
-            const oldProduct =
-                findProduct(oldSale.product);
+            const oldProduct=findProduct(old.product);
 
-            if(oldProduct){
-
-                oldProduct.stock +=
-                    Number(oldSale.qty || 0);
-            }
+            if(oldProduct)
+                oldProduct.stock+=Number(old.qty||0);
         }
     }
 
-    /* Product থাকলে stock check */
-
-    let currentProduct =
-        findProduct(name);
-
-    let cost = 0;
-
-    if(currentProduct){
-
-        if(currentProduct.stock < qty){
-
-            alert(
-                "Stock পর্যাপ্ত নেই। Current Stock: "
-                + currentProduct.stock
-            );
-
-            /* EDIT reverse */
-
-            if(id){
-
-                const oldSale =
-                    db.sales.find(function(s){
-                        return s.id === id;
-                    });
-
-                if(oldSale){
-
-                    const oldProduct =
-                        findProduct(oldSale.product);
-
-                    if(oldProduct){
-
-                        oldProduct.stock -=
-                            Number(oldSale.qty || 0);
-                    }
-                }
-            }
-
-            return;
-        }
-
-        currentProduct.stock -= qty;
-
-        cost =
-            qty * Number(currentProduct.buy || 0);
-
-    }else{
-
-        alert(
-            "এই নামে কোনো Product নেই। আগে Product Add করুন।"
-        );
-
-        /* EDIT reverse */
+    if(product.stock<qty){
 
         if(id){
 
-            const oldSale =
-                db.sales.find(function(s){
-                    return s.id === id;
-                });
+            const old=db.sales.find(s=>s.id===id);
 
-            if(oldSale){
+            if(old){
 
-                const oldProduct =
-                    findProduct(oldSale.product);
+                const oldProduct=findProduct(old.product);
 
-                if(oldProduct){
-
-                    oldProduct.stock -=
-                        Number(oldSale.qty || 0);
-                }
+                if(oldProduct)
+                    oldProduct.stock-=Number(old.qty||0);
             }
         }
 
+        alert("❌ Stock পর্যাপ্ত নেই");
         return;
     }
 
-    const sale = {
+    product.stock-=qty;
 
-        id: id || Date.now().toString(),
-
-        date:
-            $("saleDate").value || today(),
-
+    const sale={
+        id:id||Date.now().toString(),
+        date:$("saleDate").value||today(),
         product:name,
-
         qty:qty,
-
         price:price,
-
         total:total,
-
         paid:paid,
-
-        due:
-            Math.max(0,total-paid),
-
-        customer:
-            $("saleCustomer").value.trim(),
-
-        cost:cost
-
+        due:Math.max(0,total-paid),
+        customer:$("saleCustomer").value.trim(),
+        cost:qty*Number(product.buy||0)
     };
 
     if(id){
 
-        const index =
-            db.sales.findIndex(function(s){
-                return s.id === id;
-            });
+        const i=db.sales.findIndex(s=>s.id===id);
 
-        if(index !== -1){
-
-            db.sales[index] = sale;
-        }
+        if(i!==-1)db.sales[i]=sale;
 
     }else{
-
         db.sales.push(sale);
     }
 
     resetSaleForm();
-
     save();
 
-    alert("Sale Successfully Saved");
+    alert("✅ Sale Saved");
 }
 
 function editSale(id){
 
-    const s =
-        db.sales.find(function(x){
-            return x.id === id;
-        });
+    const s=db.sales.find(x=>x.id===id);
+    if(!s)return;
 
-    if(!s) return;
+    $("saleId").value=s.id;
+    $("saleDate").value=s.date;
+    $("saleProduct").value=s.product;
+    $("saleQty").value=s.qty;
+    $("salePrice").value=s.price;
+    $("saleCustomer").value=s.customer||"";
+    $("salePaid").value=s.paid;
+    $("saleTotal").value=s.total;
+    $("saleDue").value=s.due;
+    $("saleCost").value=s.cost;
 
-    $("saleId").value = s.id;
-    $("saleDate").value = s.date;
-    $("saleProduct").value = s.product;
-    $("saleQty").value = s.qty;
-    $("salePrice").value = s.price;
-    $("saleCustomer").value =
-        s.customer || "";
-    $("salePaid").value = s.paid;
-    $("saleTotal").value = s.total;
-    $("saleDue").value = s.due;
-    $("saleCost").value = s.cost;
+    $("saleSubmit").innerText="💾 Update Sale";
 
-    $("saleSubmit").innerText =
-        "💾 Update Sale";
-
-    showPage(
-        "sales",
-        document.querySelectorAll(".menu button")[2]
-    );
+    showPage("sales");
 }
 
 function deleteSale(id){
 
-    if(!confirm("এই Sale Delete করতে চান?")){
-        return;
+    if(!confirm("Sale Delete করবেন?"))return;
+
+    const s=db.sales.find(x=>x.id===id);
+
+    if(s){
+
+        const p=findProduct(s.product);
+
+        if(p)p.stock+=Number(s.qty||0);
     }
 
-    const sale =
-        db.sales.find(function(s){
-            return s.id === id;
-        });
-
-    if(sale){
-
-        const product =
-            findProduct(sale.product);
-
-        if(product){
-
-            product.stock +=
-                Number(sale.qty || 0);
-        }
-    }
-
-    db.sales =
-        db.sales.filter(function(s){
-            return s.id !== id;
-        });
+    db.sales=db.sales.filter(s=>s.id!==id);
 
     save();
 }
 
-/* =====================================================
+/* =========================
    PURCHASE
-===================================================== */
+========================= */
 
 function autoPurchasePrice(){
 
-    const product =
-        findProduct(
-            $("purchaseProduct").value
-        );
+    const p=findProduct($("purchaseProduct").value);
 
-    if(product){
+    if(p){
 
-        $("purchasePrice").value =
-            product.buy;
-
-        $("purchaseSell").value =
-            product.sell;
+        $("purchasePrice").value=p.buy;
+        $("purchaseSell").value=p.sell;
     }
 }
 
 function resetPurchaseForm(){
 
-    const form =
-        $("purchaseForm");
+    $("purchaseForm")?.reset();
 
-    if(form){
-        form.reset();
-    }
+    $("purchaseId").value="";
+    $("purchaseDate").value=today();
 
-    $("purchaseId").value = "";
-
-    $("purchaseDate").value = today();
-
-    $("purchaseSubmit").innerText =
-        "➕ Add Purchase";
+    $("purchaseSubmit").innerText="➕ Add Purchase";
 }
 
 function savePurchase(e){
 
     e.preventDefault();
 
-    const id =
-        $("purchaseId").value;
-
-    const name =
-        $("purchaseProduct").value.trim();
-
-    const qty =
-        Number($("purchaseQty").value || 0);
-
-    const price =
-        Number($("purchasePrice").value || 0);
-
-    const sell =
-        Number($("purchaseSell").value || 0);
+    const id=$("purchaseId").value;
+    const name=$("purchaseProduct").value.trim();
+    const qty=Number($("purchaseQty").value||0);
+    const price=Number($("purchasePrice").value||0);
+    const sell=Number($("purchaseSell").value||0);
 
     if(!name){
-
         alert("Product Name লিখুন");
         return;
     }
 
-    if(qty <= 0){
-
+    if(qty<=0){
         alert("Quantity সঠিকভাবে লিখুন");
         return;
     }
 
-    if(price < 0){
-
-        alert("Purchase Price সঠিক নয়");
-        return;
-    }
-
-    /* EDIT reverse */
-
     if(id){
 
-        const old =
-            db.purchases.find(function(p){
-                return p.id === id;
-            });
+        const old=db.purchases.find(p=>p.id===id);
 
         if(old){
 
-            const oldProduct =
-                findProduct(old.product);
+            const oldProduct=findProduct(old.product);
 
-            if(oldProduct){
-
-                oldProduct.stock -=
-                    Number(old.qty || 0);
-            }
+            if(oldProduct)
+                oldProduct.stock-=Number(old.qty||0);
         }
     }
 
-    let product =
-        findProduct(name);
+    let product=findProduct(name);
 
     if(product){
 
-        product.stock += qty;
+        product.stock+=qty;
+        product.buy=price;
 
-        product.buy = price;
-
-        if(sell > 0){
-            product.sell = sell;
-        }
+        if(sell>0)
+            product.sell=sell;
 
     }else{
 
-        product = {
-
-            id: Date.now().toString(),
-
+        product={
+            id:Date.now().toString(),
             name:name,
-
             code:"",
-
             buy:price,
-
-            sell:sell || price,
-
+            sell:sell||price,
             stock:qty
         };
 
         db.products.push(product);
     }
 
-    const purchase = {
-
-        id:
-            id || Date.now().toString(),
-
-        date:
-            $("purchaseDate").value || today(),
-
+    const purchase={
+        id:id||Date.now().toString(),
+        date:$("purchaseDate").value||today(),
         product:name,
-
         qty:qty,
-
         price:price,
-
-        total:qty * price,
-
-        supplier:
-            $("purchaseSupplier").value.trim()
+        total:qty*price,
+        supplier:$("purchaseSupplier").value.trim()
     };
 
     if(id){
 
-        const index =
-            db.purchases.findIndex(function(p){
-                return p.id === id;
-            });
+        const i=db.purchases.findIndex(p=>p.id===id);
 
-        if(index !== -1){
-
-            db.purchases[index] =
-                purchase;
-        }
+        if(i!==-1)db.purchases[i]=purchase;
 
     }else{
-
         db.purchases.push(purchase);
     }
 
     resetPurchaseForm();
-
     save();
 
-    alert("Purchase Successfully Saved");
+    alert("✅ Purchase Saved");
 }
 
 function editPurchase(id){
 
-    const p =
-        db.purchases.find(function(x){
-            return x.id === id;
-        });
+    const p=db.purchases.find(x=>x.id===id);
+    if(!p)return;
 
-    if(!p) return;
+    $("purchaseId").value=p.id;
+    $("purchaseDate").value=p.date;
+    $("purchaseProduct").value=p.product;
+    $("purchaseQty").value=p.qty;
+    $("purchasePrice").value=p.price;
+    $("purchaseSupplier").value=p.supplier||"";
 
-    $("purchaseId").value = p.id;
-    $("purchaseDate").value = p.date;
-    $("purchaseProduct").value = p.product;
-    $("purchaseQty").value = p.qty;
-    $("purchasePrice").value = p.price;
-    $("purchaseSupplier").value =
-        p.supplier || "";
+    const product=findProduct(p.product);
 
-    const product =
-        findProduct(p.product);
+    $("purchaseSell").value=product?product.sell:"";
 
-    $("purchaseSell").value =
-        product ? product.sell : "";
+    $("purchaseSubmit").innerText="💾 Update Purchase";
 
-    $("purchaseSubmit").innerText =
-        "💾 Update Purchase";
-
-    showPage(
-        "purchase",
-        document.querySelectorAll(".menu button")[3]
-    );
+    showPage("purchase");
 }
 
 function deletePurchase(id){
 
-    if(!confirm(
-        "এই Purchase Delete করতে চান?"
-    )){
-        return;
+    if(!confirm("Purchase Delete করবেন?"))return;
+
+    const p=db.purchases.find(x=>x.id===id);
+
+    if(p){
+
+        const product=findProduct(p.product);
+
+        if(product)
+            product.stock=Math.max(
+                0,
+                Number(product.stock||0)-Number(p.qty||0)
+            );
     }
 
-    const purchase =
-        db.purchases.find(function(p){
-            return p.id === id;
-        });
-
-    if(purchase){
-
-        const product =
-            findProduct(purchase.product);
-
-        if(product){
-
-            product.stock =
-                Math.max(
-                    0,
-                    product.stock -
-                    Number(purchase.qty || 0)
-                );
-        }
-    }
-
-    db.purchases =
-        db.purchases.filter(function(p){
-            return p.id !== id;
-        });
+    db.purchases=db.purchases.filter(p=>p.id!==id);
 
     save();
 }
 
-/* =====================================================
+/* =========================
    CUSTOMER
-===================================================== */
+========================= */
 
 function resetCustomerForm(){
 
-    const form =
-        $("customerForm");
+    $("customerForm")?.reset();
 
-    if(form){
-        form.reset();
-    }
-
-    $("customerId").value = "";
-
-    $("customerDate").value =
-        today();
-
-    $("customerDue").value = 0;
-
-    $("customerPayment").value = 0;
+    $("customerId").value="";
+    $("customerDate").value=today();
+    $("customerDue").value=0;
+    $("customerPayment").value=0;
 }
 
 function saveCustomer(e){
 
     e.preventDefault();
 
-    const id =
-        $("customerId").value;
-
-    const name =
-        $("customerName").value.trim();
+    const id=$("customerId").value;
+    const name=$("customerName").value.trim();
 
     if(!name){
-
         alert("Customer Name লিখুন");
         return;
     }
 
-    const customer = {
-
-        id:
-            id || Date.now().toString(),
-
-        date:
-            $("customerDate").value || today(),
-
+    const customer={
+        id:id||Date.now().toString(),
+        date:$("customerDate").value||today(),
         name:name,
-
-        mobile:
-            $("customerMobile").value.trim(),
-
-        address:
-            $("customerAddress").value.trim(),
-
-        due:
-            Number($("customerDue").value || 0),
-
-        payment:
-            Number($("customerPayment").value || 0)
+        mobile:$("customerMobile").value.trim(),
+        address:$("customerAddress").value.trim(),
+        due:Number($("customerDue").value||0),
+        payment:Number($("customerPayment").value||0)
     };
 
     if(id){
 
-        const index =
-            db.customers.findIndex(function(c){
-                return c.id === id;
-            });
+        const i=db.customers.findIndex(c=>c.id===id);
 
-        if(index !== -1){
-
-            db.customers[index] =
-                customer;
-        }
+        if(i!==-1)db.customers[i]=customer;
 
     }else{
-
         db.customers.push(customer);
     }
 
     resetCustomerForm();
-
     save();
 
-    alert("Customer Saved");
+    alert("✅ Customer Saved");
 }
 
 function editCustomer(id){
 
-    const c =
-        db.customers.find(function(x){
-            return x.id === id;
-        });
+    const c=db.customers.find(x=>x.id===id);
+    if(!c)return;
 
-    if(!c) return;
+    $("customerId").value=c.id;
+    $("customerDate").value=c.date;
+    $("customerName").value=c.name;
+    $("customerMobile").value=c.mobile||"";
+    $("customerAddress").value=c.address||"";
+    $("customerDue").value=c.due||0;
+    $("customerPayment").value=c.payment||0;
 
-    $("customerId").value = c.id;
-    $("customerDate").value = c.date;
-    $("customerName").value = c.name;
-    $("customerMobile").value =
-        c.mobile || "";
-    $("customerAddress").value =
-        c.address || "";
-    $("customerDue").value =
-        c.due || 0;
-    $("customerPayment").value =
-        c.payment || 0;
-
-    showPage(
-        "customers",
-        document.querySelectorAll(".menu button")[4]
-    );
+    showPage("customers");
 }
 
 function deleteCustomer(id){
 
-    if(!confirm(
-        "Customer Delete করতে চান?"
-    )){
-        return;
-    }
+    if(!confirm("Customer Delete করবেন?"))return;
 
-    db.customers =
-        db.customers.filter(function(c){
-            return c.id !== id;
-        });
+    db.customers=db.customers.filter(c=>c.id!==id);
 
     save();
 }
 
-/* =====================================================
+/* =========================
    EXPENSE
-===================================================== */
+========================= */
 
 function resetExpenseForm(){
 
-    const form =
-        $("expenseForm");
+    $("expenseForm")?.reset();
 
-    if(form){
-        form.reset();
-    }
-
-    $("expenseId").value = "";
-
-    $("expenseDate").value =
-        today();
+    $("expenseId").value="";
+    $("expenseDate").value=today();
 }
 
 function saveExpense(e){
 
     e.preventDefault();
 
-    const id =
-        $("expenseId").value;
-
-    const name =
-        $("expenseName").value.trim();
-
-    const amount =
-        Number(
-            $("expenseAmount").value || 0
-        );
+    const id=$("expenseId").value;
+    const name=$("expenseName").value.trim();
+    const amount=Number($("expenseAmount").value||0);
 
     if(!name){
-
         alert("Expense Name লিখুন");
         return;
     }
 
-    if(amount <= 0){
-
+    if(amount<=0){
         alert("Amount লিখুন");
         return;
     }
 
-    const expense = {
-
-        id:
-            id || Date.now().toString(),
-
-        date:
-            $("expenseDate").value || today(),
-
+    const expense={
+        id:id||Date.now().toString(),
+        date:$("expenseDate").value||today(),
         name:name,
-
         amount:amount,
-
-        note:
-            $("expenseNote").value.trim()
+        note:$("expenseNote").value.trim()
     };
 
     if(id){
 
-        const index =
-            db.expenses.findIndex(function(x){
-                return x.id === id;
-            });
+        const i=db.expenses.findIndex(e=>e.id===id);
 
-        if(index !== -1){
-
-            db.expenses[index] =
-                expense;
-        }
+        if(i!==-1)db.expenses[i]=expense;
 
     }else{
-
         db.expenses.push(expense);
     }
 
     resetExpenseForm();
-
     save();
 
-    alert("Expense Saved");
+    alert("✅ Expense Saved");
 }
 
 function editExpense(id){
 
-    const e =
-        db.expenses.find(function(x){
-            return x.id === id;
-        });
+    const e=db.expenses.find(x=>x.id===id);
+    if(!e)return;
 
-    if(!e) return;
+    $("expenseId").value=e.id;
+    $("expenseDate").value=e.date;
+    $("expenseName").value=e.name;
+    $("expenseAmount").value=e.amount;
+    $("expenseNote").value=e.note||"";
 
-    $("expenseId").value = e.id;
-    $("expenseDate").value = e.date;
-    $("expenseName").value = e.name;
-    $("expenseAmount").value = e.amount;
-    $("expenseNote").value =
-        e.note || "";
-
-    showPage(
-        "expenses",
-        document.querySelectorAll(".menu button")[5]
-    );
+    showPage("expenses");
 }
 
 function deleteExpense(id){
 
-    if(!confirm(
-        "Expense Delete করতে চান?"
-    )){
-        return;
-    }
+    if(!confirm("Expense Delete করবেন?"))return;
 
-    db.expenses =
-        db.expenses.filter(function(e){
-            return e.id !== id;
-        });
+    db.expenses=db.expenses.filter(e=>e.id!==id);
 
     save();
 }
 
-/* =====================================================
-   RENDER PRODUCTS
-===================================================== */
+/* =========================
+   RENDER
+========================= */
 
 function renderProducts(){
 
-    let html = "";
+    if(!$("productTable"))return;
 
-    if(db.products.length === 0){
+    let html="";
 
-        html = `
-        <tr>
-            <td colspan="7" class="empty">
-                কোনো Product নেই
-            </td>
-        </tr>`;
+    if(!db.products.length){
+
+        html=`<tr><td colspan="7" class="empty">কোনো Product নেই</td></tr>`;
 
     }else{
 
-        db.products.forEach(function(p){
+        db.products.forEach(p=>{
 
-            html += `
+            html+=`
             <tr>
-
                 <td>${escapeHTML(p.name)}</td>
-
-                <td>${escapeHTML(p.code || "-")}</td>
-
+                <td>${escapeHTML(p.code||"-")}</td>
                 <td>${money(p.buy)}</td>
-
                 <td>${money(p.sell)}</td>
-
+                <td>${p.stock}</td>
+                <td>${money(Number(p.stock)*Number(p.buy))}</td>
                 <td>
-                    <span class="badge ${
-                        Number(p.stock) > 0
-                        ? "badge-green"
-                        : "badge-red"
-                    }">
-                        ${Number(p.stock || 0)}
-                    </span>
+                    <button class="btn btn-warning" onclick="editProduct('${p.id}')">Edit</button>
+                    <button class="btn btn-danger" onclick="deleteProduct('${p.id}')">Delete</button>
                 </td>
-
-                <td>
-                    ${money(
-                        Number(p.stock || 0) *
-                        Number(p.buy || 0)
-                    )}
-                </td>
-
-                <td>
-
-                    <div class="action-buttons">
-
-                        <button
-                            class="btn btn-warning"
-                            onclick="editProduct('${p.id}')">
-                            Edit
-                        </button>
-
-                        <button
-                            class="btn btn-danger"
-                            onclick="deleteProduct('${p.id}')">
-                            Delete
-                        </button>
-
-                    </div>
-
-                </td>
-
             </tr>`;
         });
     }
 
-    $("productTable").innerHTML =
-        html;
+    $("productTable").innerHTML=html;
 }
-
-/* =====================================================
-   RENDER SALES
-===================================================== */
 
 function renderSales(){
 
-    let html = "";
+    if(!$("salesTable"))return;
 
-    if(db.sales.length === 0){
+    let html="";
 
-        html = `
+    [...db.sales].reverse().forEach(s=>{
+
+        html+=`
         <tr>
-            <td colspan="9" class="empty">
-                কোনো Sale নেই
+            <td>${escapeHTML(s.date)}</td>
+            <td>${escapeHTML(s.product)}</td>
+            <td>${s.qty}</td>
+            <td>${money(s.price)}</td>
+            <td>${money(s.total)}</td>
+            <td>${escapeHTML(s.customer||"-")}</td>
+            <td>${money(s.paid)}</td>
+            <td>${money(s.due)}</td>
+            <td>
+                <button class="btn btn-warning" onclick="editSale('${s.id}')">Edit</button>
+                <button class="btn btn-danger" onclick="deleteSale('${s.id}')">Delete</button>
             </td>
         </tr>`;
+    });
 
-    }else{
+    if(!html)
+        html=`<tr><td colspan="9" class="empty">কোনো Sale নেই</td></tr>`;
 
-        [...db.sales]
-            .reverse()
-            .forEach(function(s){
-
-                html += `
-                <tr>
-
-                    <td>${escapeHTML(s.date)}</td>
-
-                    <td>${escapeHTML(s.product)}</td>
-
-                    <td>${s.qty}</td>
-
-                    <td>${money(s.price)}</td>
-
-                    <td>${money(s.total)}</td>
-
-                    <td>
-                        ${escapeHTML(
-                            s.customer || "-"
-                        )}
-                    </td>
-
-                    <td>${money(s.paid)}</td>
-
-                    <td>
-                        <span class="badge ${
-                            Number(s.due) > 0
-                            ? "badge-red"
-                            : "badge-green"
-                        }">
-                            ${money(s.due)}
-                        </span>
-                    </td>
-
-                    <td>
-
-                        <div class="action-buttons">
-
-                            <button
-                                class="btn btn-warning"
-                                onclick="editSale('${s.id}')">
-                                Edit
-                            </button>
-
-                            <button
-                                class="btn btn-danger"
-                                onclick="deleteSale('${s.id}')">
-                                Delete
-                            </button>
-
-                        </div>
-
-                    </td>
-
-                </tr>`;
-            });
-    }
-
-    $("salesTable").innerHTML =
-        html;
+    $("salesTable").innerHTML=html;
 }
-
-/* =====================================================
-   RENDER PURCHASE
-===================================================== */
 
 function renderPurchases(){
 
-    let html = "";
+    if(!$("purchaseTable"))return;
 
-    if(db.purchases.length === 0){
+    let html="";
 
-        html = `
+    [...db.purchases].reverse().forEach(p=>{
+
+        html+=`
         <tr>
-            <td colspan="7" class="empty">
-                কোনো Purchase নেই
+            <td>${escapeHTML(p.date)}</td>
+            <td>${escapeHTML(p.product)}</td>
+            <td>${p.qty}</td>
+            <td>${money(p.price)}</td>
+            <td>${money(p.total)}</td>
+            <td>${escapeHTML(p.supplier||"-")}</td>
+            <td>
+                <button class="btn btn-warning" onclick="editPurchase('${p.id}')">Edit</button>
+                <button class="btn btn-danger" onclick="deletePurchase('${p.id}')">Delete</button>
             </td>
         </tr>`;
+    });
 
-    }else{
+    if(!html)
+        html=`<tr><td colspan="7" class="empty">কোনো Purchase নেই</td></tr>`;
 
-        [...db.purchases]
-            .reverse()
-            .forEach(function(p){
-
-                html += `
-                <tr>
-
-                    <td>${escapeHTML(p.date)}</td>
-
-                    <td>${escapeHTML(p.product)}</td>
-
-                    <td>${p.qty}</td>
-
-                    <td>${money(p.price)}</td>
-
-                    <td>${money(p.total)}</td>
-
-                    <td>
-                        ${escapeHTML(
-                            p.supplier || "-"
-                        )}
-                    </td>
-
-                    <td>
-
-                        <div class="action-buttons">
-
-                            <button
-                                class="btn btn-warning"
-                                onclick="editPurchase('${p.id}')">
-                                Edit
-                            </button>
-
-                            <button
-                                class="btn btn-danger"
-                                onclick="deletePurchase('${p.id}')">
-                                Delete
-                            </button>
-
-                        </div>
-
-                    </td>
-
-                </tr>`;
-            });
-    }
-
-    $("purchaseTable").innerHTML =
-        html;
+    $("purchaseTable").innerHTML=html;
 }
-
-/* =====================================================
-   RENDER CUSTOMERS
-===================================================== */
 
 function renderCustomers(){
 
-    let html = "";
+    if(!$("customerTable"))return;
 
-    if(db.customers.length === 0){
+    let html="";
 
-        html = `
+    [...db.customers].reverse().forEach(c=>{
+
+        const balance=
+            Number(c.due||0)-Number(c.payment||0);
+
+        html+=`
         <tr>
-            <td colspan="8" class="empty">
-                কোনো Customer নেই
+            <td>${escapeHTML(c.date)}</td>
+            <td>${escapeHTML(c.name)}</td>
+            <td>${escapeHTML(c.mobile||"-")}</td>
+            <td>${escapeHTML(c.address||"-")}</td>
+            <td>${money(c.due)}</td>
+            <td>${money(c.payment)}</td>
+            <td>${money(balance)}</td>
+            <td>
+                <button class="btn btn-warning" onclick="editCustomer('${c.id}')">Edit</button>
+                <button class="btn btn-danger" onclick="deleteCustomer('${c.id}')">Delete</button>
             </td>
         </tr>`;
+    });
 
-    }else{
+    if(!html)
+        html=`<tr><td colspan="8" class="empty">কোনো Customer নেই</td></tr>`;
 
-        [...db.customers]
-            .reverse()
-            .forEach(function(c){
-
-                const balance =
-                    Number(c.due || 0) -
-                    Number(c.payment || 0);
-
-                html += `
-                <tr>
-
-                    <td>${escapeHTML(c.date)}</td>
-
-                    <td>${escapeHTML(c.name)}</td>
-
-                    <td>
-                        ${escapeHTML(
-                            c.mobile || "-"
-                        )}
-                    </td>
-
-                    <td>
-                        ${escapeHTML(
-                            c.address || "-"
-                        )}
-                    </td>
-
-                    <td>${money(c.due)}</td>
-
-                    <td>${money(c.payment)}</td>
-
-                    <td>
-                        <span class="badge ${
-                            balance > 0
-                            ? "badge-red"
-                            : "badge-green"
-                        }">
-                            ${money(balance)}
-                        </span>
-                    </td>
-
-                    <td>
-
-                        <div class="action-buttons">
-
-                            <button
-                                class="btn btn-warning"
-                                onclick="editCustomer('${c.id}')">
-                                Edit
-                            </button>
-
-                            <button
-                                class="btn btn-danger"
-                                onclick="deleteCustomer('${c.id}')">
-                                Delete
-                            </button>
-
-                        </div>
-
-                    </td>
-
-                </tr>`;
-            });
-    }
-
-    $("customerTable").innerHTML =
-        html;
+    $("customerTable").innerHTML=html;
 }
-
-/* =====================================================
-   RENDER EXPENSE
-===================================================== */
 
 function renderExpenses(){
 
-    let html = "";
+    if(!$("expenseTable"))return;
 
-    if(db.expenses.length === 0){
+    let html="";
 
-        html = `
+    [...db.expenses].reverse().forEach(e=>{
+
+        html+=`
         <tr>
-            <td colspan="5" class="empty">
-                কোনো Expense নেই
+            <td>${escapeHTML(e.date)}</td>
+            <td>${escapeHTML(e.name)}</td>
+            <td>${money(e.amount)}</td>
+            <td>${escapeHTML(e.note||"-")}</td>
+            <td>
+                <button class="btn btn-warning" onclick="editExpense('${e.id}')">Edit</button>
+                <button class="btn btn-danger" onclick="deleteExpense('${e.id}')">Delete</button>
             </td>
         </tr>`;
+    });
 
-    }else{
+    if(!html)
+        html=`<tr><td colspan="5" class="empty">কোনো Expense নেই</td></tr>`;
 
-        [...db.expenses]
-            .reverse()
-            .forEach(function(e){
-
-                html += `
-                <tr>
-
-                    <td>${escapeHTML(e.date)}</td>
-
-                    <td>${escapeHTML(e.name)}</td>
-
-                    <td>${money(e.amount)}</td>
-
-                    <td>
-                        ${escapeHTML(
-                            e.note || "-"
-                        )}
-                    </td>
-
-                    <td>
-
-                        <div class="action-buttons">
-
-                            <button
-                                class="btn btn-warning"
-                                onclick="editExpense('${e.id}')">
-                                Edit
-                            </button>
-
-                            <button
-                                class="btn btn-danger"
-                                onclick="deleteExpense('${e.id}')">
-                                Delete
-                            </button>
-
-                        </div>
-
-                    </td>
-
-                </tr>`;
-            });
-    }
-
-    $("expenseTable").innerHTML =
-        html;
+    $("expenseTable").innerHTML=html;
 }
 
-/* =====================================================
+/* =========================
    DASHBOARD
-===================================================== */
+========================= */
 
 function calculateDashboard(){
 
-    const sales =
-        db.sales.reduce(
-            (sum,s) =>
-                sum + Number(s.total || 0),
-            0
-        );
+    const sales=db.sales.reduce((a,s)=>a+Number(s.total||0),0);
 
-    const purchase =
-        db.purchases.reduce(
-            (sum,p) =>
-                sum + Number(p.total || 0),
-            0
-        );
+    const purchase=db.purchases.reduce((a,p)=>a+Number(p.total||0),0);
 
-    const gross =
-        db.sales.reduce(
-            (sum,s) =>
-                sum +
-                Number(s.total || 0) -
-                Number(s.cost || 0),
-            0
-        );
+    const gross=db.sales.reduce(
+        (a,s)=>a+Number(s.total||0)-Number(s.cost||0),0
+    );
 
-    const expenses =
-        db.expenses.reduce(
-            (sum,e) =>
-                sum + Number(e.amount || 0),
-            0
-        );
+    const expense=db.expenses.reduce(
+        (a,e)=>a+Number(e.amount||0),0
+    );
 
-    const net =
-        gross - expenses;
+    const net=gross-expense;
 
-    const salesDue =
-        db.sales.reduce(
-            (sum,s) =>
-                sum + Number(s.due || 0),
-            0
-        );
+    const due=db.sales.reduce(
+        (a,s)=>a+Number(s.due||0),0
+    )+
+    db.customers.reduce(
+        (a,c)=>a+Number(c.due||0)-Number(c.payment||0),0
+    );
 
-    const customerDue =
-        db.customers.reduce(
-            (sum,c) =>
-                sum +
-                Number(c.due || 0) -
-                Number(c.payment || 0),
-            0
-        );
+    const stock=db.products.reduce(
+        (a,p)=>a+Number(p.stock||0)*Number(p.buy||0),0
+    );
 
-    const totalDue =
-        salesDue + customerDue;
+    const paid=db.sales.reduce(
+        (a,s)=>a+Number(s.paid||0),0
+    );
 
-    const stockValue =
-        db.products.reduce(
-            (sum,p) =>
-                sum +
-                Number(p.stock || 0) *
-                Number(p.buy || 0),
-            0
-        );
+    const cash=paid-purchase-expense;
 
-    const paidSales =
-        db.sales.reduce(
-            (sum,s) =>
-                sum + Number(s.paid || 0),
-            0
-        );
+    if($("dashSales"))$("dashSales").innerText=money(sales);
+    if($("dashPurchase"))$("dashPurchase").innerText=money(purchase);
+    if($("dashGross"))$("dashGross").innerText=money(gross);
+    if($("dashExpense"))$("dashExpense").innerText=money(expense);
+    if($("dashNet"))$("dashNet").innerText=money(net);
+    if($("dashDue"))$("dashDue").innerText=money(due);
+    if($("dashStock"))$("dashStock").innerText=money(stock);
+    if($("dashCash"))$("dashCash").innerText=money(cash);
+    if($("dashProducts"))$("dashProducts").innerText=db.products.length;
 
-    const cash =
-        paidSales -
-        purchase -
-        expenses;
+    if($("recentSales")){
 
-    $("dashSales").innerText =
-        money(sales);
+        let html="";
 
-    $("dashPurchase").innerText =
-        money(purchase);
+        [...db.sales].reverse().slice(0,10).forEach(s=>{
 
-    $("dashGross").innerText =
-        money(gross);
-
-    $("dashExpense").innerText =
-        money(expenses);
-
-    $("dashNet").innerText =
-        money(net);
-
-    $("dashDue").innerText =
-        money(totalDue);
-
-    $("dashStock").innerText =
-        money(stockValue);
-
-    $("dashCash").innerText =
-        money(cash);
-
-    $("dashProducts").innerText =
-        db.products.length;
-
-    let recent = "";
-
-    [...db.sales]
-        .reverse()
-        .slice(0,10)
-        .forEach(function(s){
-
-            recent += `
+            html+=`
             <tr>
-
                 <td>${escapeHTML(s.date)}</td>
-
                 <td>${escapeHTML(s.product)}</td>
-
                 <td>${s.qty}</td>
-
                 <td>${money(s.total)}</td>
-
                 <td>${money(s.paid)}</td>
-
                 <td>${money(s.due)}</td>
-
             </tr>`;
         });
 
-    if(!recent){
-
-        recent = `
-        <tr>
-            <td colspan="6" class="empty">
-                কোনো Sale নেই
-            </td>
-        </tr>`;
+        $("recentSales").innerHTML=
+            html||
+            `<tr><td colspan="6" class="empty">কোনো Sale নেই</td></tr>`;
     }
-
-    $("recentSales").innerHTML =
-        recent;
 }
 
-/* =====================================================
+/* =========================
    REPORT
-===================================================== */
+========================= */
 
 function dateInRange(date,from,to){
 
-    if(from && date < from){
-        return false;
-    }
-
-    if(to && date > to){
-        return false;
-    }
+    if(from && date<from)return false;
+    if(to && date>to)return false;
 
     return true;
 }
 
 function generateReport(){
 
-    const from =
-        $("reportFrom").value;
+    if(!$("reportFrom"))return;
 
-    const to =
-        $("reportTo").value;
+    const from=$("reportFrom").value;
+    const to=$("reportTo").value;
 
-    const sales =
-        db.sales.filter(function(s){
-            return dateInRange(
-                s.date,
-                from,
-                to
-            );
-        });
+    const sales=db.sales.filter(s=>dateInRange(s.date,from,to));
 
-    const purchases =
-        db.purchases.filter(function(p){
-            return dateInRange(
-                p.date,
-                from,
-                to
-            );
-        });
+    const purchases=db.purchases.filter(p=>dateInRange(p.date,from,to));
 
-    const expenses =
-        db.expenses.filter(function(e){
-            return dateInRange(
-                e.date,
-                from,
-                to
-            );
-        });
+    const expenses=db.expenses.filter(e=>dateInRange(e.date,from,to));
 
-    const totalSales =
-        sales.reduce(
-            (sum,s) =>
-                sum + Number(s.total || 0),
-            0
-        );
+    const totalSales=sales.reduce((a,s)=>a+Number(s.total||0),0);
 
-    const totalPurchase =
-        purchases.reduce(
-            (sum,p) =>
-                sum + Number(p.total || 0),
-            0
-        );
+    const totalPurchase=purchases.reduce((a,p)=>a+Number(p.total||0),0);
 
-    const gross =
-        sales.reduce(
-            (sum,s) =>
-                sum +
-                Number(s.total || 0) -
-                Number(s.cost || 0),
-            0
-        );
+    const gross=sales.reduce(
+        (a,s)=>a+Number(s.total||0)-Number(s.cost||0),0
+    );
 
-    const totalExpense =
-        expenses.reduce(
-            (sum,e) =>
-                sum + Number(e.amount || 0),
-            0
-        );
+    const totalExpense=expenses.reduce(
+        (a,e)=>a+Number(e.amount||0),0
+    );
 
-    const net =
-        gross - totalExpense;
+    const net=gross-totalExpense;
 
-    const salesDue =
-        db.sales.reduce(
-            (sum,s) =>
-                sum + Number(s.due || 0),
-            0
-        );
+    const due=db.sales.reduce(
+        (a,s)=>a+Number(s.due||0),0
+    )+
+    db.customers.reduce(
+        (a,c)=>a+Number(c.due||0)-Number(c.payment||0),0
+    );
 
-    const customerDue =
-        db.customers.reduce(
-            (sum,c) =>
-                sum +
-                Number(c.due || 0) -
-                Number(c.payment || 0),
-            0
-        );
+    const stock=db.products.reduce(
+        (a,p)=>a+Number(p.stock||0)*Number(p.buy||0),0
+    );
 
-    const totalDue =
-        salesDue + customerDue;
+    const paid=sales.reduce(
+        (a,s)=>a+Number(s.paid||0),0
+    );
 
-    const stockValue =
-        db.products.reduce(
-            (sum,p) =>
-                sum +
-                Number(p.stock || 0) *
-                Number(p.buy || 0),
-            0
-        );
+    const cash=paid-totalPurchase-totalExpense;
 
-    const paidSales =
-        sales.reduce(
-            (sum,s) =>
-                sum + Number(s.paid || 0),
-            0
-        );
-
-    const cash =
-        paidSales -
-        totalPurchase -
-        totalExpense;
-
-    $("reportSales").innerText =
-        money(totalSales);
-
-    $("reportPurchase").innerText =
-        money(totalPurchase);
-
-    $("reportGross").innerText =
-        money(gross);
-
-    $("reportExpense").innerText =
-        money(totalExpense);
-
-    $("reportNet").innerText =
-        money(net);
-
-    $("reportDue").innerText =
-        money(totalDue);
-
-    $("reportStock").innerText =
-        money(stockValue);
-
-    $("reportCash").innerText =
-        money(cash);
-
-    $("reportProducts").innerText =
-        db.products.length;
+    if($("reportSales"))$("reportSales").innerText=money(totalSales);
+    if($("reportPurchase"))$("reportPurchase").innerText=money(totalPurchase);
+    if($("reportGross"))$("reportGross").innerText=money(gross);
+    if($("reportExpense"))$("reportExpense").innerText=money(totalExpense);
+    if($("reportNet"))$("reportNet").innerText=money(net);
+    if($("reportDue"))$("reportDue").innerText=money(due);
+    if($("reportStock"))$("reportStock").innerText=money(stock);
+    if($("reportCash"))$("reportCash").innerText=money(cash);
+    if($("reportProducts"))$("reportProducts").innerText=db.products.length;
 }
 
 function reportToday(){
 
-    const d = today();
+    const d=today();
 
-    $("reportFrom").value = d;
-
-    $("reportTo").value = d;
+    $("reportFrom").value=d;
+    $("reportTo").value=d;
 
     generateReport();
 }
 
 function reportMonth(){
 
-    const d = new Date();
+    const d=new Date();
 
-    const year =
-        d.getFullYear();
+    const from=
+        d.getFullYear()+"-"+
+        String(d.getMonth()+1).padStart(2,"0")+"-01";
 
-    const month =
-        String(
-            d.getMonth()+1
-        ).padStart(2,"0");
-
-    $("reportFrom").value =
-        year+"-"+month+"-01";
-
-    $("reportTo").value =
-        today();
+    $("reportFrom").value=from;
+    $("reportTo").value=today();
 
     generateReport();
 }
 
 function reportAll(){
 
-    $("reportFrom").value = "";
-
-    $("reportTo").value = "";
+    $("reportFrom").value="";
+    $("reportTo").value="";
 
     generateReport();
 }
 
-/* =====================================================
+/* =========================
    RENDER ALL
-===================================================== */
+========================= */
 
 function renderAll(){
 
     try{
-
         renderProducts();
-
         renderSales();
-
         renderPurchases();
-
         renderCustomers();
-
         renderExpenses();
-
         calculateDashboard();
-
         generateReport();
-
-    }catch(error){
-
-        console.error(
-            "Render Error:",
-            error
-        );
+    }catch(e){
+        console.error("Render Error:",e);
     }
 }
 
-/* =====================================================
-   DOM READY
-===================================================== */
+/* =========================
+   START
+========================= */
 
-document.addEventListener(
-    "DOMContentLoaded",
-    function(){
+document.addEventListener("DOMContentLoaded",()=>{
 
-        /* Forms */
+    $("productForm")?.addEventListener("submit",saveProduct);
+    $("salesForm")?.addEventListener("submit",saveSale);
+    $("purchaseForm")?.addEventListener("submit",savePurchase);
+    $("customerForm")?.addEventListener("submit",saveCustomer);
+    $("expenseForm")?.addEventListener("submit",saveExpense);
 
-        if($("productForm")){
-            $("productForm")
-                .addEventListener(
-                    "submit",
-                    saveProduct
-                );
-        }
+    if($("saleDate"))$("saleDate").value=today();
+    if($("purchaseDate"))$("purchaseDate").value=today();
+    if($("customerDate"))$("customerDate").value=today();
+    if($("expenseDate"))$("expenseDate").value=today();
 
-        if($("salesForm")){
-            $("salesForm")
-                .addEventListener(
-                    "submit",
-                    saveSale
-                );
-        }
+    renderAll();
 
-        if($("purchaseForm")){
-            $("purchaseForm")
-                .addEventListener(
-                    "submit",
-                    savePurchase
-                );
-        }
-
-        if($("customerForm")){
-            $("customerForm")
-                .addEventListener(
-                    "submit",
-                    saveCustomer
-                );
-        }
-
-        if($("expenseForm")){
-            $("expenseForm")
-                .addEventListener(
-                    "submit",
-                    saveExpense
-                );
-        }
-
-        /* Initial dates */
-
-        if($("saleDate")){
-            $("saleDate").value = today();
-        }
-
-        if($("purchaseDate")){
-            $("purchaseDate").value = today();
-        }
-
-        if($("customerDate")){
-            $("customerDate").value = today();
-        }
-
-        if($("expenseDate")){
-            $("expenseDate").value = today();
-        }
-
-        /* Render */
-
-        renderAll();
-
-        console.log(
-            "Smart Store Started Successfully"
-        );
-    }
-);
-
+    console.log("✅ Smart Store Ready");
+});
 </script>
