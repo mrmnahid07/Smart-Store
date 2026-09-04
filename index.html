@@ -1,10 +1,1492 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Smart Store Management</title>
+
+<!-- PDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<!-- Barcode -->
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  font-family:Arial,"Noto Sans Bengali",sans-serif;
+}
+
+body{
+  background:#f4f6f9;
+  color:#222;
+}
+
+button{
+  border:0;
+  cursor:pointer;
+  padding:9px 13px;
+  border-radius:6px;
+  background:#2563eb;
+  color:white;
+  font-size:14px;
+}
+
+button:hover{
+  opacity:.9;
+}
+
+input,select,textarea{
+  width:100%;
+  padding:10px;
+  border:1px solid #ddd;
+  border-radius:6px;
+  outline:none;
+  background:white;
+}
+
+input:focus,
+select:focus,
+textarea:focus{
+  border-color:#2563eb;
+}
+
+textarea{
+  min-height:80px;
+  resize:vertical;
+}
+
+.btnGreen{background:#16a34a}
+.btnRed{background:#dc2626}
+.btnDark{background:#111827}
+.btnOrange{background:#ea580c}
+.btnGray{background:#64748b}
+
+.loginScreen{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:linear-gradient(135deg,#2563eb,#0f172a);
+  padding:20px;
+}
+
+.authBox{
+  width:100%;
+  max-width:430px;
+  background:white;
+  padding:30px;
+  border-radius:15px;
+  box-shadow:0 20px 50px #0004;
+}
+
+.authBox h1{
+  text-align:center;
+  margin-bottom:8px;
+}
+
+.authBox .subtitle{
+  text-align:center;
+  color:#666;
+  margin-bottom:25px;
+}
+
+.authForm{
+  display:none;
+}
+
+.authForm.active{
+  display:block;
+}
+
+.formGroup{
+  margin-bottom:14px;
+}
+
+.formGroup label{
+  display:block;
+  margin-bottom:6px;
+  font-weight:bold;
+}
+
+.authBtn{
+  width:100%;
+  margin-top:5px;
+  padding:12px;
+}
+
+.authLinks{
+  text-align:center;
+  margin-top:18px;
+}
+
+.authLinks button{
+  background:none;
+  color:#2563eb;
+  padding:4px;
+}
+
+#app{
+  display:none;
+}
+
+.layout{
+  min-height:100vh;
+  display:flex;
+}
+
+.sidebar{
+  width:245px;
+  background:#111827;
+  color:white;
+  position:fixed;
+  left:0;
+  top:0;
+  bottom:0;
+  overflow-y:auto;
+}
+
+.logo{
+  padding:22px 15px;
+  font-size:21px;
+  font-weight:bold;
+  text-align:center;
+  border-bottom:1px solid #ffffff18;
+}
+
+.userBox{
+  padding:15px;
+  border-bottom:1px solid #ffffff18;
+}
+
+.userBox strong{
+  display:block;
+  margin-bottom:5px;
+}
+
+.userBox small{
+  color:#cbd5e1;
+  word-break:break-all;
+}
+
+.nav{
+  padding:10px;
+}
+
+.navBtn{
+  display:block;
+  width:100%;
+  text-align:left;
+  margin:4px 0;
+  background:transparent;
+  color:#cbd5e1;
+}
+
+.navBtn:hover,
+.navBtn.active{
+  background:#2563eb;
+  color:white;
+}
+
+.main{
+  margin-left:245px;
+  width:calc(100% - 245px);
+  padding:20px;
+}
+
+.topbar{
+  background:white;
+  padding:15px 20px;
+  border-radius:10px;
+  margin-bottom:20px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+}
+
+.section{
+  display:none;
+}
+
+.section.active{
+  display:block;
+}
+
+.sectionTitle{
+  margin-bottom:15px;
+}
+
+.cards{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:15px;
+  margin-bottom:20px;
+}
+
+.card{
+  background:white;
+  border-radius:10px;
+  padding:18px;
+  box-shadow:0 2px 10px #0000000c;
+}
+
+.card h3{
+  font-size:14px;
+  color:#64748b;
+  margin-bottom:8px;
+}
+
+.card .value{
+  font-size:24px;
+  font-weight:bold;
+}
+
+.formCard{
+  background:white;
+  padding:20px;
+  border-radius:10px;
+  margin-bottom:20px;
+}
+
+.formGrid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:12px;
+}
+
+.formActions{
+  margin-top:15px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+
+.tableWrap{
+  overflow-x:auto;
+  background:white;
+  border-radius:10px;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:750px;
+}
+
+th,td{
+  padding:10px;
+  border-bottom:1px solid #eee;
+  text-align:left;
+}
+
+th{
+  background:#f8fafc;
+}
+
+.lowStock{
+  color:#dc2626;
+  font-weight:bold;
+}
+
+.goodStock{
+  color:#16a34a;
+  font-weight:bold;
+}
+
+.badge{
+  padding:4px 8px;
+  border-radius:20px;
+  font-size:12px;
+}
+
+.badgeGreen{
+  background:#dcfce7;
+  color:#166534;
+}
+
+.saleRow{
+  display:grid;
+  grid-template-columns:2fr 1fr 1fr 1fr auto;
+  gap:8px;
+  margin-bottom:8px;
+}
+
+.summaryBox{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  margin-top:15px;
+}
+
+.summaryItem{
+  background:#f8fafc;
+  padding:12px;
+  border-radius:7px;
+}
+
+.modal{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:#0008;
+  z-index:1000;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+}
+
+.modalBox{
+  background:white;
+  width:100%;
+  max-width:450px;
+  padding:25px;
+  border-radius:12px;
+}
+
+.modalBox h2{
+  margin-bottom:15px;
+}
+
+.modalActions{
+  display:flex;
+  justify-content:flex-end;
+  gap:8px;
+  margin-top:15px;
+}
+
+.accountInfo{
+  line-height:1.8;
+  background:#f8fafc;
+  padding:15px;
+  border-radius:8px;
+}
+
+.migrationBox{
+  background:#fff7ed;
+  border:1px solid #fed7aa;
+  padding:15px;
+  border-radius:8px;
+  margin-top:15px;
+}
+
+.invoice{
+  display:none;
+}
+
+@media(max-width:1100px){
+  .cards{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .formGrid{
+    grid-template-columns:repeat(2,1fr);
+  }
+}
+
+@media(max-width:750px){
+  .sidebar{
+    width:100%;
+    position:relative;
+    height:auto;
+  }
+
+  .layout{
+    display:block;
+  }
+
+  .main{
+    margin-left:0;
+    width:100%;
+    padding:10px;
+  }
+
+  .cards{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .formGrid{
+    grid-template-columns:1fr;
+  }
+
+  .saleRow{
+    grid-template-columns:1fr;
+  }
+
+  .topbar{
+    flex-direction:column;
+    align-items:stretch;
+  }
+}
+
+@media(max-width:450px){
+  .cards{
+    grid-template-columns:1fr;
+  }
+
+  .authBox{
+    padding:20px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!-- =========================================================
+     LOGIN SCREEN
+========================================================= -->
+
+<div id="loginScreen" class="loginScreen">
+
+  <div class="authBox">
+
+    <h1>🏪 Smart Store</h1>
+    <div class="subtitle">Store Management System</div>
+
+    <!-- LOGIN -->
+    <div id="loginForm" class="authForm active">
+
+      <div class="formGroup">
+        <label>Email</label>
+        <input id="loginEmail" type="email" placeholder="example@gmail.com">
+      </div>
+
+      <div class="formGroup">
+        <label>Password</label>
+        <input id="loginPassword" type="password" placeholder="Password">
+      </div>
+
+      <button class="authBtn" onclick="loginAccount()">
+        🔐 Login
+      </button>
+
+      <div class="authLinks">
+        <button onclick="showCreateAccount()">
+          নতুন Account Create
+        </button>
+        <br>
+        <button onclick="showForgotPassword()">
+          Password ভুলে গেছেন?
+        </button>
+      </div>
+
+    </div>
+
+
+    <!-- CREATE ACCOUNT -->
+
+    <div id="createForm" class="authForm">
+
+      <div class="formGroup">
+        <label>Name</label>
+        <input id="createName" type="text" placeholder="আপনার নাম">
+      </div>
+
+      <div class="formGroup">
+        <label>Email</label>
+        <input id="createEmail" type="email" placeholder="example@gmail.com">
+      </div>
+
+      <div class="formGroup">
+        <label>Password</label>
+        <input id="createPassword" type="password" placeholder="কমপক্ষে 6 characters">
+      </div>
+
+      <div class="formGroup">
+        <label>Confirm Password</label>
+        <input id="createPassword2" type="password">
+      </div>
+
+      <button class="authBtn btnGreen" onclick="createAccount()">
+        ✅ Create Account
+      </button>
+
+      <div class="authLinks">
+        <button onclick="showLogin()">
+          ← Login
+        </button>
+      </div>
+
+    </div>
+
+
+    <!-- FORGOT -->
+
+    <div id="forgotForm" class="authForm">
+
+      <div class="formGroup">
+        <label>Email</label>
+        <input id="forgotEmail" type="email">
+      </div>
+
+      <button class="authBtn btnOrange" onclick="sendResetCode()">
+        📧 Send Reset Link
+      </button>
+
+      <div class="authLinks">
+        <button onclick="showLogin()">
+          ← Login
+        </button>
+      </div>
+
+    </div>
+
+    <div id="codeSection" style="display:none"></div>
+
+  </div>
+</div>
+
+
+<!-- =========================================================
+     APP
+========================================================= -->
+
+<div id="app">
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+
+  <aside class="sidebar">
+
+    <div class="logo">
+      🏪 Smart Store
+    </div>
+
+    <div class="userBox">
+      <strong id="sideUserName">Account</strong>
+      <small id="sideUserEmail"></small>
+    </div>
+
+    <div class="nav">
+
+      <button class="navBtn active"
+        onclick="showSection('dashboard',this)">
+        📊 Dashboard
+      </button>
+
+      <button class="navBtn"
+        onclick="showSection('products',this)">
+        📦 Products
+      </button>
+
+      <button class="navBtn"
+        onclick="showSection('sales',this)">
+        🛒 Sales
+      </button>
+
+      <button class="navBtn"
+        onclick="showSection('purchases',this)">
+        🚚 Purchase
+      </button>
+
+      <button class="navBtn"
+        onclick="showSection('customers',this)">
+        👥 Customers
+      </button>
+
+      <button class="navBtn"
+        onclick="showSection('expenses',this)">
+        💸 Expenses
+      </button>
+
+      <button class="navBtn"
+        onclick="showSection('reports',this)">
+        📈 Reports
+      </button>
+
+      <button class="navBtn"
+        onclick="showSection('settings',this)">
+        ⚙️ Settings
+      </button>
+
+      <button class="navBtn"
+        onclick="showSection('backup',this)">
+        💾 Backup
+      </button>
+
+      <button class="navBtn"
+        onclick="logoutAccount()">
+        🚪 Logout
+      </button>
+
+    </div>
+
+  </aside>
+
+
+  <!-- MAIN -->
+
+  <main class="main">
+
+    <div class="topbar">
+      <div>
+        <strong id="topStoreName">Smart Store</strong>
+      </div>
+
+      <button class="btnRed" onclick="logoutAccount()">
+        Logout
+      </button>
+    </div>
+
+
+    <!-- =====================================================
+         DASHBOARD
+    ====================================================== -->
+
+    <section id="dashboard" class="section active">
+
+      <h2 class="sectionTitle">📊 Dashboard</h2>
+
+      <div class="cards">
+
+        <div class="card">
+          <h3>Today's Sales</h3>
+          <div class="value" id="todaySales">৳0.00</div>
+        </div>
+
+        <div class="card">
+          <h3>Total Products</h3>
+          <div class="value" id="totalProducts">0</div>
+        </div>
+
+        <div class="card">
+          <h3>Gross Profit</h3>
+          <div class="value" id="totalProfit">৳0.00</div>
+        </div>
+
+        <div class="card">
+          <h3>Total Expense</h3>
+          <div class="value" id="totalExpense">৳0.00</div>
+        </div>
+
+        <div class="card">
+          <h3>Customer Due</h3>
+          <div class="value" id="customerDue">৳0.00</div>
+        </div>
+
+        <div class="card">
+          <h3>Stock Value</h3>
+          <div class="value" id="stockValue">৳0.00</div>
+        </div>
+
+        <div class="card">
+          <h3>Low Stock</h3>
+          <div class="value" id="lowStockCount">0</div>
+        </div>
+
+        <div class="card">
+          <h3>Net Profit</h3>
+          <div class="value" id="netProfit">৳0.00</div>
+        </div>
+
+      </div>
+
+
+      <div class="formCard">
+
+        <h3>⚠️ Low Stock Products</h3>
+
+        <div class="tableWrap" style="margin-top:12px">
+
+          <table>
+
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Code</th>
+                <th>Stock</th>
+                <th>Minimum</th>
+              </tr>
+            </thead>
+
+            <tbody id="lowStockTable"></tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         PRODUCTS
+    ====================================================== -->
+
+    <section id="products" class="section">
+
+      <h2 class="sectionTitle">📦 Products</h2>
+
+      <div class="formCard">
+
+        <div class="formGrid">
+
+          <div class="formGroup">
+            <label>Product Name</label>
+            <input id="productName">
+          </div>
+
+          <div class="formGroup">
+            <label>Product Code</label>
+            <input id="productCode">
+          </div>
+
+          <div class="formGroup">
+            <label>Category</label>
+            <input id="productCategory">
+          </div>
+
+          <div class="formGroup">
+            <label>Purchase Price</label>
+            <input id="purchasePrice" type="number">
+          </div>
+
+          <div class="formGroup">
+            <label>Selling Price</label>
+            <input id="sellingPrice" type="number">
+          </div>
+
+          <div class="formGroup">
+            <label>Stock</label>
+            <input id="productStock" type="number">
+          </div>
+
+          <div class="formGroup">
+            <label>Unit</label>
+            <input id="productUnit" value="pcs">
+          </div>
+
+          <div class="formGroup">
+            <label>Minimum Stock</label>
+            <input id="minStock" type="number" value="5">
+          </div>
+
+        </div>
+
+        <div class="formActions">
+          <button class="btnGreen" onclick="addProduct()">
+            ➕ Add Product
+          </button>
+
+          <button class="btnGray" onclick="clearProductForm()">
+            Clear
+          </button>
+        </div>
+
+      </div>
+
+
+      <div class="formCard">
+
+        <input
+          id="productSearch"
+          placeholder="🔍 Product search..."
+          oninput="renderProducts()"
+        >
+
+      </div>
+
+
+      <div class="tableWrap">
+
+        <table>
+
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Code</th>
+              <th>Category</th>
+              <th>Purchase</th>
+              <th>Sale</th>
+              <th>Stock</th>
+              <th>Unit</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+
+          <tbody id="productTable"></tbody>
+
+        </table>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         SALES
+    ====================================================== -->
+
+    <section id="sales" class="section">
+
+      <h2 class="sectionTitle">🛒 Sales</h2>
+
+      <div class="formCard">
+
+        <div class="formGrid">
+
+          <div class="formGroup">
+            <label>Date</label>
+            <input id="saleDate" type="date">
+          </div>
+
+          <div class="formGroup">
+            <label>Customer</label>
+            <input id="saleCustomer"
+                   placeholder="Walk-in Customer">
+          </div>
+
+          <div class="formGroup">
+            <label>Payment Method</label>
+            <select id="salePayment">
+              <option>Cash</option>
+              <option>bKash</option>
+              <option>Nagad</option>
+              <option>Card</option>
+              <option>Bank</option>
+            </select>
+          </div>
+
+        </div>
+
+        <hr style="margin:15px 0">
+
+        <div id="saleRows"></div>
+
+        <div class="formActions">
+
+          <button class="btnGray"
+                  onclick="addSaleRow()">
+            ➕ Add Product
+          </button>
+
+        </div>
+
+        <div class="summaryBox">
+
+          <div class="summaryItem">
+            <b>Total</b>
+            <input id="saleTotal" value="0" readonly>
+          </div>
+
+          <div class="summaryItem">
+            <b>Paid</b>
+            <input id="salePaid"
+                   type="number"
+                   oninput="calculateSale()">
+          </div>
+
+          <div class="summaryItem">
+            <b>Due</b>
+            <input id="saleDue" value="0" readonly>
+          </div>
+
+        </div>
+
+        <div class="formActions">
+
+          <button class="btnGreen"
+                  onclick="completeSale()">
+            ✅ Complete Sale
+          </button>
+
+        </div>
+
+      </div>
+
+
+      <div class="tableWrap">
+
+        <table>
+
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Customer</th>
+              <th>Total</th>
+              <th>Paid</th>
+              <th>Due</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+
+          <tbody id="salesTable"></tbody>
+
+        </table>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         PURCHASE
+    ====================================================== -->
+
+    <section id="purchases" class="section">
+
+      <h2 class="sectionTitle">🚚 Purchase</h2>
+
+      <div class="formCard">
+
+        <div class="formGrid">
+
+          <div class="formGroup">
+            <label>Date</label>
+            <input id="purchaseDate" type="date">
+          </div>
+
+          <div class="formGroup">
+            <label>Product</label>
+            <input id="purchaseProduct"
+                   list="purchaseProductList"
+                   oninput="purchaseProductChanged()">
+            <datalist id="purchaseProductList"></datalist>
+          </div>
+
+          <div class="formGroup">
+            <label>Quantity</label>
+            <input id="purchaseQty" type="number">
+          </div>
+
+          <div class="formGroup">
+            <label>Purchase Price</label>
+            <input id="purchasePrice2" type="number">
+          </div>
+
+          <div class="formGroup">
+            <label>Supplier</label>
+            <input id="supplier">
+          </div>
+
+        </div>
+
+        <div class="formActions">
+
+          <button class="btnGreen"
+                  onclick="addPurchase()">
+            ➕ Add Purchase
+          </button>
+
+        </div>
+
+      </div>
+
+
+      <div class="tableWrap">
+
+        <table>
+
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Product</th>
+              <th>Qty</th>
+              <th>Price</th>
+              <th>Supplier</th>
+              <th>Total</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+
+          <tbody id="purchaseTable"></tbody>
+
+        </table>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         CUSTOMERS
+    ====================================================== -->
+
+    <section id="customers" class="section">
+
+      <h2 class="sectionTitle">👥 Customers / Due</h2>
+
+      <div class="tableWrap">
+
+        <table>
+
+          <thead>
+            <tr>
+              <th>Customer</th>
+              <th>Total Sale</th>
+              <th>Paid</th>
+              <th>Due</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+
+          <tbody id="customerTable"></tbody>
+
+        </table>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         EXPENSE
+    ====================================================== -->
+
+    <section id="expenses" class="section">
+
+      <h2 class="sectionTitle">💸 Expenses</h2>
+
+      <div class="formCard">
+
+        <div class="formGrid">
+
+          <div class="formGroup">
+            <label>Date</label>
+            <input id="expenseDate" type="date">
+          </div>
+
+          <div class="formGroup">
+            <label>Expense Name</label>
+            <input id="expenseName">
+          </div>
+
+          <div class="formGroup">
+            <label>Amount</label>
+            <input id="expenseAmount" type="number">
+          </div>
+
+          <div class="formGroup">
+            <label>Note</label>
+            <input id="expenseNote">
+          </div>
+
+        </div>
+
+        <div class="formActions">
+
+          <button class="btnGreen"
+                  onclick="addExpense()">
+            ➕ Add Expense
+          </button>
+
+        </div>
+
+      </div>
+
+
+      <div class="tableWrap">
+
+        <table>
+
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Expense</th>
+              <th>Amount</th>
+              <th>Note</th>
+              <th>Delete</th>
+            </tr>
+          </thead>
+
+          <tbody id="expenseTable"></tbody>
+
+        </table>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         REPORT
+    ====================================================== -->
+
+    <section id="reports" class="section">
+
+      <h2 class="sectionTitle">📈 Reports</h2>
+
+      <div class="cards">
+
+        <div class="card">
+          <h3>Total Sales</h3>
+          <div id="reportSales" class="value">৳0.00</div>
+        </div>
+
+        <div class="card">
+          <h3>Total Purchase</h3>
+          <div id="reportPurchase" class="value">৳0.00</div>
+        </div>
+
+        <div class="card">
+          <h3>Gross Profit</h3>
+          <div id="reportGross" class="value">৳0.00</div>
+        </div>
+
+        <div class="card">
+          <h3>Total Expense</h3>
+          <div id="reportExpense" class="value">৳0.00</div>
+        </div>
+
+        <div class="card">
+          <h3>Net Profit</h3>
+          <div id="reportNet" class="value">৳0.00</div>
+        </div>
+
+        <div class="card">
+          <h3>Customer Due</h3>
+          <div id="reportDue" class="value">৳0.00</div>
+        </div>
+
+        <div class="card">
+          <h3>Stock Value</h3>
+          <div id="reportStock" class="value">৳0.00</div>
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         SETTINGS
+    ====================================================== -->
+
+    <section id="settings" class="section">
+
+      <h2 class="sectionTitle">⚙️ Settings</h2>
+
+      <div class="formCard">
+
+        <div class="formGrid">
+
+          <div class="formGroup">
+            <label>Store Name</label>
+            <input id="storeName">
+          </div>
+
+          <div class="formGroup">
+            <label>Owner</label>
+            <input id="storeOwner">
+          </div>
+
+          <div class="formGroup">
+            <label>Phone</label>
+            <input id="storePhone">
+          </div>
+
+          <div class="formGroup">
+            <label>Address</label>
+            <input id="storeAddress">
+          </div>
+
+        </div>
+
+        <div class="formActions">
+
+          <button class="btnGreen"
+                  onclick="saveSettings()">
+            💾 Save Settings
+          </button>
+
+        </div>
+
+      </div>
+
+
+      <div class="formCard">
+
+        <h3>Account Information</h3>
+
+        <div id="accountInfo"
+             class="accountInfo"
+             style="margin-top:12px">
+        </div>
+
+        <div class="formActions">
+
+          <button class="btnOrange"
+                  onclick="sendVerificationEmail()">
+            📧 Resend Verification Email
+          </button>
+
+          <button class="btnRed"
+                  onclick="deleteCurrentAccount()">
+            🗑️ Delete Account
+          </button>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         BACKUP
+    ====================================================== -->
+
+    <section id="backup" class="section">
+
+      <h2 class="sectionTitle">💾 Backup & Download</h2>
+
+      <div class="formCard">
+
+        <h3>📄 PDF Download</h3>
+
+        <p style="margin:10px 0;color:#64748b">
+          Products, Sales, Purchase, Expenses এবং Due-এর
+          সম্পূর্ণ data PDF file হিসেবে download হবে।
+        </p>
+
+        <button class="btnDark"
+                onclick="downloadDataPDF()">
+          📄 Download Data PDF
+        </button>
+
+      </div>
+
+
+      <div class="formCard">
+
+        <h3>💾 JSON Backup</h3>
+
+        <p style="margin:10px 0;color:#64748b">
+          Full data JSON backup হিসেবে save করুন।
+        </p>
+
+        <button class="btnGreen"
+                onclick="backupData()">
+          💾 Download JSON Backup
+        </button>
+
+      </div>
+
+
+      <div class="formCard">
+
+        <h3>♻️ Restore Backup</h3>
+
+        <p style="margin:10px 0;color:#dc2626">
+          Restore করলে বর্তমান data replace হয়ে যাবে।
+        </p>
+
+        <input type="file"
+               id="restoreFile"
+               accept=".json"
+               onchange="restoreData(event)">
+
+      </div>
+
+
+      <div class="formCard">
+
+        <h3>🔄 Old LocalStorage Migration</h3>
+
+        <p style="margin:10px 0;color:#64748b">
+          আগের localStorage version-এর data থাকলে
+          Firebase account-এ নিয়ে আসতে পারবেন।
+        </p>
+
+        <div class="formActions">
+
+          <button class="btnOrange"
+                  onclick="migrateOldData(true)">
+            🔄 Migrate Old Data
+          </button>
+
+          <button class="btnGray"
+                  onclick="showMigratedExpenses()">
+            👁️ Migrated Expenses
+          </button>
+
+          <button class="btnRed"
+                  onclick="deleteMigratedExpenses()">
+            🗑️ Delete Migrated Expenses
+          </button>
+
+        </div>
+
+        <div id="migrationResult"
+             class="migrationBox">
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+</div>
+</div>
+
+
+<!-- =========================================================
+     DUE MODAL
+========================================================= -->
+
+<div id="dueModal" class="modal">
+
+  <div class="modalBox">
+
+    <h2>💰 Receive Due</h2>
+
+    <h3 id="dueCustomerName"></h3>
+
+    <br>
+
+    <div class="formGroup">
+      <label>Payment Amount</label>
+      <input id="dueAmount" type="number">
+    </div>
+
+    <div class="formGroup">
+      <label>Note</label>
+      <textarea id="dueNote"></textarea>
+    </div>
+
+    <div class="modalActions">
+
+      <button class="btnGray"
+              onclick="closeModal('dueModal')">
+        Cancel
+      </button>
+
+      <button class="btnGreen"
+              onclick="receiveDue()">
+        Receive
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- =========================================================
+     BARCODE MODAL
+========================================================= -->
+
+<div id="barcodeModal" class="modal">
+
+  <div class="modalBox"
+       style="text-align:center">
+
+    <h2>Barcode</h2>
+
+    <svg id="barcodeSvg"></svg>
+
+    <div class="modalActions">
+
+      <button class="btnGray"
+              onclick="closeModal('barcodeModal')">
+        Close
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- =========================================================
+     INVOICE
+========================================================= -->
+
+<div id="invoicePrint" class="invoice">
+
+  <div style="padding:30px">
+
+    <h1 id="invoiceStoreName"></h1>
+
+    <p id="invoiceAddress"></p>
+    <p id="invoicePhone"></p>
+
+    <hr>
+
+    <p>
+      Invoice:
+      <span id="invoiceNumber"></span>
+    </p>
+
+    <p>
+      Date:
+      <span id="invoiceDate"></span>
+    </p>
+
+    <p>
+      Customer:
+      <span id="invoiceCustomer"></span>
+    </p>
+
+    <br>
+
+    <table style="width:100%;border-collapse:collapse">
+
+      <thead>
+
+        <tr>
+          <th style="border:1px solid #000;padding:8px">
+            Product
+          </th>
+
+          <th style="border:1px solid #000;padding:8px">
+            Qty
+          </th>
+
+          <th style="border:1px solid #000;padding:8px">
+            Price
+          </th>
+
+          <th style="border:1px solid #000;padding:8px">
+            Subtotal
+          </th>
+        </tr>
+
+      </thead>
+
+      <tbody id="invoiceItems"></tbody>
+
+    </table>
+
+    <br>
+
+    <h3>Total:
+      ৳<span id="invoiceTotal">0</span>
+    </h3>
+
+    <h3>Paid:
+      ৳<span id="invoicePaid">0</span>
+    </h3>
+
+    <h3>Due:
+      ৳<span id="invoiceDue">0</span>
+    </h3>
+
+    <br>
+
+    <p>Owner:
+      <span id="invoiceOwner"></span>
+    </p>
+
+  </div>
+
+</div>
+
+
+<!-- =========================================================
+     FIREBASE SCRIPT
+========================================================= -->
+
 <script type="module">
 
-/* =========================================================
-   FIREBASE
-========================================================= */
-
-import { initializeApp } 
+import { initializeApp }
 from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
 
 import {
@@ -26,14 +1508,13 @@ import {
   setDoc,
   deleteDoc,
   collection,
-  getDocs,
-  writeBatch
+  getDocs
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
 
 /* =========================================================
-   🔥 YOUR FIREBASE CONFIG
-   এখানে নিজের Firebase config বসাও
+   🔥 FIREBASE CONFIG
+   নিজের Firebase config এখানে বসাও
 ========================================================= */
 
 const firebaseConfig = {
@@ -53,32 +1534,35 @@ const firebaseConfig = {
 };
 
 
-const firebaseApp = initializeApp(firebaseConfig);
+const firebaseApp =
+  initializeApp(firebaseConfig);
 
-const auth = getAuth(firebaseApp);
+const auth =
+  getAuth(firebaseApp);
 
-const db = getFirestore(firebaseApp);
+const db =
+  getFirestore(firebaseApp);
 
 
 /* =========================================================
    GLOBAL DATA
 ========================================================= */
 
-let products = [];
-let sales = [];
-let purchases = [];
-let expenses = [];
-let duePayments = [];
+let products=[];
+let sales=[];
+let purchases=[];
+let expenses=[];
+let duePayments=[];
 
-let settings = {
-  name: "Smart Store",
-  owner: "",
-  address: "",
-  phone: ""
+let settings={
+  name:"Smart Store",
+  owner:"",
+  address:"",
+  phone:""
 };
 
-let saleRowCounter = 0;
-let selectedDueCustomer = "";
+let saleRowCounter=0;
+let selectedDueCustomer="";
 
 
 /* =========================================================
@@ -87,7 +1571,7 @@ let selectedDueCustomer = "";
 
 function uid(){
 
-  return Date.now().toString(36) +
+  return Date.now().toString(36)+
     Math.random().toString(36).substring(2);
 
 }
@@ -95,10 +1579,13 @@ function uid(){
 
 function money(n){
 
-  return "৳" + Number(n || 0).toLocaleString("en-BD", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  });
+  return "৳"+Number(n||0).toLocaleString(
+    "en-BD",
+    {
+      minimumFractionDigits:2,
+      maximumFractionDigits:2
+    }
+  );
 
 }
 
@@ -112,7 +1599,7 @@ function today(){
 
 function escapeHtml(str){
 
-  return String(str ?? "")
+  return String(str??"")
     .replace(/&/g,"&amp;")
     .replace(/</g,"&lt;")
     .replace(/>/g,"&gt;")
@@ -128,12 +1615,22 @@ function escapeHtml(str){
 
 function userRef(){
 
-  return doc(db,"users",auth.currentUser.uid);
+  if(!auth.currentUser)
+    throw new Error("User not logged in");
+
+  return doc(
+    db,
+    "users",
+    auth.currentUser.uid
+  );
 
 }
 
 
 function collectionRef(name){
+
+  if(!auth.currentUser)
+    throw new Error("User not logged in");
 
   return collection(
     db,
@@ -147,52 +1644,62 @@ function collectionRef(name){
 
 function documentRef(name,id){
 
+  if(!auth.currentUser)
+    throw new Error("User not logged in");
+
   return doc(
     db,
     "users",
     auth.currentUser.uid,
     name,
-    id
+    String(id)
   );
 
 }
 
 
 /* =========================================================
-   ACCOUNT UI
+   AUTH UI
 ========================================================= */
 
 function showCreateAccount(){
 
-  document.getElementById("loginForm").style.display="none";
+  document.getElementById("loginForm")
+    .classList.remove("active");
 
-  document.getElementById("createForm").style.display="block";
+  document.getElementById("createForm")
+    .classList.add("active");
 
-  document.getElementById("forgotForm").style.display="none";
+  document.getElementById("forgotForm")
+    .classList.remove("active");
 
 }
 
 
 function showLogin(){
 
-  document.getElementById("loginForm").style.display="block";
+  document.getElementById("loginForm")
+    .classList.add("active");
 
-  document.getElementById("createForm").style.display="none";
+  document.getElementById("createForm")
+    .classList.remove("active");
 
-  document.getElementById("forgotForm").style.display="none";
-
-  document.getElementById("codeSection").style.display="none";
+  document.getElementById("forgotForm")
+    .classList.remove("active");
 
 }
 
 
 function showForgotPassword(){
 
-  document.getElementById("loginForm").style.display="none";
+  document.getElementById("loginForm")
+    .classList.remove("active");
 
-  document.getElementById("createForm").style.display="none";
+  document.getElementById("createForm")
+    .classList.remove("active");
 
-  document.getElementById("forgotForm").style.display="block";
+  document.getElementById("forgotForm")
+    .classList.add("active");
 
 }
 
@@ -203,41 +1710,42 @@ function showForgotPassword(){
 
 async function createAccount(){
 
-  const name =
-    document.getElementById("createName").value.trim();
+  const name=
+    document.getElementById("createName")
+      .value.trim();
 
-  const email =
-    document.getElementById("createEmail").value.trim().toLowerCase();
+  const email=
+    document.getElementById("createEmail")
+      .value.trim().toLowerCase();
 
-  const pass =
-    document.getElementById("createPassword").value;
+  const pass=
+    document.getElementById("createPassword")
+      .value;
 
-  const pass2 =
-    document.getElementById("createPassword2").value;
+  const pass2=
+    document.getElementById("createPassword2")
+      .value;
 
 
-  if(!name || !email || !pass){
+  if(!name||!email||!pass){
 
     alert("সব তথ্য পূরণ করুন।");
-
     return;
 
   }
 
 
-  if(pass.length < 6){
+  if(pass.length<6){
 
-    alert("Firebase অনুযায়ী Password কমপক্ষে 6 characters হতে হবে।");
-
+    alert("Password কমপক্ষে 6 characters হতে হবে।");
     return;
 
   }
 
 
-  if(pass !== pass2){
+  if(pass!==pass2){
 
     alert("Password মিলছে না।");
-
     return;
 
   }
@@ -245,20 +1753,22 @@ async function createAccount(){
 
   try{
 
-    const result =
+    const result=
       await createUserWithEmailAndPassword(
         auth,
         email,
         pass
       );
 
+    const user=result.user;
 
-    const user = result.user;
 
-
-    await updateProfile(user,{
-      displayName:name
-    });
+    await updateProfile(
+      user,
+      {
+        displayName:name
+      }
+    );
 
 
     await setDoc(
@@ -295,7 +1805,7 @@ async function createAccount(){
 
     }catch(e){
 
-      console.log("Verification email:",e);
+      console.log(e);
 
     }
 
@@ -306,6 +1816,7 @@ async function createAccount(){
     expenses=[];
     duePayments=[];
 
+
     settings={
       name:"Smart Store",
       owner:name,
@@ -315,7 +1826,7 @@ async function createAccount(){
 
 
     alert(
-      "Account successfully created!\n\n" +
+      "Account successfully created!\n\n"+
       "আপনার email-এ verification link পাঠানো হয়েছে।"
     );
 
@@ -337,17 +1848,18 @@ async function createAccount(){
 
 async function loginAccount(){
 
-  const email =
-    document.getElementById("loginEmail").value.trim().toLowerCase();
+  const email=
+    document.getElementById("loginEmail")
+      .value.trim().toLowerCase();
 
-  const pass =
-    document.getElementById("loginPassword").value;
+  const pass=
+    document.getElementById("loginPassword")
+      .value;
 
 
-  if(!email || !pass){
+  if(!email||!pass){
 
     alert("Email এবং Password দিন।");
-
     return;
 
   }
@@ -355,19 +1867,15 @@ async function loginAccount(){
 
   try{
 
-    const result =
-      await signInWithEmailAndPassword(
-        auth,
-        email,
-        pass
-      );
-
+    await signInWithEmailAndPassword(
+      auth,
+      email,
+      pass
+    );
 
     await loadAccountData();
 
-
     openApp();
-
 
   }catch(error){
 
@@ -386,53 +1894,37 @@ function showFirebaseError(error){
 
   console.error(error);
 
+  let msg=
+    error.message||
+    "Unknown error";
 
-  let msg = error.message || "Unknown error";
 
+  if(error.code==="auth/invalid-credential")
+    msg="Email অথবা Password ভুল।";
 
-  if(error.code === "auth/invalid-credential"){
+  else if(error.code==="auth/user-not-found")
+    msg="এই Email দিয়ে Account পাওয়া যায়নি।";
 
-    msg = "Email অথবা Password ভুল।";
+  else if(error.code==="auth/email-already-in-use")
+    msg="এই Email দিয়ে Account আগে থেকেই আছে।";
 
-  }
+  else if(error.code==="auth/weak-password")
+    msg="Password কমপক্ষে 6 characters হতে হবে।";
 
-  else if(error.code === "auth/user-not-found"){
+  else if(error.code==="auth/invalid-email")
+    msg="Email সঠিক নয়।";
 
-    msg = "এই Email দিয়ে Account পাওয়া যায়নি।";
+  else if(error.code==="auth/api-key-not-valid")
+    msg="Firebase API Key সঠিক নয়। firebaseConfig ঠিক করুন।";
 
-  }
+  else if(
+    error.code==="permission-denied" ||
+    error.code==="firestore/permission-denied"
+  )
+    msg="Firestore permission denied। Security Rules ঠিক করুন।";
 
-  else if(error.code === "auth/email-already-in-use"){
-
-    msg = "এই Email দিয়ে Account আগে থেকেই আছে।";
-
-  }
-
-  else if(error.code === "auth/weak-password"){
-
-    msg = "Password কমপক্ষে 6 characters হতে হবে।";
-
-  }
-
-  else if(error.code === "auth/invalid-email"){
-
-    msg = "Email সঠিক নয়।";
-
-  }
-
-  else if(error.code === "auth/api-key-not-valid"){
-
-    msg =
-      "Firebase API Key সঠিক নয়। firebaseConfig ঠিক করুন।";
-
-  }
-
-  else if(error.code === "permission-denied"){
-
-    msg =
-      "Firestore permission denied। Firestore Rules ঠিক করুন।";
-
-  }
+  else if(error.code==="auth/network-request-failed")
+    msg="Internet connection check করুন।";
 
 
   alert(msg);
@@ -446,9 +1938,11 @@ function showFirebaseError(error){
 
 function openApp(){
 
-  document.getElementById("loginScreen").style.display="none";
+  document.getElementById("loginScreen")
+    .style.display="none";
 
-  document.getElementById("app").style.display="block";
+  document.getElementById("app")
+    .style.display="block";
 
   updateAccountUI();
 
@@ -475,9 +1969,11 @@ async function logoutAccount(){
     expenses=[];
     duePayments=[];
 
-    document.getElementById("app").style.display="none";
+    document.getElementById("app")
+      .style.display="none";
 
-    document.getElementById("loginScreen").style.display="flex";
+    document.getElementById("loginScreen")
+      .style.display="flex";
 
     showLogin();
 
@@ -491,31 +1987,31 @@ async function logoutAccount(){
 
 
 /* =========================================================
-   LOAD FIRESTORE DATA
+   LOAD ACCOUNT DATA
 ========================================================= */
 
 async function loadAccountData(){
 
-  const user = auth.currentUser;
+  const user=auth.currentUser;
 
-  if(!user) return;
+  if(!user)return;
 
 
   try{
 
-    const profileSnap =
+    const profileSnap=
       await getDoc(
         doc(db,"users",user.uid)
       );
 
 
-    const profile =
+    const profile=
       profileSnap.exists()
-      ? profileSnap.data()
-      : {};
+      ?profileSnap.data()
+      :{};
 
 
-    const settingsSnap =
+    const settingsSnap=
       await getDoc(
         doc(
           db,
@@ -529,13 +2025,22 @@ async function loadAccountData(){
 
     if(settingsSnap.exists()){
 
-      settings = settingsSnap.data();
+      settings={
+        name:"Smart Store",
+        owner:"",
+        address:"",
+        phone:"",
+        ...settingsSnap.data()
+      };
 
     }else{
 
       settings={
         name:"Smart Store",
-        owner:profile.name || user.displayName || "",
+        owner:
+          profile.name||
+          user.displayName||
+          "",
         address:"",
         phone:""
       };
@@ -543,29 +2048,22 @@ async function loadAccountData(){
     }
 
 
-    products =
+    products=
       await loadCollection("products");
 
-
-    sales =
+    sales=
       await loadCollection("sales");
 
-
-    purchases =
+    purchases=
       await loadCollection("purchases");
 
-
-    expenses =
+    expenses=
       await loadCollection("expenses");
 
-
-    duePayments =
+    duePayments=
       await loadCollection("duePayments");
 
-
   }catch(error){
-
-    console.error(error);
 
     showFirebaseError(error);
 
@@ -580,7 +2078,7 @@ async function loadAccountData(){
 
 async function loadCollection(name){
 
-  const snap =
+  const snap=
     await getDocs(
       collectionRef(name)
     );
@@ -589,7 +2087,6 @@ async function loadCollection(name){
   return snap.docs.map(d=>({
 
     id:d.id,
-
     ...d.data()
 
   }));
@@ -598,22 +2095,30 @@ async function loadCollection(name){
 
 
 /* =========================================================
-   SAVE ONE DOCUMENT
+   SAVE DOCUMENT
 ========================================================= */
 
-async function saveDocument(collectionName,data){
+async function saveDocument(
+  collectionName,
+  data
+){
 
-  if(!auth.currentUser)return;
-
-  const id =
-    data.id || uid();
+  if(!auth.currentUser)
+    throw new Error("Login required");
 
 
-  data.id=id;
+  const id=
+    data.id||
+    uid();
+
+  data.id=String(id);
 
 
   await setDoc(
-    documentRef(collectionName,id),
+    documentRef(
+      collectionName,
+      data.id
+    ),
     data
   );
 
@@ -621,83 +2126,23 @@ async function saveDocument(collectionName,data){
 
 
 /* =========================================================
-   SAVE ALL DATA
+   DELETE DOCUMENT
 ========================================================= */
 
-async function saveData(){
+async function deleteCollectionDocument(
+  name,
+  id
+){
 
-  if(!auth.currentUser)return;
+  if(!auth.currentUser)
+    throw new Error("Login required");
 
-
-  try{
-
-    await setDoc(
-      doc(
-        db,
-        "users",
-        auth.currentUser.uid,
-        "settings",
-        "main"
-      ),
-      settings
-    );
-
-
-    await saveCollection("products",products);
-
-    await saveCollection("sales",sales);
-
-    await saveCollection("purchases",purchases);
-
-    await saveCollection("expenses",expenses);
-
-    await saveCollection("duePayments",duePayments);
-
-
-  }catch(error){
-
-    console.error(error);
-
-    showFirebaseError(error);
-
-  }
-
-}
-
-
-/* =========================================================
-   SAVE COLLECTION WITHOUT 500 BATCH LIMIT PROBLEM
-========================================================= */
-
-async function saveCollection(name,data){
-
-  for(let i=0;i<data.length;i++){
-
-    const item = data[i];
-
-    await setDoc(
-      documentRef(
-        name,
-        item.id || uid()
-      ),
-      item
-    );
-
-  }
-
-}
-
-
-/* =========================================================
-   DELETE FIRESTORE DOCUMENT
-========================================================= */
-
-async function deleteCollectionDocument(name,id){
-
-  if(!auth.currentUser)return;
 
   await deleteDoc(
-    documentRef(name,id)
+    documentRef(
+      name,
+      String(id)
+    )
   );
 
 }
@@ -714,30 +2159,33 @@ function updateAccountUI(){
   if(!user)return;
 
 
-  const name =
-    user.displayName ||
-    settings.owner ||
+  const name=
+    user.displayName||
+    settings.owner||
     "Account";
 
 
   document.getElementById("sideUserName")
     .textContent=name;
 
-
   document.getElementById("sideUserEmail")
-    .textContent=user.email;
+    .textContent=user.email||"";
 
 
-  document.getElementById("accountInfo").innerHTML =
+  document.getElementById("accountInfo")
+    .innerHTML=
+      "<b>Name:</b> "+
+      escapeHtml(name)+
+      "<br><b>Email:</b> "+
+      escapeHtml(user.email||"")+
+      "<br><b>Firebase UID:</b> "+
+      escapeHtml(user.uid);
 
-    "<b>Name:</b> "+
-    escapeHtml(name)+
 
-    "<br><b>Email:</b> "+
-    escapeHtml(user.email || "") +
-
-    "<br><b>Firebase UID:</b> "+
-    escapeHtml(user.uid);
+  document.getElementById("topStoreName")
+    .textContent=
+      settings.name||
+      "Smart Store";
 
 }
 
@@ -748,14 +2196,14 @@ function updateAccountUI(){
 
 async function sendResetCode(){
 
-  const email =
-    document.getElementById("forgotEmail").value.trim().toLowerCase();
+  const email=
+    document.getElementById("forgotEmail")
+      .value.trim().toLowerCase();
 
 
   if(!email){
 
     alert("Email দিন।");
-
     return;
 
   }
@@ -770,13 +2218,11 @@ async function sendResetCode(){
 
 
     alert(
-      "Password reset link আপনার email-এ পাঠানো হয়েছে।\n\n" +
-      "Email খুলে link-এ গিয়ে নতুন Password দিন।"
+      "Password reset link আপনার email-এ পাঠানো হয়েছে।"
     );
 
 
     showLogin();
-
 
   }catch(error){
 
@@ -787,19 +2233,17 @@ async function sendResetCode(){
 }
 
 
-/* পুরোনো demo OTP আর ব্যবহার হচ্ছে না */
-
 function resetPassword(){
 
   alert(
-    "এখন Password reset করতে email-এর Reset Password link ব্যবহার করুন।"
+    "Password reset করতে email-এর Reset Password link ব্যবহার করুন।"
   );
 
 }
 
 
 /* =========================================================
-   EMAIL VERIFICATION
+   VERIFICATION
 ========================================================= */
 
 async function sendVerificationEmail(){
@@ -813,561 +2257,15 @@ async function sendVerificationEmail(){
 
     await sendEmailVerification(user);
 
-    alert("Verification email আবার পাঠানো হয়েছে।");
+    alert(
+      "Verification email আবার পাঠানো হয়েছে।"
+    );
 
   }catch(error){
 
     showFirebaseError(error);
 
   }
-
-}
-
-
-/* =========================================================
-   OLD DATA MIGRATION
-========================================================= */
-
-function hasLegacyData(){
-
-  try{
-
-    const p =
-      JSON.parse(
-        localStorage.getItem("products") || "[]"
-      );
-
-    const s =
-      JSON.parse(
-        localStorage.getItem("sales") || "[]"
-      );
-
-    const pu =
-      JSON.parse(
-        localStorage.getItem("purchases") || "[]"
-      );
-
-    const e =
-      JSON.parse(
-        localStorage.getItem("expenses") || "[]"
-      );
-
-
-    return (
-      p.length ||
-      s.length ||
-      pu.length ||
-      e.length
-    );
-
-  }catch(e){
-
-    return false;
-
-  }
-
-}
-
-
-function stableHash(str){
-
-  let h=0;
-
-  for(let i=0;i<str.length;i++){
-
-    h=((h<<5)-h)+str.charCodeAt(i);
-
-    h|=0;
-
-  }
-
-  return Math.abs(h).toString(36);
-
-}
-
-
-function migrationKey(type,obj){
-
-  if(
-    obj &&
-    obj.id !== undefined &&
-    obj.id !== null
-  ){
-
-    return type+"_"+String(obj.id);
-
-  }
-
-
-  const copy={...(obj||{})};
-
-  delete copy.migrated;
-  delete copy.migratedAt;
-  delete copy.oldMigrationId;
-
-
-  return type+"_"+stableHash(
-    JSON.stringify(copy)
-  );
-
-}
-
-
-/* =========================================================
-   MIGRATE OLD DATA
-========================================================= */
-
-async function migrateOldData(showMessage=false){
-
-  if(!auth.currentUser){
-
-    if(showMessage)
-      alert("আগে Login করুন।");
-
-    return false;
-
-  }
-
-
-  try{
-
-    const oldProducts =
-      JSON.parse(
-        localStorage.getItem("products") || "[]"
-      );
-
-
-    const oldSales =
-      JSON.parse(
-        localStorage.getItem("sales") || "[]"
-      );
-
-
-    const oldPurchases =
-      JSON.parse(
-        localStorage.getItem("purchases") || "[]"
-      );
-
-
-    const oldExpenses =
-      JSON.parse(
-        localStorage.getItem("expenses") || "[]"
-      );
-
-
-    const oldSettings =
-      JSON.parse(
-        localStorage.getItem("storeSettings") || "null"
-      );
-
-
-    const hasOld =
-      oldProducts.length ||
-      oldSales.length ||
-      oldPurchases.length ||
-      oldExpenses.length;
-
-
-    if(!hasOld){
-
-      if(showMessage)
-        alert("পুরোনো data পাওয়া যায়নি।");
-
-      return false;
-
-    }
-
-
-    const existingKeys=new Set();
-
-
-    [
-      ...products,
-      ...sales,
-      ...purchases,
-      ...expenses
-    ].forEach(item=>{
-
-      if(item.oldMigrationId){
-
-        existingKeys.add(
-          item.oldMigrationId
-        );
-
-      }
-
-    });
-
-
-    const productIdMap={};
-
-
-    const migratedProducts=[];
-
-
-    oldProducts.forEach(old=>{
-
-      const key=
-        migrationKey("product",old);
-
-
-      if(existingKeys.has(key))return;
-
-
-      const newId=uid();
-
-
-      if(old.id){
-
-        productIdMap[String(old.id)]=newId;
-
-      }
-
-
-      migratedProducts.push({
-
-        ...old,
-
-        id:newId,
-
-        migrated:true,
-
-        migratedAt:new Date().toISOString(),
-
-        oldMigrationId:key
-
-      });
-
-
-      existingKeys.add(key);
-
-    });
-
-
-    const migratedSales=[];
-
-
-    oldSales.forEach(old=>{
-
-      const key=
-        migrationKey("sale",old);
-
-
-      if(existingKeys.has(key))return;
-
-
-      const newItems =
-        (old.items || []).map(item=>({
-
-          ...item,
-
-          productId:
-            productIdMap[String(item.productId)] ||
-            item.productId
-
-        }));
-
-
-      migratedSales.push({
-
-        ...old,
-
-        id:uid(),
-
-        items:newItems,
-
-        migrated:true,
-
-        migratedAt:new Date().toISOString(),
-
-        oldMigrationId:key
-
-      });
-
-
-      existingKeys.add(key);
-
-    });
-
-
-    const migratedPurchases=[];
-
-
-    oldPurchases.forEach(old=>{
-
-      const key=
-        migrationKey("purchase",old);
-
-
-      if(existingKeys.has(key))return;
-
-
-      migratedPurchases.push({
-
-        ...old,
-
-        id:uid(),
-
-        productId:
-          productIdMap[String(old.productId)] ||
-          old.productId,
-
-        migrated:true,
-
-        migratedAt:new Date().toISOString(),
-
-        oldMigrationId:key
-
-      });
-
-
-      existingKeys.add(key);
-
-    });
-
-
-    const migratedExpenses=[];
-
-
-    oldExpenses.forEach(old=>{
-
-      const key=
-        migrationKey("expense",old);
-
-
-      if(existingKeys.has(key))return;
-
-
-      migratedExpenses.push({
-
-        ...old,
-
-        id:uid(),
-
-        migrated:true,
-
-        migratedAt:new Date().toISOString(),
-
-        oldMigrationId:key
-
-      });
-
-
-      existingKeys.add(key);
-
-    });
-
-
-    products=[
-      ...products,
-      ...migratedProducts
-    ];
-
-
-    sales=[
-      ...sales,
-      ...migratedSales
-    ];
-
-
-    purchases=[
-      ...purchases,
-      ...migratedPurchases
-    ];
-
-
-    expenses=[
-      ...expenses,
-      ...migratedExpenses
-    ];
-
-
-    if(oldSettings){
-
-      settings={
-        ...settings,
-        ...oldSettings
-      };
-
-    }
-
-
-    await saveData();
-
-
-    loadSettings();
-
-    renderAll();
-
-
-    const msg=
-
-      "Migration complete: "+
-
-      migratedProducts.length+
-      " Products, "+
-
-      migratedSales.length+
-      " Sales, "+
-
-      migratedPurchases.length+
-      " Purchases, "+
-
-      migratedExpenses.length+
-      " Expenses.";
-
-
-    document.getElementById(
-      "migrationResult"
-    ).textContent=msg;
-
-
-    if(showMessage)
-      alert(msg);
-
-
-    return true;
-
-
-  }catch(error){
-
-    console.error(error);
-
-    alert(
-      "Migration failed: "+
-      error.message
-    );
-
-    return false;
-
-  }
-
-}
-
-
-/* =========================================================
-   MIGRATED EXPENSE
-========================================================= */
-
-function showMigratedExpenses(){
-
-  const migrated =
-    expenses.filter(
-      e=>e.migrated===true
-    );
-
-
-  if(!migrated.length){
-
-    document.getElementById(
-      "migrationResult"
-    ).textContent=
-      "কোনো migrated expense পাওয়া যায়নি।";
-
-
-    alert(
-      "কোনো migrated expense পাওয়া যায়নি।"
-    );
-
-    return;
-
-  }
-
-
-  let text=
-    "Migrated Expenses:\n\n";
-
-
-  migrated.forEach((e,i)=>{
-
-    text +=
-
-      (i+1)+". "+
-
-      (e.name||"Expense")+
-
-      " | "+
-
-      money(e.amount)+
-
-      " | "+
-
-      (e.date||"")+
-
-      "\n";
-
-  });
-
-
-  alert(text);
-
-
-  document.getElementById(
-    "migrationResult"
-  ).textContent=
-
-    "মোট "+
-    migrated.length+
-    "টি migrated expense পাওয়া গেছে।";
-
-}
-
-
-async function deleteMigratedExpenses(){
-
-  const list =
-    expenses.filter(
-      e=>e.migrated===true
-    );
-
-
-  if(!list.length){
-
-    alert(
-      "কোনো migrated expense নেই।"
-    );
-
-    return;
-
-  }
-
-
-  if(!confirm(
-    "মোট "+list.length+
-    "টি migrated expense delete করবেন?"
-  ))return;
-
-
-  for(const e of list){
-
-    await deleteCollectionDocument(
-      "expenses",
-      e.id
-    );
-
-  }
-
-
-  expenses =
-    expenses.filter(
-      e=>e.migrated!==true
-    );
-
-
-  renderAll();
-
-
-  document.getElementById(
-    "migrationResult"
-  ).textContent=
-    list.length+
-    "টি migrated expense delete করা হয়েছে।";
-
-
-  alert(
-    list.length+
-    "টি migrated expense successfully deleted!"
-  );
 
 }
 
@@ -1384,8 +2282,11 @@ function showSection(id,btn){
     );
 
 
-  document.getElementById(id)
-    .classList.add("active");
+  const section=
+    document.getElementById(id);
+
+  if(section)
+    section.classList.add("active");
 
 
   document.querySelectorAll(".navBtn")
@@ -1406,7 +2307,7 @@ function showSection(id,btn){
 
 async function addProduct(){
 
-  const name =
+  const name=
     document.getElementById("productName")
       .value.trim();
 
@@ -1414,29 +2315,26 @@ async function addProduct(){
   if(!name){
 
     alert("Product name দিন।");
-
     return;
 
   }
 
 
-  const code =
+  const code=
     document.getElementById("productCode")
-      .value.trim()
-      || "P"+Date.now();
+      .value.trim()||
+    "P"+Date.now();
 
 
-  if(products.some(
-    p=>
-      String(p.code).toLowerCase()
-      ===
-      code.toLowerCase()
-  )){
+  if(
+    products.some(
+      p=>
+        String(p.code).toLowerCase()===
+        code.toLowerCase()
+    )
+  ){
 
-    alert(
-      "এই Product Code আগে থেকেই আছে।"
-    );
-
+    alert("এই Product Code আগে থেকেই আছে।");
     return;
 
   }
@@ -1446,9 +2344,9 @@ async function addProduct(){
 
     id:uid(),
 
-    name,
+    name:name,
 
-    code,
+    code:code,
 
     category:
       document.getElementById("productCategory")
@@ -1474,8 +2372,8 @@ async function addProduct(){
 
     unit:
       document.getElementById("productUnit")
-        .value.trim()
-      ||"pcs",
+        .value.trim()||
+      "pcs",
 
     minStock:
       Number(
@@ -1493,18 +2391,13 @@ async function addProduct(){
       product
     );
 
-
     products.push(product);
-
 
     clearProductForm();
 
     renderAll();
 
-
-    alert(
-      "Product added successfully!"
-    );
+    alert("Product added successfully!");
 
   }catch(error){
 
@@ -1528,22 +2421,43 @@ function clearProductForm(){
     "minStock"
   ].forEach(id=>{
 
-    document.getElementById(id).value="";
+    const el=
+      document.getElementById(id);
+
+    if(el)
+      el.value="";
 
   });
+
+
+  document.getElementById("productUnit")
+    .value="pcs";
+
+  document.getElementById("minStock")
+    .value="5";
 
 }
 
 
 function renderProducts(){
 
-  const search =
+  const table=
+    document.getElementById(
+      "productTable"
+    );
+
+  if(!table)return;
+
+
+  const search=
     document.getElementById(
       "productSearch"
-    )?.value.toLowerCase() || "";
+    )?.value
+      .toLowerCase()||
+    "";
 
 
-  const list =
+  const list=
     products.filter(p=>
 
       String(p.name||"")
@@ -1565,10 +2479,7 @@ function renderProducts(){
     );
 
 
-  document.getElementById(
-    "productTable"
-  ).innerHTML=
-
+  table.innerHTML=
     list.map(p=>`
 
       <tr>
@@ -1594,7 +2505,8 @@ function renderProducts(){
           ${money(p.sellingPrice)}
         </td>
 
-        <td class="${p.stock<=p.minStock?'lowStock':'goodStock'}">
+        <td class="${Number(p.stock)<=Number(p.minStock)
+          ?"lowStock":"goodStock"}">
           ${p.stock}
         </td>
 
@@ -1632,14 +2544,16 @@ function renderProducts(){
 
 async function editProduct(id){
 
-  const p =
-    products.find(x=>x.id===id);
+  const p=
+    products.find(
+      x=>String(x.id)===String(id)
+    );
 
 
   if(!p)return;
 
 
-  const price =
+  const price=
     prompt(
       "নতুন Selling Price:",
       p.sellingPrice
@@ -1649,8 +2563,17 @@ async function editProduct(id){
   if(price===null)return;
 
 
-  p.sellingPrice =
-    Number(price)||0;
+  const n=Number(price);
+
+  if(Number.isNaN(n)||n<0){
+
+    alert("সঠিক price দিন।");
+    return;
+
+  }
+
+
+  p.sellingPrice=n;
 
 
   try{
@@ -1659,7 +2582,6 @@ async function editProduct(id){
       "products",
       p
     );
-
 
     renderAll();
 
@@ -1674,9 +2596,8 @@ async function editProduct(id){
 
 async function deleteProduct(id){
 
-  if(!confirm(
-    "Product delete করবেন?"
-  ))return;
+  if(!confirm("Product delete করবেন?"))
+    return;
 
 
   try{
@@ -1687,9 +2608,9 @@ async function deleteProduct(id){
     );
 
 
-    products =
+    products=
       products.filter(
-        p=>p.id!==id
+        p=>String(p.id)!==String(id)
       );
 
 
@@ -1710,8 +2631,10 @@ async function deleteProduct(id){
 
 function showBarcode(id){
 
-  const p =
-    products.find(x=>x.id===id);
+  const p=
+    products.find(
+      x=>String(x.id)===String(id)
+    );
 
 
   if(!p)return;
@@ -1740,8 +2663,11 @@ function showBarcode(id){
 
 function closeModal(id){
 
-  document.getElementById(id)
-    .style.display="none";
+  const el=
+    document.getElementById(id);
+
+  if(el)
+    el.style.display="none";
 
 }
 
@@ -1753,7 +2679,6 @@ function closeModal(id){
 function addSaleRow(){
 
   saleRowCounter++;
-
 
   const id=saleRowCounter;
 
@@ -1772,9 +2697,8 @@ function addSaleRow(){
     <input
       list="saleProductList"
       class="saleProduct"
-      placeholder="Type Product Name / Code"
+      placeholder="Product Name / Code"
       oninput="saleProductChanged(${id})">
-
 
     <input
       type="number"
@@ -1783,18 +2707,15 @@ function addSaleRow(){
       min="1"
       oninput="calculateSale()">
 
-
     <input
       class="salePrice"
       readonly
       placeholder="Price">
 
-
     <input
       class="saleSubtotal"
       readonly
       placeholder="Subtotal">
-
 
     <button
       class="btnRed"
@@ -1829,16 +2750,17 @@ function removeSaleRow(id){
 
 function renderSaleProductList(){
 
-  let old =
+  let old=
     document.getElementById(
       "saleProductList"
     );
 
 
-  if(old)old.remove();
+  if(old)
+    old.remove();
 
 
-  const list =
+  const list=
     document.createElement("datalist");
 
 
@@ -1847,15 +2769,13 @@ function renderSaleProductList(){
 
   products.forEach(p=>{
 
-    const o =
+    const o=
       document.createElement("option");
-
 
     o.value=p.name;
 
     o.label=
       p.code+" | "+p.name;
-
 
     list.appendChild(o);
 
@@ -1892,7 +2812,7 @@ function findProduct(text){
 
 function saleProductChanged(id){
 
-  const row =
+  const row=
     document.getElementById(
       "saleRow_"+id
     );
@@ -1901,20 +2821,18 @@ function saleProductChanged(id){
   if(!row)return;
 
 
-  const input =
-    row.querySelector(
-      ".saleProduct"
+  const p=
+    findProduct(
+      row.querySelector(
+        ".saleProduct"
+      ).value
     );
-
-
-  const p =
-    findProduct(input.value);
 
 
   row.querySelector(
     ".salePrice"
-  ).value =
-    p ? p.sellingPrice : "";
+  ).value=
+    p?p.sellingPrice:"";
 
 
   calculateSale();
@@ -1931,14 +2849,14 @@ function calculateSale(){
     ".saleRow"
   ).forEach(row=>{
 
-    const qty =
+    const qty=
       Number(
         row.querySelector(".saleQty")
           .value
       )||0;
 
 
-    const price =
+    const price=
       Number(
         row.querySelector(".salePrice")
           .value
@@ -1965,7 +2883,7 @@ function calculateSale(){
     total.toFixed(2);
 
 
-  const paid =
+  const paid=
     Number(
       document.getElementById(
         "salePaid"
@@ -1986,7 +2904,7 @@ function calculateSale(){
 
 async function completeSale(){
 
-  const rows =
+  const rows=
     [...document.querySelectorAll(
       ".saleRow"
     )];
@@ -1994,10 +2912,7 @@ async function completeSale(){
 
   if(!rows.length){
 
-    alert(
-      "কমপক্ষে একটি product যোগ করুন।"
-    );
-
+    alert("কমপক্ষে একটি product যোগ করুন।");
     return;
 
   }
@@ -2008,17 +2923,15 @@ async function completeSale(){
 
   for(const row of rows){
 
-    const input =
-      row.querySelector(
-        ".saleProduct"
+    const p=
+      findProduct(
+        row.querySelector(
+          ".saleProduct"
+        ).value
       );
 
 
-    const p =
-      findProduct(input.value);
-
-
-    const qty =
+    const qty=
       Number(
         row.querySelector(".saleQty")
           .value
@@ -2029,7 +2942,7 @@ async function completeSale(){
 
       alert(
         "Product পাওয়া যায়নি: "+
-        input.value
+        row.querySelector(".saleProduct").value
       );
 
       return;
@@ -2039,16 +2952,13 @@ async function completeSale(){
 
     if(qty<=0){
 
-      alert(
-        "Quantity সঠিক দিন।"
-      );
-
+      alert("Quantity সঠিক দিন।");
       return;
 
     }
 
 
-    if(p.stock<qty){
+    if(Number(p.stock)<qty){
 
       alert(
         p.name+
@@ -2064,33 +2974,27 @@ async function completeSale(){
     items.push({
 
       productId:p.id,
-
       name:p.name,
-
       code:p.code,
-
-      qty,
-
-      price:p.sellingPrice,
-
-      purchasePrice:p.purchasePrice,
-
+      qty:qty,
+      price:Number(p.sellingPrice)||0,
+      purchasePrice:Number(p.purchasePrice)||0,
       subtotal:
-        qty*p.sellingPrice
+        qty*(Number(p.sellingPrice)||0)
 
     });
 
   }
 
 
-  const total =
+  const total=
     items.reduce(
       (sum,i)=>sum+i.subtotal,
       0
     );
 
 
-  const paid =
+  const paid=
     Number(
       document.getElementById(
         "salePaid"
@@ -2098,10 +3002,10 @@ async function completeSale(){
     )||0;
 
 
-  if(paid>total){
+  if(paid<0||paid>total){
 
     alert(
-      "Paid amount total-এর চেয়ে বেশি হতে পারবে না।"
+      "Paid amount সঠিক দিন।"
     );
 
     return;
@@ -2113,51 +3017,56 @@ async function completeSale(){
 
     id:uid(),
 
-    invoice:
-      "INV-"+Date.now(),
+    invoice:"INV-"+Date.now(),
 
     date:
       document.getElementById(
         "saleDate"
-      ).value||today(),
+      ).value||
+      today(),
 
     customer:
       document.getElementById(
         "saleCustomer"
-      ).value.trim()
-      ||"Walk-in Customer",
+      ).value.trim()||
+      "Walk-in Customer",
 
     payment:
       document.getElementById(
         "salePayment"
-      ).value.trim()
-      ||"Cash",
+      ).value||
+      "Cash",
 
-    items,
+    items:items,
 
-    total,
+    total:total,
 
-    paid,
+    paid:paid,
 
-    due:
-      total-paid
+    due:total-paid
 
   };
 
 
   try{
 
+    /*
+      আগে stock update
+    */
+
     for(const item of items){
 
-      const p =
+      const p=
         products.find(
-          x=>x.id===item.productId
+          x=>String(x.id)===String(item.productId)
         );
 
 
       if(p){
 
-        p.stock-=item.qty;
+        p.stock=
+          Number(p.stock||0)-
+          Number(item.qty);
 
 
         await saveDocument(
@@ -2177,9 +3086,6 @@ async function completeSale(){
 
 
     sales.push(sale);
-
-
-    printInvoiceForSale(sale);
 
 
     document.getElementById(
@@ -2209,8 +3115,10 @@ async function completeSale(){
 
     addSaleRow();
 
-
     renderAll();
+
+
+    printInvoiceForSale(sale);
 
   }catch(error){
 
@@ -2223,9 +3131,9 @@ async function completeSale(){
 
 async function deleteSale(id){
 
-  const sale =
+  const sale=
     sales.find(
-      s=>s.id===id
+      s=>String(s.id)===String(id)
     );
 
 
@@ -2241,15 +3149,17 @@ async function deleteSale(id){
 
     for(const item of sale.items||[]){
 
-      const p =
+      const p=
         products.find(
-          x=>x.id===item.productId
+          x=>String(x.id)===String(item.productId)
         );
 
 
       if(p){
 
-        p.stock+=item.qty;
+        p.stock=
+          Number(p.stock||0)+
+          Number(item.qty||0);
 
 
         await saveDocument(
@@ -2268,9 +3178,9 @@ async function deleteSale(id){
     );
 
 
-    sales =
+    sales=
       sales.filter(
-        s=>s.id!==id
+        s=>String(s.id)!==String(id)
       );
 
 
@@ -2287,11 +3197,17 @@ async function deleteSale(id){
 
 function renderSales(){
 
-  document.getElementById(
-    "salesTable"
-  ).innerHTML=
+  const table=
+    document.getElementById(
+      "salesTable"
+    );
 
-    sales.slice().reverse()
+  if(!table)return;
+
+
+  table.innerHTML=
+    sales.slice()
+      .reverse()
       .map(s=>`
 
         <tr>
@@ -2313,7 +3229,8 @@ function renderSales(){
             ${money(s.paid)}
           </td>
 
-          <td class="${s.due>0?'lowStock':'goodStock'}">
+          <td class="${Number(s.due)>0
+            ?"lowStock":"goodStock"}">
             ${money(s.due)}
           </td>
 
@@ -2345,10 +3262,13 @@ function renderSales(){
 
 function renderPurchaseProducts(){
 
-  const list =
+  const list=
     document.getElementById(
       "purchaseProductList"
     );
+
+
+  if(!list)return;
 
 
   list.innerHTML="";
@@ -2356,17 +3276,13 @@ function renderPurchaseProducts(){
 
   products.forEach(p=>{
 
-    const o =
-      document.createElement(
-        "option"
-      );
-
+    const o=
+      document.createElement("option");
 
     o.value=p.name;
 
     o.label=
       p.code+" | "+p.name;
-
 
     list.appendChild(o);
 
@@ -2377,7 +3293,7 @@ function renderPurchaseProducts(){
 
 function purchaseProductChanged(){
 
-  const p =
+  const p=
     findProduct(
       document.getElementById(
         "purchaseProduct"
@@ -2399,28 +3315,23 @@ function purchaseProductChanged(){
 
 async function addPurchase(){
 
-  const productInput =
-    document.getElementById(
-      "purchaseProduct"
-    ).value;
-
-
-  const p =
-    findProduct(productInput);
+  const p=
+    findProduct(
+      document.getElementById(
+        "purchaseProduct"
+      ).value
+    );
 
 
   if(!p){
 
-    alert(
-      "Product পাওয়া যায়নি।"
-    );
-
+    alert("Product পাওয়া যায়নি।");
     return;
 
   }
 
 
-  const qty =
+  const qty=
     Number(
       document.getElementById(
         "purchaseQty"
@@ -2428,7 +3339,7 @@ async function addPurchase(){
     )||0;
 
 
-  const price =
+  const price=
     Number(
       document.getElementById(
         "purchasePrice2"
@@ -2438,10 +3349,15 @@ async function addPurchase(){
 
   if(qty<=0){
 
-    alert(
-      "Quantity দিন।"
-    );
+    alert("Quantity দিন।");
+    return;
 
+  }
+
+
+  if(price<0){
+
+    alert("Price সঠিক দিন।");
     return;
 
   }
@@ -2454,7 +3370,8 @@ async function addPurchase(){
     date:
       document.getElementById(
         "purchaseDate"
-      ).value||today(),
+      ).value||
+      today(),
 
     productId:p.id,
 
@@ -2462,9 +3379,9 @@ async function addPurchase(){
 
     code:p.code,
 
-    qty,
+    qty:qty,
 
-    price,
+    price:price,
 
     supplier:
       document.getElementById(
@@ -2478,7 +3395,8 @@ async function addPurchase(){
 
   try{
 
-    p.stock+=qty;
+    p.stock=
+      Number(p.stock||0)+qty;
 
     p.purchasePrice=price;
 
@@ -2502,16 +3420,13 @@ async function addPurchase(){
       "purchaseProduct"
     ).value="";
 
-
     document.getElementById(
       "purchaseQty"
     ).value="";
 
-
     document.getElementById(
       "purchasePrice2"
     ).value="";
-
 
     document.getElementById(
       "supplier"
@@ -2531,9 +3446,9 @@ async function addPurchase(){
 
 async function deletePurchase(id){
 
-  const pur =
+  const pur=
     purchases.find(
-      x=>x.id===id
+      x=>String(x.id)===String(id)
     );
 
 
@@ -2541,15 +3456,15 @@ async function deletePurchase(id){
 
 
   if(!confirm(
-    "Purchase delete করবেন? Stock কমে যাবে."
+    "Purchase delete করবেন? Stock কমে যাবে।"
   ))return;
 
 
   try{
 
-    const p =
+    const p=
       products.find(
-        x=>x.id===pur.productId
+        x=>String(x.id)===String(pur.productId)
       );
 
 
@@ -2558,7 +3473,8 @@ async function deletePurchase(id){
       p.stock=
         Math.max(
           0,
-          p.stock-pur.qty
+          Number(p.stock||0)-
+          Number(pur.qty||0)
         );
 
 
@@ -2576,9 +3492,9 @@ async function deletePurchase(id){
     );
 
 
-    purchases =
+    purchases=
       purchases.filter(
-        x=>x.id!==id
+        x=>String(x.id)!==String(id)
       );
 
 
@@ -2595,17 +3511,22 @@ async function deletePurchase(id){
 
 function renderPurchases(){
 
-  document.getElementById(
-    "purchaseTable"
-  ).innerHTML=
+  const table=
+    document.getElementById(
+      "purchaseTable"
+    );
 
-    purchases.slice().reverse()
+  if(!table)return;
+
+
+  table.innerHTML=
+    purchases.slice()
+      .reverse()
       .map(p=>`
 
         <tr>
 
           <td>
-            ${p.migrated?"🔄 ":""}
             ${escapeHtml(p.date)}
           </td>
 
@@ -2647,7 +3568,7 @@ function renderPurchases(){
 
 
 /* =========================================================
-   CUSTOMERS
+   CUSTOMERS / DUE
 ========================================================= */
 
 function getCustomerData(){
@@ -2657,37 +3578,32 @@ function getCustomerData(){
 
   sales.forEach(s=>{
 
-    const name =
-      s.customer ||
+    const name=
+      s.customer||
       "Walk-in Customer";
 
 
     if(!map[name]){
 
       map[name]={
-
-        name,
-
+        name:name,
         total:0,
-
         paid:0,
-
         originalDue:0
-
       };
 
     }
 
 
-    map[name].total +=
+    map[name].total+=
       Number(s.total)||0;
 
 
-    map[name].paid +=
+    map[name].paid+=
       Number(s.paid)||0;
 
 
-    map[name].originalDue +=
+    map[name].originalDue+=
       Number(s.due)||0;
 
   });
@@ -2695,27 +3611,24 @@ function getCustomerData(){
 
   duePayments.forEach(p=>{
 
-    const name=p.customer;
+    const name=
+      p.customer||
+      "Unknown";
 
 
     if(!map[name]){
 
       map[name]={
-
-        name,
-
+        name:name,
         total:0,
-
         paid:0,
-
         originalDue:0
-
       };
 
     }
 
 
-    map[name].paid +=
+    map[name].paid+=
       Number(p.amount)||0;
 
   });
@@ -2739,14 +3652,19 @@ function getCustomerData(){
 
 function renderCustomers(){
 
-  const data =
+  const table=
+    document.getElementById(
+      "customerTable"
+    );
+
+  if(!table)return;
+
+
+  const data=
     getCustomerData();
 
 
-  document.getElementById(
-    "customerTable"
-  ).innerHTML=
-
+  table.innerHTML=
     data.map(c=>`
 
       <tr>
@@ -2763,7 +3681,8 @@ function renderCustomers(){
           ${money(c.paid)}
         </td>
 
-        <td class="${c.due>0?'lowStock':'goodStock'}">
+        <td class="${c.due>0
+          ?"lowStock":"goodStock"}">
           ${money(c.due)}
         </td>
 
@@ -2798,7 +3717,7 @@ function renderCustomers(){
 
 function openDue(encoded){
 
-  selectedDueCustomer =
+  selectedDueCustomer=
     decodeURIComponent(encoded);
 
 
@@ -2828,7 +3747,7 @@ function openDue(encoded){
 
 async function receiveDue(){
 
-  const amount =
+  const amount=
     Number(
       document.getElementById(
         "dueAmount"
@@ -2838,16 +3757,13 @@ async function receiveDue(){
 
   if(amount<=0){
 
-    alert(
-      "Payment amount দিন।"
-    );
-
+    alert("Payment amount দিন।");
     return;
 
   }
 
 
-  const customerData =
+  const customerData=
     getCustomerData().find(
       c=>c.name===selectedDueCustomer
     );
@@ -2855,10 +3771,7 @@ async function receiveDue(){
 
   if(!customerData){
 
-    alert(
-      "Customer পাওয়া যায়নি।"
-    );
-
+    alert("Customer পাওয়া যায়নি।");
     return;
 
   }
@@ -2881,7 +3794,7 @@ async function receiveDue(){
 
     customer:selectedDueCustomer,
 
-    amount,
+    amount:amount,
 
     date:today(),
 
@@ -2928,13 +3841,13 @@ async function receiveDue(){
 
 async function addExpense(){
 
-  const name =
+  const name=
     document.getElementById(
       "expenseName"
     ).value.trim();
 
 
-  const amount =
+  const amount=
     Number(
       document.getElementById(
         "expenseAmount"
@@ -2942,7 +3855,7 @@ async function addExpense(){
     )||0;
 
 
-  if(!name || amount<=0){
+  if(!name||amount<=0){
 
     alert(
       "Expense name ও amount দিন।"
@@ -2960,11 +3873,12 @@ async function addExpense(){
     date:
       document.getElementById(
         "expenseDate"
-      ).value||today(),
+      ).value||
+      today(),
 
-    name,
+    name:name,
 
-    amount,
+    amount:amount,
 
     note:
       document.getElementById(
@@ -3011,30 +3925,71 @@ async function addExpense(){
 }
 
 
+/*
+  IMPORTANT:
+  Expense delete করার পর saveData()
+  call করা হচ্ছে না।
+  তাই deleted expense Firestore-এ
+  আবার ফিরে আসবে না।
+*/
+
 async function deleteExpense(id){
 
+  const expense=
+    expenses.find(
+      e=>String(e.id)===String(id)
+    );
+
+
+  if(!expense){
+
+    alert("Expense পাওয়া যায়নি।");
+    return;
+
+  }
+
+
   if(!confirm(
-    "Expense delete করবেন?"
+    "এই Expense permanently delete করবেন?"
   ))return;
 
 
   try{
 
-    await deleteCollectionDocument(
-      "expenses",
-      id
+    if(!auth.currentUser){
+
+      alert("আগে Login করুন।");
+      return;
+
+    }
+
+
+    await deleteDoc(
+      documentRef(
+        "expenses",
+        String(id)
+      )
     );
 
 
-    expenses =
+    expenses=
       expenses.filter(
-        e=>e.id!==id
+        e=>String(e.id)!==String(id)
       );
 
 
-    renderAll();
+    renderExpenses();
+    updateDashboard();
+    updateReport();
+
+
+    alert(
+      "Expense successfully deleted!"
+    );
 
   }catch(error){
+
+    console.error(error);
 
     showFirebaseError(error);
 
@@ -3045,11 +4000,17 @@ async function deleteExpense(id){
 
 function renderExpenses(){
 
-  document.getElementById(
-    "expenseTable"
-  ).innerHTML=
+  const table=
+    document.getElementById(
+      "expenseTable"
+    );
 
-    expenses.slice().reverse()
+  if(!table)return;
+
+
+  table.innerHTML=
+    expenses.slice()
+      .reverse()
       .map(e=>`
 
         <tr>
@@ -3060,7 +4021,6 @@ function renderExpenses(){
           </td>
 
           <td>
-            ${e.migrated?"🔄 ":""}
             ${escapeHtml(e.name)}
           </td>
 
@@ -3095,38 +4055,35 @@ function renderExpenses(){
 
 function getTotals(){
 
-  const totalSales =
+  const totalSales=
     sales.reduce(
       (sum,s)=>
-        sum+
-        (Number(s.total)||0),
+        sum+(Number(s.total)||0),
       0
     );
 
 
-  const totalPurchase =
+  const totalPurchase=
     purchases.reduce(
       (sum,p)=>
-        sum+
-        (Number(p.total)||0),
+        sum+(Number(p.total)||0),
       0
     );
 
 
-  const totalExpense =
+  const totalExpense=
     expenses.reduce(
       (sum,e)=>
-        sum+
-        (Number(e.amount)||0),
+        sum+(Number(e.amount)||0),
       0
     );
 
 
-  const grossProfit =
+  const grossProfit=
     sales.reduce(
       (sum,s)=>{
 
-        const profit =
+        const profit=
           (s.items||[]).reduce(
             (a,i)=>
               a+
@@ -3146,7 +4103,7 @@ function getTotals(){
     );
 
 
-  const due =
+  const due=
     getCustomerData().reduce(
       (sum,c)=>
         sum+c.due,
@@ -3154,7 +4111,7 @@ function getTotals(){
     );
 
 
-  const stockValue =
+  const stockValue=
     products.reduce(
       (sum,p)=>
         sum+
@@ -3167,15 +4124,10 @@ function getTotals(){
   return{
 
     totalSales,
-
     totalPurchase,
-
     totalExpense,
-
     grossProfit,
-
     due,
-
     stockValue,
 
     netProfit:
@@ -3192,10 +4144,11 @@ function getTotals(){
 
 function updateDashboard(){
 
-  const t=getTotals();
+  const t=
+    getTotals();
 
 
-  const todaySale =
+  const todaySale=
     sales
       .filter(
         s=>s.date===today()
@@ -3208,7 +4161,7 @@ function updateDashboard(){
       );
 
 
-  const low =
+  const low=
     products.filter(
       p=>
         Number(p.stock)<=
@@ -3216,134 +4169,136 @@ function updateDashboard(){
     );
 
 
-  document.getElementById(
-    "todaySales"
-  ).textContent=
-    money(todaySale);
+  const setText=(id,value)=>{
+
+    const el=
+      document.getElementById(id);
+
+    if(el)
+      el.textContent=value;
+
+  };
 
 
-  document.getElementById(
-    "totalProducts"
-  ).textContent=
-    products.length;
+  setText(
+    "todaySales",
+    money(todaySale)
+  );
+
+  setText(
+    "totalProducts",
+    products.length
+  );
+
+  setText(
+    "totalProfit",
+    money(t.grossProfit)
+  );
+
+  setText(
+    "totalExpense",
+    money(t.totalExpense)
+  );
+
+  setText(
+    "customerDue",
+    money(t.due)
+  );
+
+  setText(
+    "stockValue",
+    money(t.stockValue)
+  );
+
+  setText(
+    "lowStockCount",
+    low.length
+  );
+
+  setText(
+    "netProfit",
+    money(t.netProfit)
+  );
 
 
-  document.getElementById(
-    "totalProfit"
-  ).textContent=
-    money(t.grossProfit);
+  const table=
+    document.getElementById(
+      "lowStockTable"
+    );
 
 
-  document.getElementById(
-    "totalExpense"
-  ).textContent=
-    money(t.totalExpense);
+  if(table){
 
+    table.innerHTML=
+      low.map(p=>`
 
-  document.getElementById(
-    "customerDue"
-  ).textContent=
-    money(t.due);
+        <tr>
 
+          <td>
+            ${escapeHtml(p.name)}
+          </td>
 
-  document.getElementById(
-    "stockValue"
-  ).textContent=
-    money(t.stockValue);
+          <td>
+            ${escapeHtml(p.code)}
+          </td>
 
+          <td class="lowStock">
+            ${p.stock}
+          </td>
 
-  document.getElementById(
-    "lowStockCount"
-  ).textContent=
-    low.length;
+          <td>
+            ${p.minStock}
+          </td>
 
+        </tr>
 
-  document.getElementById(
-    "netProfit"
-  ).textContent=
-    money(t.netProfit);
+      `).join("");
 
-
-  document.getElementById(
-    "lowStockTable"
-  ).innerHTML=
-
-    low.map(p=>`
-
-      <tr>
-
-        <td>
-          ${escapeHtml(p.name)}
-        </td>
-
-        <td>
-          ${escapeHtml(p.code)}
-        </td>
-
-        <td class="lowStock">
-          ${p.stock}
-        </td>
-
-        <td>
-          ${p.minStock}
-        </td>
-
-      </tr>
-
-    `).join("");
+  }
 
 }
 
 
 /* =========================================================
-   REPORTS
+   REPORT
 ========================================================= */
 
 function updateReport(){
 
-  const t=getTotals();
+  const t=
+    getTotals();
 
 
-  document.getElementById(
-    "reportSales"
-  ).textContent=
-    money(t.totalSales);
+  const values={
+
+    reportSales:money(t.totalSales),
+
+    reportPurchase:money(t.totalPurchase),
+
+    reportGross:money(t.grossProfit),
+
+    reportExpense:money(t.totalExpense),
+
+    reportNet:money(t.netProfit),
+
+    reportDue:money(t.due),
+
+    reportStock:money(t.stockValue)
+
+  };
 
 
-  document.getElementById(
-    "reportPurchase"
-  ).textContent=
-    money(t.totalPurchase);
+  Object.entries(values).forEach(
+    ([id,value])=>{
 
+      const el=
+        document.getElementById(id);
 
-  document.getElementById(
-    "reportGross"
-  ).textContent=
-    money(t.grossProfit);
+      if(el)
+        el.textContent=value;
 
-
-  document.getElementById(
-    "reportExpense"
-  ).textContent=
-    money(t.totalExpense);
-
-
-  document.getElementById(
-    "reportNet"
-  ).textContent=
-    money(t.netProfit);
-
-
-  document.getElementById(
-    "reportDue"
-  ).textContent=
-    money(t.due);
-
-
-  document.getElementById(
-    "reportStock"
-  ).textContent=
-    money(t.stockValue);
+    }
+  );
 
 }
 
@@ -3354,39 +4309,60 @@ function updateReport(){
 
 function loadSettings(){
 
-  document.getElementById(
-    "storeName"
-  ).value=
-    settings.name||"";
+  const fields={
+
+    storeName:settings.name||"",
+
+    storeOwner:settings.owner||"",
+
+    storePhone:settings.phone||"",
+
+    storeAddress:settings.address||""
+
+  };
 
 
-  document.getElementById(
-    "storeOwner"
-  ).value=
-    settings.owner||"";
+  Object.entries(fields).forEach(
+    ([id,value])=>{
+
+      const el=
+        document.getElementById(id);
+
+      if(el)
+        el.value=value;
+
+    }
+  );
 
 
-  document.getElementById(
-    "storePhone"
-  ).value=
-    settings.phone||"";
+  const top=
+    document.getElementById(
+      "topStoreName"
+    );
 
-
-  document.getElementById(
-    "storeAddress"
-  ).value=
-    settings.address||"";
+  if(top)
+    top.textContent=
+      settings.name||
+      "Smart Store";
 
 }
 
 
 async function saveSettings(){
 
+  if(!auth.currentUser){
+
+    alert("Login করুন।");
+    return;
+
+  }
+
+
   settings.name=
     document.getElementById(
       "storeName"
-    ).value.trim()
-    ||"Smart Store";
+    ).value.trim()||
+    "Smart Store";
 
 
   settings.owner=
@@ -3421,8 +4397,10 @@ async function saveSettings(){
     );
 
 
-    if(auth.currentUser.displayName
-      !==settings.owner){
+    if(
+      auth.currentUser.displayName !==
+      settings.owner
+    ){
 
       await updateProfile(
         auth.currentUser,
@@ -3436,11 +4414,10 @@ async function saveSettings(){
 
 
     updateAccountUI();
+    loadSettings();
 
 
-    alert(
-      "Settings saved!"
-    );
+    alert("Settings saved!");
 
   }catch(error){
 
@@ -3457,9 +4434,9 @@ async function saveSettings(){
 
 function printInvoiceForSaleById(id){
 
-  const sale =
+  const sale=
     sales.find(
-      s=>s.id===id
+      s=>String(s.id)===String(id)
     );
 
 
@@ -3474,7 +4451,8 @@ function printInvoiceForSale(sale){
   document.getElementById(
     "invoiceStoreName"
   ).textContent=
-    settings.name||"Smart Store";
+    settings.name||
+    "Smart Store";
 
 
   document.getElementById(
@@ -3510,7 +4488,6 @@ function printInvoiceForSale(sale){
   document.getElementById(
     "invoiceItems"
   ).innerHTML=
-
     (sale.items||[])
       .map(i=>`
 
@@ -3540,19 +4517,19 @@ function printInvoiceForSale(sale){
   document.getElementById(
     "invoiceTotal"
   ).textContent=
-    Number(sale.total).toFixed(2);
+    Number(sale.total||0).toFixed(2);
 
 
   document.getElementById(
     "invoicePaid"
   ).textContent=
-    Number(sale.paid).toFixed(2);
+    Number(sale.paid||0).toFixed(2);
 
 
   document.getElementById(
     "invoiceDue"
   ).textContent=
-    Number(sale.due).toFixed(2);
+    Number(sale.due||0).toFixed(2);
 
 
   document.getElementById(
@@ -3561,16 +4538,503 @@ function printInvoiceForSale(sale){
     settings.owner||"";
 
 
-  setTimeout(
-    ()=>window.print(),
-    300
-  );
+  const invoice=
+    document.getElementById(
+      "invoicePrint"
+    );
+
+
+  invoice.style.display="block";
+
+
+  setTimeout(()=>{
+
+    window.print();
+
+    invoice.style.display="none";
+
+  },300);
 
 }
 
 
 /* =========================================================
-   BACKUP
+   PDF DATA DOWNLOAD
+   HTML2PDF ব্যবহার করা হয়েছে,
+   তাই বাংলা text-ও browser rendering অনুযায়ী
+   PDF-এ আসবে।
+========================================================= */
+
+async function downloadDataPDF(){
+
+  if(!auth.currentUser){
+
+    alert("আগে Login করুন।");
+    return;
+
+  }
+
+
+  if(typeof html2pdf==="undefined"){
+
+    alert(
+      "PDF library load হয়নি। Internet connection check করুন।"
+    );
+
+    return;
+
+  }
+
+
+  const t=
+    getTotals();
+
+
+  const wrap=
+    document.createElement("div");
+
+
+  wrap.style.width="900px";
+  wrap.style.background="white";
+  wrap.style.padding="30px";
+  wrap.style.color="#111";
+
+
+  const row=(a,b)=>`
+
+    <tr>
+
+      <td style="
+        border:1px solid #ddd;
+        padding:7px;
+      ">
+        ${escapeHtml(a)}
+      </td>
+
+      <td style="
+        border:1px solid #ddd;
+        padding:7px;
+      ">
+        ${escapeHtml(b)}
+      </td>
+
+    </tr>
+
+  `;
+
+
+  let html=`
+
+    <div>
+
+      <h1 style="text-align:center">
+        ${escapeHtml(settings.name||"Smart Store")}
+      </h1>
+
+      <p style="text-align:center">
+        Store Data Report
+      </p>
+
+      <p>
+        Date: ${today()}
+      </p>
+
+      <hr>
+
+      <h2>Summary</h2>
+
+      <table style="width:100%;border-collapse:collapse">
+
+        ${row("Total Sales",money(t.totalSales))}
+        ${row("Total Purchase",money(t.totalPurchase))}
+        ${row("Gross Profit",money(t.grossProfit))}
+        ${row("Total Expense",money(t.totalExpense))}
+        ${row("Net Profit",money(t.netProfit))}
+        ${row("Customer Due",money(t.due))}
+        ${row("Stock Value",money(t.stockValue))}
+
+      </table>
+
+      <br>
+
+      <h2>Products</h2>
+
+      <table style="
+        width:100%;
+        border-collapse:collapse;
+      ">
+
+        <tr>
+
+          <th style="border:1px solid #ddd;padding:7px">
+            Name
+          </th>
+
+          <th style="border:1px solid #ddd;padding:7px">
+            Code
+          </th>
+
+          <th style="border:1px solid #ddd;padding:7px">
+            Purchase
+          </th>
+
+          <th style="border:1px solid #ddd;padding:7px">
+            Sale
+          </th>
+
+          <th style="border:1px solid #ddd;padding:7px">
+            Stock
+          </th>
+
+        </tr>
+
+        ${
+          products.map(p=>`
+
+            <tr>
+
+              <td style="border:1px solid #ddd;padding:7px">
+                ${escapeHtml(p.name)}
+              </td>
+
+              <td style="border:1px solid #ddd;padding:7px">
+                ${escapeHtml(p.code)}
+              </td>
+
+              <td style="border:1px solid #ddd;padding:7px">
+                ${money(p.purchasePrice)}
+              </td>
+
+              <td style="border:1px solid #ddd;padding:7px">
+                ${money(p.sellingPrice)}
+              </td>
+
+              <td style="border:1px solid #ddd;padding:7px">
+                ${p.stock}
+              </td>
+
+            </tr>
+
+          `).join("")
+        }
+
+      </table>
+
+      <br>
+
+      <h2>Sales History</h2>
+
+      <table style="
+        width:100%;
+        border-collapse:collapse;
+      ">
+
+        <tr>
+
+          <th style="border:1px solid #ddd;padding:7px">
+            Date
+          </th>
+
+          <th style="border:1px solid #ddd;padding:7px">
+            Customer
+          </th>
+
+          <th style="border:1px solid #ddd;padding:7px">
+            Total
+          </th>
+
+          <th style="border:1px solid #ddd;padding:7px">
+            Paid
+          </th>
+
+          <th style="border:1px solid #ddd;padding:7px">
+            Due
+          </th>
+
+        </tr>
+
+        ${
+          sales.map(s=>`
+
+            <tr>
+
+              <td style="border:1px solid #ddd;padding:7px">
+                ${escapeHtml(s.date)}
+              </td>
+
+              <td style="border:1px solid #ddd;padding:7px">
+                ${escapeHtml(s.customer)}
+              </td>
+
+              <td style="border:1px solid #ddd;padding:7px">
+                ${money(s.total)}
+              </td>
+
+              <td style="border:1px solid #ddd;padding:7px">
+                ${money(s.paid)}
+              </td>
+
+              <td style="border:1px solid #ddd;padding:7px">
+                ${money(s.due)}
+              </td>
+
+            </tr>
+
+          `).join("")
+        }
+
+      </table>
+
+      <br>
+
+      <h2>Purchase History</h2>
+
+      <table style="
+        width:100%;
+        border-collapse:collapse;
+      ">
+
+        <tr>
+
+          <th style="border:1px solid #ddd;padding:7px">
+            Date
+          </th>
+
+          <th style="border:1px solid #ddd;padding:7px">
+            Product
+          </th>
+
+          <th style="border:1px solid #ddd;padding:7px">
+            Qty
+          </th>
+
+          <th style="border:1px solid #ddd;padding:7px">
+            Price
+          </th>
+
+          <th style="border:1px solid #ddd;padding:7px">
+            Total
+          </th>
+
+        </tr>
+
+        ${
+          purchases.map(p=>`
+
+            <tr>
+
+              <td style="border:1px solid #ddd;padding:7px">
+                ${escapeHtml(p.date)}
+              </td>
+
+              <td style="border:1px solid #ddd;padding:7px">
+                ${escapeHtml(p.product)}
+              </td>
+
+              <td style="border:1px solid #ddd;padding:7px">
+                ${p.qty}
+              </td>
+
+              <td style="border:1px solid #ddd;padding:7px">
+                ${money(p.price)}
+              </td>
+
+              <td style="border:1px solid #ddd;padding:7px">
+                ${money(p.total)}
+              </td>
+
+            </tr>
+
+          `).join("")
+        }
+
+      </table>
+
+      <br>
+
+      <h2>Expense History</h2>
+
+      <table style="
+        width:100%;
+        border-collapse:collapse;
+      ">
+
+        <tr>
+
+          <th style="border:1px solid #ddd;padding:7px">
+            Date
+          </th>
+
+          <th style="border:1px solid #ddd;padding:7px">
+            Expense
+          </th>
+
+          <th style="border:1px solid #ddd;padding:7px">
+            Amount
+          </th>
+
+          <th style="border:1px solid #ddd;padding:7px">
+            Note
+          </th>
+
+        </tr>
+
+        ${
+          expenses.map(e=>`
+
+            <tr>
+
+              <td style="border:1px solid #ddd;padding:7px">
+                ${escapeHtml(e.date)}
+              </td>
+
+              <td style="border:1px solid #ddd;padding:7px">
+                ${escapeHtml(e.name)}
+              </td>
+
+              <td style="border:1px solid #ddd;padding:7px">
+                ${money(e.amount)}
+              </td>
+
+              <td style="border:1px solid #ddd;padding:7px">
+                ${escapeHtml(e.note)}
+              </td>
+
+            </tr>
+
+          `).join("")
+        }
+
+      </table>
+
+      <br>
+
+      <h2>Due Payment History</h2>
+
+      <table style="
+        width:100%;
+        border-collapse:collapse;
+      ">
+
+        <tr>
+
+          <th style="border:1px solid #ddd;padding:7px">
+            Date
+          </th>
+
+          <th style="border:1px solid #ddd;padding:7px">
+            Customer
+          </th>
+
+          <th style="border:1px solid #ddd;padding:7px">
+            Amount
+          </th>
+
+          <th style="border:1px solid #ddd;padding:7px">
+            Note
+          </th>
+
+        </tr>
+
+        ${
+          duePayments.map(p=>`
+
+            <tr>
+
+              <td style="border:1px solid #ddd;padding:7px">
+                ${escapeHtml(p.date)}
+              </td>
+
+              <td style="border:1px solid #ddd;padding:7px">
+                ${escapeHtml(p.customer)}
+              </td>
+
+              <td style="border:1px solid #ddd;padding:7px">
+                ${money(p.amount)}
+              </td>
+
+              <td style="border:1px solid #ddd;padding:7px">
+                ${escapeHtml(p.note)}
+              </td>
+
+            </tr>
+
+          `).join("")
+        }
+
+      </table>
+
+      <br>
+
+      <p style="text-align:center">
+        Smart Store Management
+      </p>
+
+    </div>
+
+  `;
+
+
+  wrap.innerHTML=html;
+
+
+  document.body.appendChild(wrap);
+
+
+  try{
+
+    await html2pdf()
+      .set({
+
+        margin:10,
+
+        filename:
+          "smart-store-data-"+today()+".pdf",
+
+        image:{
+          type:"jpeg",
+          quality:.98
+        },
+
+        html2canvas:{
+          scale:2,
+          useCORS:true
+        },
+
+        jsPDF:{
+          unit:"mm",
+          format:"a4",
+          orientation:"portrait"
+        },
+
+        pagebreak:{
+          mode:["css","legacy"]
+        }
+
+      })
+      .from(wrap)
+      .save();
+
+
+  }catch(error){
+
+    console.error(error);
+
+    alert(
+      "PDF তৈরি করা যায়নি।"
+    );
+
+  }finally{
+
+    wrap.remove();
+
+  }
+
+}
+
+
+/* =========================================================
+   JSON BACKUP
 ========================================================= */
 
 function backupData(){
@@ -3578,7 +5042,6 @@ function backupData(){
   if(!auth.currentUser){
 
     alert("Login করুন।");
-
     return;
 
   }
@@ -3588,7 +5051,7 @@ function backupData(){
 
     app:"Smart Store",
 
-    version:3,
+    version:4,
 
     date:
       new Date().toISOString(),
@@ -3596,15 +5059,10 @@ function backupData(){
     data:{
 
       products,
-
       sales,
-
       purchases,
-
       expenses,
-
       duePayments,
-
       settings
 
     }
@@ -3637,17 +5095,23 @@ function backupData(){
 
   a.href=url;
 
-
   a.download=
     "smart-store-backup-"+
     today()+
     ".json";
 
 
+  document.body.appendChild(a);
+
   a.click();
 
+  a.remove();
 
-  URL.revokeObjectURL(url);
+
+  setTimeout(
+    ()=>URL.revokeObjectURL(url),
+    1000
+  );
 
 }
 
@@ -3658,137 +5122,139 @@ function backupData(){
 
 async function restoreData(event){
 
-  const file =
+  const file=
     event.target.files[0];
 
 
   if(!file)return;
 
 
-  const reader =
-    new FileReader();
+  try{
+
+    const text=
+      await file.text();
 
 
-  reader.onload=
-    async function(e){
-
-      try{
-
-        const backup =
-          JSON.parse(
-            e.target.result
-          );
+    const backup=
+      JSON.parse(text);
 
 
-        const data =
-          backup.data ||
-          backup;
+    const data=
+      backup.data||
+      backup;
 
 
-        if(!data)
-          throw new Error();
+    if(!data)
+      throw new Error("Invalid backup");
 
 
-        if(!confirm(
-          "বর্তমান data replace করে backup restore করবেন?"
-        ))return;
+    if(!confirm(
+      "বর্তমান data replace করে backup restore করবেন?"
+    )){
+
+      event.target.value="";
+      return;
+
+    }
 
 
-        products =
-          data.products||[];
+    products=
+      Array.isArray(data.products)
+      ?data.products
+      :[];
 
 
-        sales =
-          data.sales||[];
+    sales=
+      Array.isArray(data.sales)
+      ?data.sales
+      :[];
 
 
-        purchases =
-          data.purchases||[];
+    purchases=
+      Array.isArray(data.purchases)
+      ?data.purchases
+      :[];
 
 
-        expenses =
-          data.expenses||[];
+    expenses=
+      Array.isArray(data.expenses)
+      ?data.expenses
+      :[];
 
 
-        duePayments =
-          data.duePayments||[];
+    duePayments=
+      Array.isArray(data.duePayments)
+      ?data.duePayments
+      :[];
 
 
-        settings =
-          data.settings||settings;
+    settings=
+      data.settings||
+      settings;
 
 
-        /*
-          Restore-এর জন্য পুরোনো Firestore
-          collection delete করে নতুন data save
-        */
-
-        await replaceCollection(
-          "products",
-          products
-        );
+    await replaceCollection(
+      "products",
+      products
+    );
 
 
-        await replaceCollection(
-          "sales",
-          sales
-        );
+    await replaceCollection(
+      "sales",
+      sales
+    );
 
 
-        await replaceCollection(
-          "purchases",
-          purchases
-        );
+    await replaceCollection(
+      "purchases",
+      purchases
+    );
 
 
-        await replaceCollection(
-          "expenses",
-          expenses
-        );
+    await replaceCollection(
+      "expenses",
+      expenses
+    );
 
 
-        await replaceCollection(
-          "duePayments",
-          duePayments
-        );
+    await replaceCollection(
+      "duePayments",
+      duePayments
+    );
 
 
-        await setDoc(
-          doc(
-            db,
-            "users",
-            auth.currentUser.uid,
-            "settings",
-            "main"
-          ),
-          settings
-        );
+    await setDoc(
+      doc(
+        db,
+        "users",
+        auth.currentUser.uid,
+        "settings",
+        "main"
+      ),
+      settings
+    );
 
 
-        loadSettings();
+    loadSettings();
 
-        renderAll();
+    updateAccountUI();
 
-
-        alert(
-          "Backup successfully restored!"
-        );
+    renderAll();
 
 
-      }catch(err){
+    alert(
+      "Backup successfully restored!"
+    );
 
-        console.error(err);
+  }catch(error){
 
-        alert(
-          "Backup file সঠিক নয়।"
-        );
+    console.error(error);
 
-      }
+    alert(
+      "Backup file সঠিক নয় অথবা restore করা যায়নি।"
+    );
 
-    };
-
-
-  reader.readAsText(file);
+  }
 
 
   event.target.value="";
@@ -3805,14 +5271,14 @@ async function replaceCollection(
   data
 ){
 
-  const snap =
+  const snap=
     await getDocs(
       collectionRef(name)
     );
 
 
   /*
-    Delete old documents
+    প্রথমে Firestore-এর পুরোনো docs delete
   */
 
   for(const d of snap.docs){
@@ -3823,22 +5289,23 @@ async function replaceCollection(
 
 
   /*
-    Add backup documents
+    তারপর নতুন backup data save
   */
 
   for(const item of data){
 
-    const id =
-      item.id || uid();
+    const id=
+      item.id||
+      uid();
 
 
-    item.id=id;
+    item.id=String(id);
 
 
     await setDoc(
       documentRef(
         name,
-        id
+        item.id
       ),
       item
     );
@@ -3849,28 +5316,24 @@ async function replaceCollection(
 
 
 /* =========================================================
-   DELETE FIREBASE ACCOUNT + ALL DATA
+   DELETE ACCOUNT
 ========================================================= */
 
 async function deleteCurrentAccount(){
 
-  const user =
+  const user=
     auth.currentUser;
 
 
   if(!user)return;
 
 
-  const ok =
-    confirm(
-      "আপনার Account এবং এই account-এর সব data delete হয়ে যাবে। নিশ্চিত?"
-    );
+  if(!confirm(
+    "Account এবং এই account-এর সব data delete হয়ে যাবে। নিশ্চিত?"
+  ))return;
 
 
-  if(!ok)return;
-
-
-  const confirmText =
+  const confirmText=
     prompt(
       'নিশ্চিত করতে "DELETE" লিখুন'
     );
@@ -3890,21 +5353,19 @@ async function deleteCurrentAccount(){
   try{
 
     const collections=[
+
       "products",
       "sales",
       "purchases",
       "expenses",
       "duePayments"
+
     ];
 
 
-    /*
-      সব data delete
-    */
-
     for(const name of collections){
 
-      const snap =
+      const snap=
         await getDocs(
           collectionRef(name)
         );
@@ -3919,10 +5380,6 @@ async function deleteCurrentAccount(){
     }
 
 
-    /*
-      Settings delete
-    */
-
     await deleteDoc(
       doc(
         db,
@@ -3934,10 +5391,6 @@ async function deleteCurrentAccount(){
     );
 
 
-    /*
-      User profile delete
-    */
-
     await deleteDoc(
       doc(
         db,
@@ -3948,7 +5401,7 @@ async function deleteCurrentAccount(){
 
 
     /*
-      Firebase Authentication account delete
+      Firebase Auth account delete
     */
 
     await deleteUser(user);
@@ -3961,14 +5414,10 @@ async function deleteCurrentAccount(){
 
     location.reload();
 
-
   }catch(error){
 
-    console.error(error);
-
-
     if(
-      error.code ===
+      error.code===
       "auth/requires-recent-login"
     ){
 
@@ -3981,6 +5430,577 @@ async function deleteCurrentAccount(){
       showFirebaseError(error);
 
     }
+
+  }
+
+}
+
+
+/* =========================================================
+   OLD DATA MIGRATION
+========================================================= */
+
+function stableHash(str){
+
+  let h=0;
+
+  for(let i=0;i<str.length;i++){
+
+    h=
+      ((h<<5)-h)+
+      str.charCodeAt(i);
+
+    h|=0;
+
+  }
+
+  return Math.abs(h).toString(36);
+
+}
+
+
+function migrationKey(type,obj){
+
+  if(
+    obj &&
+    obj.id!==undefined &&
+    obj.id!==null
+  ){
+
+    return type+
+      "_"+
+      String(obj.id);
+
+  }
+
+
+  const copy={
+    ...(obj||{})
+  };
+
+
+  delete copy.migrated;
+  delete copy.migratedAt;
+  delete copy.oldMigrationId;
+
+
+  return type+
+    "_"+
+    stableHash(
+      JSON.stringify(copy)
+    );
+
+}
+
+
+async function migrateOldData(
+  showMessage=false
+){
+
+  if(!auth.currentUser){
+
+    if(showMessage)
+      alert("আগে Login করুন।");
+
+    return false;
+
+  }
+
+
+  try{
+
+    const oldProducts=
+      JSON.parse(
+        localStorage.getItem(
+          "products"
+        )||"[]"
+      );
+
+
+    const oldSales=
+      JSON.parse(
+        localStorage.getItem(
+          "sales"
+        )||"[]"
+      );
+
+
+    const oldPurchases=
+      JSON.parse(
+        localStorage.getItem(
+          "purchases"
+        )||"[]"
+      );
+
+
+    const oldExpenses=
+      JSON.parse(
+        localStorage.getItem(
+          "expenses"
+        )||"[]"
+      );
+
+
+    const oldSettings=
+      JSON.parse(
+        localStorage.getItem(
+          "storeSettings"
+        )||"null"
+      );
+
+
+    const hasOld=
+      oldProducts.length||
+      oldSales.length||
+      oldPurchases.length||
+      oldExpenses.length;
+
+
+    if(!hasOld){
+
+      if(showMessage)
+        alert(
+          "পুরোনো data পাওয়া যায়নি।"
+        );
+
+      return false;
+
+    }
+
+
+    const existingKeys=
+      new Set();
+
+
+    [
+      ...products,
+      ...sales,
+      ...purchases,
+      ...expenses
+    ].forEach(item=>{
+
+      if(item.oldMigrationId){
+
+        existingKeys.add(
+          item.oldMigrationId
+        );
+
+      }
+
+    });
+
+
+    const productIdMap={};
+
+
+    const migratedProducts=[];
+
+
+    oldProducts.forEach(old=>{
+
+      const key=
+        migrationKey(
+          "product",
+          old
+        );
+
+
+      if(existingKeys.has(key))
+        return;
+
+
+      const newId=uid();
+
+
+      if(old.id){
+
+        productIdMap[
+          String(old.id)
+        ]=newId;
+
+      }
+
+
+      migratedProducts.push({
+
+        ...old,
+
+        id:newId,
+
+        migrated:true,
+
+        migratedAt:
+          new Date().toISOString(),
+
+        oldMigrationId:key
+
+      });
+
+
+      existingKeys.add(key);
+
+    });
+
+
+    const migratedSales=[];
+
+
+    oldSales.forEach(old=>{
+
+      const key=
+        migrationKey(
+          "sale",
+          old
+        );
+
+
+      if(existingKeys.has(key))
+        return;
+
+
+      const newItems=
+        (old.items||[])
+          .map(item=>({
+
+            ...item,
+
+            productId:
+              productIdMap[
+                String(item.productId)
+              ]||
+              item.productId
+
+          }));
+
+
+      migratedSales.push({
+
+        ...old,
+
+        id:uid(),
+
+        items:newItems,
+
+        migrated:true,
+
+        migratedAt:
+          new Date().toISOString(),
+
+        oldMigrationId:key
+
+      });
+
+
+      existingKeys.add(key);
+
+    });
+
+
+    const migratedPurchases=[];
+
+
+    oldPurchases.forEach(old=>{
+
+      const key=
+        migrationKey(
+          "purchase",
+          old
+        );
+
+
+      if(existingKeys.has(key))
+        return;
+
+
+      migratedPurchases.push({
+
+        ...old,
+
+        id:uid(),
+
+        productId:
+          productIdMap[
+            String(old.productId)
+          ]||
+          old.productId,
+
+        migrated:true,
+
+        migratedAt:
+          new Date().toISOString(),
+
+        oldMigrationId:key
+
+      });
+
+
+      existingKeys.add(key);
+
+    });
+
+
+    const migratedExpenses=[];
+
+
+    oldExpenses.forEach(old=>{
+
+      const key=
+        migrationKey(
+          "expense",
+          old
+        );
+
+
+      if(existingKeys.has(key))
+        return;
+
+
+      migratedExpenses.push({
+
+        ...old,
+
+        id:uid(),
+
+        migrated:true,
+
+        migratedAt:
+          new Date().toISOString(),
+
+        oldMigrationId:key
+
+      });
+
+
+      existingKeys.add(key);
+
+    });
+
+
+    products=[
+      ...products,
+      ...migratedProducts
+    ];
+
+
+    sales=[
+      ...sales,
+      ...migratedSales
+    ];
+
+
+    purchases=[
+      ...purchases,
+      ...migratedPurchases
+    ];
+
+
+    expenses=[
+      ...expenses,
+      ...migratedExpenses
+    ];
+
+
+    if(oldSettings){
+
+      settings={
+        ...settings,
+        ...oldSettings
+      };
+
+    }
+
+
+    /*
+      Migration data individually save
+    */
+
+    for(const p of migratedProducts)
+      await saveDocument("products",p);
+
+    for(const s of migratedSales)
+      await saveDocument("sales",s);
+
+    for(const p of migratedPurchases)
+      await saveDocument("purchases",p);
+
+    for(const e of migratedExpenses)
+      await saveDocument("expenses",e);
+
+
+    await setDoc(
+      doc(
+        db,
+        "users",
+        auth.currentUser.uid,
+        "settings",
+        "main"
+      ),
+      settings
+    );
+
+
+    loadSettings();
+    renderAll();
+
+
+    const msg=
+      "Migration complete: "+
+      migratedProducts.length+
+      " Products, "+
+      migratedSales.length+
+      " Sales, "+
+      migratedPurchases.length+
+      " Purchases, "+
+      migratedExpenses.length+
+      " Expenses.";
+
+
+    document.getElementById(
+      "migrationResult"
+    ).textContent=msg;
+
+
+    if(showMessage)
+      alert(msg);
+
+
+    return true;
+
+  }catch(error){
+
+    console.error(error);
+
+    alert(
+      "Migration failed: "+
+      error.message
+    );
+
+    return false;
+
+  }
+
+}
+
+
+function showMigratedExpenses(){
+
+  const migrated=
+    expenses.filter(
+      e=>e.migrated===true
+    );
+
+
+  if(!migrated.length){
+
+    document.getElementById(
+      "migrationResult"
+    ).textContent=
+      "কোনো migrated expense পাওয়া যায়নি।";
+
+
+    alert(
+      "কোনো migrated expense পাওয়া যায়নি।"
+    );
+
+    return;
+
+  }
+
+
+  let text=
+    "Migrated Expenses:\n\n";
+
+
+  migrated.forEach((e,i)=>{
+
+    text+=
+      (i+1)+
+      ". "+
+      (e.name||"Expense")+
+      " | "+
+      money(e.amount)+
+      " | "+
+      (e.date||"")+
+      "\n";
+
+  });
+
+
+  alert(text);
+
+
+  document.getElementById(
+    "migrationResult"
+  ).textContent=
+    "মোট "+
+    migrated.length+
+    "টি migrated expense পাওয়া গেছে।";
+
+}
+
+
+async function deleteMigratedExpenses(){
+
+  const list=
+    expenses.filter(
+      e=>e.migrated===true
+    );
+
+
+  if(!list.length){
+
+    alert(
+      "কোনো migrated expense নেই।"
+    );
+
+    return;
+
+  }
+
+
+  if(!confirm(
+    "মোট "+
+    list.length+
+    "টি migrated expense delete করবেন?"
+  ))return;
+
+
+  try{
+
+    for(const e of list){
+
+      await deleteCollectionDocument(
+        "expenses",
+        e.id
+      );
+
+    }
+
+
+    expenses=
+      expenses.filter(
+        e=>e.migrated!==true
+      );
+
+
+    renderAll();
+
+
+    document.getElementById(
+      "migrationResult"
+    ).textContent=
+      list.length+
+      "টি migrated expense delete করা হয়েছে.";
+
+
+    alert(
+      list.length+
+      "টি migrated expense successfully deleted!"
+    );
+
+  }catch(error){
+
+    showFirebaseError(error);
 
   }
 
@@ -4015,7 +6035,7 @@ function renderAll(){
 
 
 /* =========================================================
-   FIREBASE AUTH STATE
+   AUTH STATE
 ========================================================= */
 
 onAuthStateChanged(
@@ -4045,7 +6065,6 @@ onAuthStateChanged(
 
         renderAll();
 
-
       }catch(error){
 
         console.error(error);
@@ -4073,89 +6092,186 @@ onAuthStateChanged(
 
 
 /* =========================================================
-   MAKE FUNCTIONS AVAILABLE TO HTML onclick
+   WINDOW EXPORTS
 ========================================================= */
 
-window.showCreateAccount=showCreateAccount;
-window.showLogin=showLogin;
-window.showForgotPassword=showForgotPassword;
+window.showCreateAccount=
+  showCreateAccount;
 
-window.createAccount=createAccount;
-window.loginAccount=loginAccount;
-window.logoutAccount=logoutAccount;
+window.showLogin=
+  showLogin;
 
-window.sendResetCode=sendResetCode;
-window.resetPassword=resetPassword;
+window.showForgotPassword=
+  showForgotPassword;
+
+window.createAccount=
+  createAccount;
+
+window.loginAccount=
+  loginAccount;
+
+window.logoutAccount=
+  logoutAccount;
+
+window.sendResetCode=
+  sendResetCode;
+
+window.resetPassword=
+  resetPassword;
+
 window.sendVerificationEmail=
   sendVerificationEmail;
 
-window.migrateOldData=migrateOldData;
-window.showMigratedExpenses=
-  showMigratedExpenses;
-window.deleteMigratedExpenses=
-  deleteMigratedExpenses;
+window.showSection=
+  showSection;
 
-window.showSection=showSection;
+window.addProduct=
+  addProduct;
 
-window.addProduct=addProduct;
 window.clearProductForm=
   clearProductForm;
-window.renderProducts=renderProducts;
-window.editProduct=editProduct;
-window.deleteProduct=deleteProduct;
 
-window.showBarcode=showBarcode;
-window.closeModal=closeModal;
+window.renderProducts=
+  renderProducts;
 
-window.addSaleRow=addSaleRow;
-window.removeSaleRow=removeSaleRow;
+window.editProduct=
+  editProduct;
+
+window.deleteProduct=
+  deleteProduct;
+
+window.showBarcode=
+  showBarcode;
+
+window.closeModal=
+  closeModal;
+
+window.addSaleRow=
+  addSaleRow;
+
+window.removeSaleRow=
+  removeSaleRow;
+
 window.saleProductChanged=
   saleProductChanged;
-window.calculateSale=calculateSale;
-window.completeSale=completeSale;
-window.deleteSale=deleteSale;
+
+window.calculateSale=
+  calculateSale;
+
+window.completeSale=
+  completeSale;
+
+window.deleteSale=
+  deleteSale;
+
 window.printInvoiceForSaleById=
   printInvoiceForSaleById;
 
 window.purchaseProductChanged=
   purchaseProductChanged;
-window.addPurchase=addPurchase;
-window.deletePurchase=deletePurchase;
 
-window.openDue=openDue;
-window.receiveDue=receiveDue;
+window.addPurchase=
+  addPurchase;
 
-window.addExpense=addExpense;
-window.deleteExpense=deleteExpense;
+window.deletePurchase=
+  deletePurchase;
 
-window.saveSettings=saveSettings;
+window.openDue=
+  openDue;
 
-window.backupData=backupData;
-window.restoreData=restoreData;
+window.receiveDue=
+  receiveDue;
+
+window.addExpense=
+  addExpense;
+
+window.deleteExpense=
+  deleteExpense;
+
+window.saveSettings=
+  saveSettings;
+
+window.downloadDataPDF=
+  downloadDataPDF;
+
+window.backupData=
+  backupData;
+
+window.restoreData=
+  restoreData;
 
 window.deleteCurrentAccount=
   deleteCurrentAccount;
+
+window.migrateOldData=
+  migrateOldData;
+
+window.showMigratedExpenses=
+  showMigratedExpenses;
+
+window.deleteMigratedExpenses=
+  deleteMigratedExpenses;
 
 
 /* =========================================================
    STARTUP
 ========================================================= */
 
-document.getElementById(
-  "saleDate"
-).value=today();
+document.addEventListener(
+  "DOMContentLoaded",
+  ()=>{
+
+    document.getElementById(
+      "saleDate"
+    ).value=today();
 
 
-document.getElementById(
-  "purchaseDate"
-).value=today();
+    document.getElementById(
+      "purchaseDate"
+    ).value=today();
 
 
-document.getElementById(
-  "expenseDate"
-).value=today();
+    document.getElementById(
+      "expenseDate"
+    ).value=today();
 
 
-addSaleRow();
+    addSaleRow();
+
+  }
+);
 
 </script>
+
+
+<!-- =========================================================
+     PRINT CSS
+========================================================= -->
+
+<style>
+
+@media print{
+
+  body *{
+    visibility:hidden !important;
+  }
+
+  #invoicePrint,
+  #invoicePrint *{
+    visibility:visible !important;
+  }
+
+  #invoicePrint{
+    display:block !important;
+    position:absolute;
+    left:0;
+    top:0;
+    width:100%;
+  }
+
+}
+
+</style>
+
+</body>
+</html>
