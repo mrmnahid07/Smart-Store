@@ -1,6 +1,12 @@
 <script type="module">
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+/* =========================================================
+   SMART STORE - FIREBASE + APP SCRIPT
+   Firebase Project: smart-store-2e455
+   ========================================================= */
+
+import { initializeApp }
+  from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
 
 import {
   getAuth,
@@ -26,9 +32,10 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
 
-/* =====================================================
+/* =========================================================
    FIREBASE CONFIG
-===================================================== */
+   IMPORTANT: এই config একবারই থাকবে
+   ========================================================= */
 
 const firebaseConfig = {
   apiKey: "AIzaSyDjgt2oKenX2VokbpurU8DfSYKGLq7Wfuc",
@@ -40,13 +47,13 @@ const firebaseConfig = {
 };
 
 
-/* =====================================================
-   FIREBASE INITIALIZE
-===================================================== */
+/* =========================================================
+   FIREBASE START
+   ========================================================= */
 
-let firebaseApp;
-let auth;
-let db;
+let firebaseApp = null;
+let auth = null;
+let db = null;
 
 try {
 
@@ -54,20 +61,33 @@ try {
   auth = getAuth(firebaseApp);
   db = getFirestore(firebaseApp);
 
+  console.log("Firebase connected successfully");
+
 } catch (error) {
 
-  console.error("Firebase initialization failed:", error);
+  console.error("Firebase initialization error:", error);
 
-  alert(
-    "Firebase চালু করা যাচ্ছে না। Firebase Config পরীক্ষা করুন।"
-  );
+  document.addEventListener("DOMContentLoaded", () => {
+
+    const app = document.getElementById("app");
+
+    if (app) {
+      app.style.display = "none";
+    }
+
+    alert(
+      "Firebase চালু করা যাচ্ছে না।\n\n" +
+      (error?.message || "Firebase configuration error")
+    );
+
+  });
 
 }
 
 
-/* =====================================================
+/* =========================================================
    LOCAL DATA
-===================================================== */
+   ========================================================= */
 
 let products = [];
 let sales = [];
@@ -80,32 +100,11 @@ let settings = {
 };
 
 
-/* =====================================================
-   UTILITY
-===================================================== */
+/* =========================================================
+   BASIC HELPERS
+   ========================================================= */
 
-function toast(message) {
-
-  const el = document.getElementById("toast");
-
-  if (!el) {
-    alert(message);
-    return;
-  }
-
-  el.innerText = String(message || "");
-  el.style.display = "block";
-
-  clearTimeout(window.__toastTimer);
-
-  window.__toastTimer = setTimeout(() => {
-    el.style.display = "none";
-  }, 3000);
-
-}
-
-
-function getCurrentUser() {
+function getUser() {
 
   if (!auth || !auth.currentUser) {
     throw new Error("আপনি Login করেননি।");
@@ -116,9 +115,9 @@ function getCurrentUser() {
 }
 
 
-function uid() {
+function getUID() {
 
-  return getCurrentUser().uid;
+  return getUser().uid;
 
 }
 
@@ -128,7 +127,7 @@ function userCollection(name) {
   return collection(
     db,
     "users",
-    uid(),
+    getUID(),
     name
   );
 
@@ -140,7 +139,7 @@ function userDoc(name, id) {
   return doc(
     db,
     "users",
-    uid(),
+    getUID(),
     name,
     String(id)
   );
@@ -151,20 +150,40 @@ function userDoc(name, id) {
 function newId() {
 
   return (
-    Date.now().toString() +
-    Math.random().toString(36).substring(2, 8)
+    Date.now().toString(36) +
+    Math.random().toString(36).substring(2, 10)
   );
 
 }
 
 
-function safeNumber(value) {
+function number(value) {
 
-  const number = Number(value);
+  const n = Number(value);
 
-  return Number.isFinite(number)
-    ? number
-    : 0;
+  return Number.isFinite(n) ? n : 0;
+
+}
+
+
+function money(value) {
+
+  return "৳" + number(value).toLocaleString("en-BD");
+
+}
+
+
+function dateFormat(value) {
+
+  if (!value) return "";
+
+  const d = new Date(value);
+
+  if (Number.isNaN(d.getTime())) {
+    return "";
+  }
+
+  return d.toLocaleDateString("bn-BD");
 
 }
 
@@ -172,43 +191,77 @@ function safeNumber(value) {
 function escapeHtml(value) {
 
   return String(value ?? "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 
 }
 
 
-function firebaseErrorMessage(error, defaultMessage = "কাজটি করা যায়নি।") {
+/* =========================================================
+   TOAST
+   ========================================================= */
 
-  if (!error) {
-    return defaultMessage;
+function toast(message) {
+
+  const text = String(message || "");
+
+  const el = document.getElementById("toast");
+
+  if (!el) {
+    alert(text);
+    return;
   }
 
-  switch (error.code) {
+  el.textContent = text;
+  el.style.display = "block";
+
+  clearTimeout(window.__smartStoreToast);
+
+  window.__smartStoreToast = setTimeout(() => {
+
+    el.style.display = "none";
+
+  }, 3000);
+
+}
+
+
+/* =========================================================
+   FIREBASE ERROR
+   ========================================================= */
+
+function firebaseError(error) {
+
+  const code = error?.code || "";
+
+  switch (code) {
 
     case "auth/api-key-not-valid":
-      return "Firebase API Key invalid। Firebase Console-এর Web App Config পরীক্ষা করুন।";
+      return "Firebase API Key invalid।";
+
+    case "auth/invalid-api-key":
+      return "Firebase API Key invalid।";
 
     case "auth/operation-not-allowed":
       return "Firebase Console → Authentication → Sign-in method থেকে Email/Password চালু করুন।";
 
     case "auth/email-already-in-use":
-      return "এই Email দিয়ে আগে থেকেই Account আছে।";
+      return "এই Email দিয়ে Account আগে থেকেই আছে।";
 
     case "auth/invalid-email":
-      return "সঠিক Email Address দিন।";
+      return "সঠিক Email দিন।";
 
     case "auth/weak-password":
-      return "Password কমপক্ষে 6 অক্ষরের হতে হবে।";
+      return "Password কমপক্ষে 6 অক্ষরের দিন।";
 
     case "auth/invalid-credential":
       return "Email অথবা Password ভুল।";
 
     case "auth/user-not-found":
-      return "এই Email দিয়ে কোনো Account পাওয়া যায়নি।";
+      return "এই Email দিয়ে Account পাওয়া যায়নি।";
 
     case "auth/wrong-password":
       return "Password ভুল।";
@@ -217,31 +270,29 @@ function firebaseErrorMessage(error, defaultMessage = "কাজটি করা
       return "Internet connection পরীক্ষা করুন।";
 
     case "auth/too-many-requests":
-      return "অনেকবার চেষ্টা করা হয়েছে। কিছুক্ষণ পর আবার চেষ্টা করুন।";
+      return "অনেকবার চেষ্টা হয়েছে। কিছুক্ষণ পর আবার চেষ্টা করুন।";
 
     case "auth/requires-recent-login":
-      return "নিরাপত্তার কারণে আবার Login করে তারপর চেষ্টা করুন।";
+      return "আবার Login করে চেষ্টা করুন।";
 
     case "permission-denied":
-      return "Firebase Firestore Rules-এর কারণে এই কাজটি অনুমোদিত নয়।";
+    case "firestore/permission-denied":
+      return "Firestore Rules data access বন্ধ করে দিয়েছে।";
 
     case "unavailable":
-      return "Firebase server বর্তমানে unavailable। কিছুক্ষণ পর আবার চেষ্টা করুন।";
-
-    case "failed-precondition":
-      return "Firebase configuration বা database setup পরীক্ষা করুন।";
+      return "Firebase server unavailable।";
 
     default:
-      return error.message || defaultMessage;
+      return error?.message || "কাজটি করা যায়নি।";
 
   }
 
 }
 
 
-/* =====================================================
+/* =========================================================
    LOGIN / SIGNUP SCREEN
-===================================================== */
+   ========================================================= */
 
 window.showSignup = function () {
 
@@ -275,44 +326,44 @@ window.showLogin = function () {
 };
 
 
-/* =====================================================
+/* =========================================================
    CREATE ACCOUNT
-===================================================== */
+   ========================================================= */
 
 window.createAccount = async function () {
 
-  const name =
-    document.getElementById("signupName")?.value.trim() || "";
-
-  const email =
-    document.getElementById("signupEmail")?.value.trim() || "";
-
-  const password =
-    document.getElementById("signupPassword")?.value || "";
-
-
-  if (!name) {
-    toast("আপনার নাম দিন");
-    return;
-  }
-
-  if (!email) {
-    toast("Email দিন");
-    return;
-  }
-
-  if (!password) {
-    toast("Password দিন");
-    return;
-  }
-
-  if (password.length < 6) {
-    toast("Password কমপক্ষে 6 অক্ষরের হতে হবে");
-    return;
-  }
-
-
   try {
+
+    if (!auth || !db) {
+      toast("Firebase connection পাওয়া যায়নি।");
+      return;
+    }
+
+    const name =
+      document.getElementById("signupName")?.value.trim() || "";
+
+    const email =
+      document.getElementById("signupEmail")?.value.trim() || "";
+
+    const password =
+      document.getElementById("signupPassword")?.value || "";
+
+
+    if (!name) {
+      toast("আপনার নাম দিন।");
+      return;
+    }
+
+    if (!email) {
+      toast("Email দিন।");
+      return;
+    }
+
+    if (password.length < 6) {
+      toast("Password কমপক্ষে 6 অক্ষরের হতে হবে।");
+      return;
+    }
+
 
     const result =
       await createUserWithEmailAndPassword(
@@ -321,43 +372,27 @@ window.createAccount = async function () {
         password
       );
 
-
     const user = result.user;
 
 
-    /* Profile */
-
     try {
 
-      await updateProfile(
-        user,
-        {
-          displayName: name
-        }
-      );
+      await updateProfile(user, {
+        displayName: name
+      });
 
-    } catch (_) {
-      // Profile update fail হলেও account থাকবে
-    }
+    } catch (_) {}
 
-
-    /* Main User Document */
 
     await setDoc(
-      doc(
-        db,
-        "users",
-        user.uid
-      ),
+      doc(db, "users", user.uid),
       {
-        name: name,
-        email: email,
+        name,
+        email,
         createdAt: new Date().toISOString()
       }
     );
 
-
-    /* Default Settings */
 
     await setDoc(
       doc(
@@ -373,66 +408,64 @@ window.createAccount = async function () {
     );
 
 
-    /* Verification */
-
     try {
-
       await sendEmailVerification(user);
-
-    } catch (_) {
-      // Verification fail হলেও account creation সফল
-    }
+    } catch (_) {}
 
 
-    const nameInput = document.getElementById("signupName");
-    const emailInput = document.getElementById("signupEmail");
-    const passwordInput = document.getElementById("signupPassword");
+    const fields = [
+      "signupName",
+      "signupEmail",
+      "signupPassword"
+    ];
 
-    if (nameInput) nameInput.value = "";
-    if (emailInput) emailInput.value = "";
-    if (passwordInput) passwordInput.value = "";
+    fields.forEach(id => {
+
+      const el = document.getElementById(id);
+
+      if (el) {
+        el.value = "";
+      }
+
+    });
 
 
-    toast(
-      "Account সফলভাবে তৈরি হয়েছে।"
-    );
+    toast("Account সফলভাবে তৈরি হয়েছে।");
 
   } catch (error) {
 
-    toast(
-      firebaseErrorMessage(
-        error,
-        "Account তৈরি করা যায়নি।"
-      )
-    );
+    toast(firebaseError(error));
 
   }
 
 };
 
 
-/* =====================================================
+/* =========================================================
    LOGIN
-===================================================== */
+   ========================================================= */
 
 window.loginAccount = async function () {
 
-  const email =
-    document.getElementById("loginEmail")?.value.trim() || "";
-
-  const password =
-    document.getElementById("loginPassword")?.value || "";
-
-
-  if (!email || !password) {
-
-    toast("Email এবং Password দিন");
-    return;
-
-  }
-
-
   try {
+
+    if (!auth) {
+      toast("Firebase connection পাওয়া যায়নি।");
+      return;
+    }
+
+    const email =
+      document.getElementById("loginEmail")?.value.trim() || "";
+
+    const password =
+      document.getElementById("loginPassword")?.value || "";
+
+
+    if (!email || !password) {
+      toast("Email এবং Password দিন।");
+      return;
+    }
+
 
     await signInWithEmailAndPassword(
       auth,
@@ -440,71 +473,55 @@ window.loginAccount = async function () {
       password
     );
 
+
     toast("Login successful");
 
   } catch (error) {
 
-    toast(
-      firebaseErrorMessage(
-        error,
-        "Login করা যায়নি।"
-      )
-    );
+    toast(firebaseError(error));
 
   }
 
 };
 
 
-/* =====================================================
-   FORGOT PASSWORD
-===================================================== */
+/* =========================================================
+   PASSWORD RESET
+   ========================================================= */
 
 window.sendResetCode = async function () {
 
-  const email =
-    document.getElementById("loginEmail")?.value.trim() || "";
-
-
-  if (!email) {
-
-    toast(
-      "প্রথমে Login-এর Email ঘরে আপনার Email লিখুন"
-    );
-
-    return;
-
-  }
-
-
   try {
+
+    const email =
+      document.getElementById("loginEmail")?.value.trim() || "";
+
+    if (!email) {
+
+      toast("Login Email ঘরে Email লিখুন।");
+      return;
+
+    }
 
     await sendPasswordResetEmail(
       auth,
       email
     );
 
-    toast(
-      "Password reset link আপনার Email-এ পাঠানো হয়েছে"
-    );
+    toast("Password reset link Email-এ পাঠানো হয়েছে।");
 
   } catch (error) {
 
-    toast(
-      firebaseErrorMessage(
-        error,
-        "Password reset করা যায়নি।"
-      )
-    );
+    toast(firebaseError(error));
 
   }
 
 };
 
 
-/* =====================================================
+/* =========================================================
    LOGOUT
-===================================================== */
+   ========================================================= */
 
 window.logout = async function () {
 
@@ -520,263 +537,161 @@ window.logout = async function () {
 
   } catch (error) {
 
-    toast(
-      firebaseErrorMessage(
-        error,
-        "Logout করা যায়নি।"
-      )
-    );
+    toast(firebaseError(error));
 
   }
 
 };
 
 
-/* =====================================================
-   AUTH STATE
-===================================================== */
-
-if (auth) {
-
-  onAuthStateChanged(
-    auth,
-    async user => {
-
-      const loginScreen =
-        document.getElementById("loginScreen");
-
-      const signupScreen =
-        document.getElementById("signupScreen");
-
-      const app =
-        document.getElementById("app");
-
-
-      if (user) {
-
-        if (loginScreen) {
-          loginScreen.classList.add("hidden");
-        }
-
-        if (signupScreen) {
-          signupScreen.classList.add("hidden");
-        }
-
-        if (app) {
-          app.style.display = "block";
-        }
-
-
-        const userEmail =
-          document.getElementById("userEmail");
-
-        const accountInfo =
-          document.getElementById("accountInfo");
-
-
-        if (userEmail) {
-          userEmail.innerText =
-            user.email || "";
-        }
-
-
-        if (accountInfo) {
-          accountInfo.innerText =
-            `${user.displayName || "User"} | ${user.email || ""}`;
-        }
-
-
-        try {
-
-          await loadAll();
-          showPage("dashboard");
-
-        } catch (error) {
-
-          toast(
-            "Data load করা যায়নি: " +
-            firebaseErrorMessage(error)
-          );
-
-        }
-
-      } else {
-
-        if (app) {
-          app.style.display = "none";
-        }
-
-        if (signupScreen) {
-          signupScreen.classList.add("hidden");
-        }
-
-        if (loginScreen) {
-          loginScreen.classList.remove("hidden");
-        }
-
-      }
-
-    }
-  );
-
-}
-
-
-/* =====================================================
-   LOAD COLLECTION
-===================================================== */
+/* =========================================================
+   LOAD ONE COLLECTION
+   ========================================================= */
 
 async function loadCollection(name) {
 
-  const snapshot =
+  const snap =
     await getDocs(
       userCollection(name)
     );
 
-
-  return snapshot.docs.map(
-    d => ({
-      id: d.id,
-      ...d.data()
-    })
-  );
+  return snap.docs.map(item => ({
+    id: item.id,
+    ...item.data()
+  }));
 
 }
 
 
-/* =====================================================
-   LOAD ALL
-===================================================== */
+/* =========================================================
+   LOAD ALL DATA
+   ========================================================= */
 
 async function loadAll() {
 
-  products =
-    await loadCollection("products");
+  const user = getUser();
 
-  sales =
-    await loadCollection("sales");
-
-  purchases =
-    await loadCollection("purchases");
-
-  expenses =
-    await loadCollection("expenses");
-
-  duePayments =
-    await loadCollection("duePayments");
+  if (!user) return;
 
 
-  const settingsSnap =
-    await getDoc(
+  try {
+
+    const results =
+      await Promise.all([
+        loadCollection("products"),
+        loadCollection("sales"),
+        loadCollection("purchases"),
+        loadCollection("expenses"),
+        loadCollection("duePayments")
+      ]);
+
+
+    products = results[0];
+    sales = results[1];
+    purchases = results[2];
+    expenses = results[3];
+    duePayments = results[4];
+
+
+    const settingsRef =
       doc(
         db,
         "users",
-        uid(),
+        user.uid,
         "settings",
         "main"
-      )
-    );
+      );
 
 
-  if (settingsSnap.exists()) {
-
-    settings = {
-      storeName:
-        settingsSnap.data().storeName ||
-        "Smart Store"
-    };
-
-  } else {
-
-    settings = {
-      storeName: "Smart Store"
-    };
+    const settingsSnap =
+      await getDoc(settingsRef);
 
 
-    await setDoc(
-      doc(
-        db,
-        "users",
-        uid(),
-        "settings",
-        "main"
-      ),
-      settings
-    );
+    if (settingsSnap.exists()) {
+
+      settings = {
+        storeName:
+          settingsSnap.data()?.storeName ||
+          "Smart Store"
+      };
+
+    } else {
+
+      settings = {
+        storeName: "Smart Store"
+      };
+
+      await setDoc(
+        settingsRef,
+        settings
+      );
+
+    }
+
+
+    const storeName =
+      document.getElementById("storeName");
+
+    const headerStore =
+      document.getElementById("headerStore");
+
+
+    if (storeName) {
+      storeName.value = settings.storeName;
+    }
+
+    if (headerStore) {
+      headerStore.textContent = settings.storeName;
+    }
+
+
+    renderAll();
+
+  } catch (error) {
+
+    console.error("LOAD ERROR:", error);
+
+    throw error;
 
   }
-
-
-  const storeName =
-    document.getElementById("storeName");
-
-  const headerStore =
-    document.getElementById("headerStore");
-
-
-  if (storeName) {
-    storeName.value =
-      settings.storeName;
-  }
-
-
-  if (headerStore) {
-    headerStore.innerText =
-      settings.storeName;
-  }
-
-
-  renderAll();
 
 }
 
 
-/* =====================================================
-   SAVE
-===================================================== */
+/* =========================================================
+   SAVE ITEM
+   ========================================================= */
 
-async function saveItem(
-  collectionName,
-  item
-) {
+async function saveItem(collectionName, item) {
 
   if (!item || !item.id) {
     throw new Error("Invalid data.");
   }
 
   await setDoc(
-    userDoc(
-      collectionName,
-      item.id
-    ),
+    userDoc(collectionName, item.id),
     item
   );
 
 }
 
 
-/* =====================================================
-   DELETE
-===================================================== */
+/* =========================================================
+   DELETE ITEM
+   ========================================================= */
 
-async function removeItem(
-  collectionName,
-  id
-) {
+async function removeItem(collectionName, id) {
 
   await deleteDoc(
-    userDoc(
-      collectionName,
-      id
-    )
+    userDoc(collectionName, id)
   );
 
 }
 
 
-/* =====================================================
-   PRODUCT ADD
-===================================================== */
+/* =========================================================
+   ADD PRODUCT
+   ========================================================= */
 
 window.addProduct = async function () {
 
@@ -789,43 +704,40 @@ window.addProduct = async function () {
       document.getElementById("productBarcode")?.value.trim() || "";
 
     const purchase =
-      safeNumber(
+      number(
         document.getElementById("productPurchase")?.value
       );
 
     const sale =
-      safeNumber(
+      number(
         document.getElementById("productSale")?.value
       );
 
     const stock =
-      safeNumber(
+      number(
         document.getElementById("productStock")?.value
       );
 
 
     if (!name) {
-      toast("Product Name দিন");
+      toast("Product Name দিন।");
       return;
     }
 
     if (purchase < 0 || sale < 0 || stock < 0) {
-      toast("Price ও Stock সঠিকভাবে দিন");
+      toast("Price এবং Stock সঠিক দিন।");
       return;
     }
 
 
     const item = {
-
       id: newId(),
       name,
       barcode,
       purchase,
       sale,
       stock,
-      createdAt:
-        new Date().toISOString()
-
+      createdAt: new Date().toISOString()
     };
 
 
@@ -848,9 +760,7 @@ window.addProduct = async function () {
 
       const el = document.getElementById(id);
 
-      if (el) {
-        el.value = "";
-      }
+      if (el) el.value = "";
 
     });
 
@@ -861,28 +771,22 @@ window.addProduct = async function () {
 
   } catch (error) {
 
-    toast(
-      firebaseErrorMessage(
-        error,
-        "Product save করা যায়নি।"
-      )
-    );
+    toast(firebaseError(error));
 
   }
 
 };
 
 
-/* =====================================================
+/* =========================================================
    DELETE PRODUCT
-===================================================== */
+   ========================================================= */
 
 window.deleteProduct = async function (id) {
 
   if (!confirm("Product delete করবেন?")) {
     return;
   }
-
 
   try {
 
@@ -894,8 +798,7 @@ window.deleteProduct = async function (id) {
 
     products =
       products.filter(
-        x =>
-          String(x.id) !== String(id)
+        p => String(p.id) !== String(id)
       );
 
 
@@ -905,21 +808,16 @@ window.deleteProduct = async function (id) {
 
   } catch (error) {
 
-    toast(
-      firebaseErrorMessage(
-        error,
-        "Product delete করা যায়নি।"
-      )
-    );
+    toast(firebaseError(error));
 
   }
 
 };
 
 
-/* =====================================================
+/* =========================================================
    ADD SALE
-===================================================== */
+   ========================================================= */
 
 window.addSale = async function () {
 
@@ -929,7 +827,7 @@ window.addSale = async function () {
       document.getElementById("saleProduct")?.value || "";
 
     const qty =
-      safeNumber(
+      number(
         document.getElementById("saleQty")?.value
       );
 
@@ -937,62 +835,48 @@ window.addSale = async function () {
       document.getElementById("saleCustomer")?.value.trim() || "";
 
     const paid =
-      safeNumber(
+      number(
         document.getElementById("salePaid")?.value
       );
 
 
     const product =
       products.find(
-        x =>
-          String(x.id) === String(productId)
+        p => String(p.id) === String(productId)
       );
 
 
     if (!product) {
-
-      toast("Product select করুন");
+      toast("Product select করুন।");
       return;
-
     }
-
 
     if (qty <= 0) {
-
-      toast("Quantity সঠিক দিন");
+      toast("Quantity সঠিক দিন।");
       return;
-
     }
 
-
-    if (product.stock < qty) {
-
-      toast("পর্যাপ্ত stock নেই");
+    if (number(product.stock) < qty) {
+      toast("পর্যাপ্ত stock নেই।");
       return;
-
     }
 
 
     const total =
-      safeNumber(product.sale) * qty;
+      number(product.sale) * qty;
 
 
     if (paid < 0 || paid > total) {
-
-      toast("Paid amount সঠিক নয়");
+      toast("Paid amount সঠিক নয়।");
       return;
-
     }
 
 
     const due =
-      Math.max(
-        0,
-        total - paid
-      );
+      Math.max(0, total - paid);
 
 
-    const item = {
+    const sale = {
 
       id: newId(),
       productId: product.id,
@@ -1002,36 +886,34 @@ window.addSale = async function () {
       total,
       paid,
       due,
-      date:
-        new Date().toISOString()
+      date: new Date().toISOString()
 
     };
 
 
-    /* Save sale first */
+    /* নতুন stock আগে হিসাব */
+
+    const updatedProduct = {
+      ...product,
+      stock: number(product.stock) - qty
+    };
+
+
+    /* Sale save */
 
     await saveItem(
       "sales",
-      item
+      sale
     );
 
 
-    /* Update stock */
-
-    const oldStock =
-      safeNumber(product.stock);
-
-    product.stock =
-      oldStock - qty;
-
+    /* Product stock save */
 
     await saveItem(
       "products",
-      product
+      updatedProduct
     );
 
-
-    /* Due */
 
     let dueItem = null;
 
@@ -1041,17 +923,10 @@ window.addSale = async function () {
       dueItem = {
 
         id: newId(),
-
-        customer:
-          customer || "Unknown",
-
+        customer: customer || "Unknown",
         amount: due,
-
-        saleId:
-          item.id,
-
-        date:
-          new Date().toISOString()
+        saleId: sale.id,
+        date: new Date().toISOString()
 
       };
 
@@ -1064,9 +939,18 @@ window.addSale = async function () {
     }
 
 
-    /* Local update */
+    /* Local data */
 
-    sales.push(item);
+    products =
+      products.map(
+        p =>
+          String(p.id) === String(product.id)
+            ? updatedProduct
+            : p
+      );
+
+
+    sales.push(sale);
 
     if (dueItem) {
       duePayments.push(dueItem);
@@ -1075,25 +959,20 @@ window.addSale = async function () {
 
     renderAll();
 
-    toast("Sale saved");
+    toast("Sale saved successfully");
 
   } catch (error) {
 
-    toast(
-      firebaseErrorMessage(
-        error,
-        "Sale save করা যায়নি।"
-      )
-    );
+    toast(firebaseError(error));
 
   }
 
 };
 
 
-/* =====================================================
-   DELETE SALE + RESTORE STOCK + REMOVE DUE
-===================================================== */
+/* =========================================================
+   DELETE SALE
+   ========================================================= */
 
 window.deleteSale = async function (id) {
 
@@ -1106,26 +985,54 @@ window.deleteSale = async function (id) {
 
     const sale =
       sales.find(
-        x =>
-          String(x.id) === String(id)
+        s => String(s.id) === String(id)
       );
 
 
     if (!sale) {
-
-      toast("Sale পাওয়া যায়নি");
+      toast("Sale পাওয়া যায়নি।");
       return;
-
     }
 
 
-    /* Find product */
-
     const product =
       products.find(
-        x =>
-          String(x.id) === String(sale.productId)
+        p =>
+          String(p.id) ===
+          String(sale.productId)
       );
+
+
+    /* Restore stock */
+
+    if (product) {
+
+      const restoredProduct = {
+
+        ...product,
+
+        stock:
+          number(product.stock) +
+          number(sale.qty)
+
+      };
+
+
+      await saveItem(
+        "products",
+        restoredProduct
+      );
+
+
+      products =
+        products.map(
+          p =>
+            String(p.id) === String(product.id)
+              ? restoredProduct
+              : p
+        );
+
+    }
 
 
     /* Delete sale */
@@ -1136,24 +1043,7 @@ window.deleteSale = async function (id) {
     );
 
 
-    /* Restore stock */
-
-    if (product) {
-
-      product.stock =
-        safeNumber(product.stock) +
-        safeNumber(sale.qty);
-
-
-      await saveItem(
-        "products",
-        product
-      );
-
-    }
-
-
-    /* Remove related due */
+    /* Delete related due */
 
     const relatedDue =
       duePayments.filter(
@@ -1173,12 +1063,10 @@ window.deleteSale = async function (id) {
     }
 
 
-    /* Local */
-
     sales =
       sales.filter(
-        x =>
-          String(x.id) !== String(id)
+        s =>
+          String(s.id) !== String(id)
       );
 
 
@@ -1192,25 +1080,20 @@ window.deleteSale = async function (id) {
 
     renderAll();
 
-    toast("Sale deleted এবং stock restore হয়েছে");
+    toast("Sale deleted এবং stock restore হয়েছে।");
 
   } catch (error) {
 
-    toast(
-      firebaseErrorMessage(
-        error,
-        "Sale delete করা যায়নি।"
-      )
-    );
+    toast(firebaseError(error));
 
   }
 
 };
 
 
-/* =====================================================
+/* =========================================================
    ADD PURCHASE
-===================================================== */
+   ========================================================= */
 
 window.addPurchase = async function () {
 
@@ -1220,77 +1103,82 @@ window.addPurchase = async function () {
       document.getElementById("purchaseProduct")?.value || "";
 
     const qty =
-      safeNumber(
+      number(
         document.getElementById("purchaseQty")?.value
       );
 
     const total =
-      safeNumber(
+      number(
         document.getElementById("purchaseTotal")?.value
       );
 
 
     const product =
       products.find(
-        x =>
-          String(x.id) === String(productId)
+        p => String(p.id) === String(productId)
       );
 
 
     if (!product) {
-
-      toast("Product select করুন");
+      toast("Product select করুন।");
       return;
-
     }
-
 
     if (qty <= 0) {
-
-      toast("Quantity সঠিক দিন");
+      toast("Quantity সঠিক দিন।");
       return;
-
     }
-
 
     if (total < 0) {
-
-      toast("Total Cost সঠিক দিন");
+      toast("Total Cost সঠিক দিন।");
       return;
-
     }
 
 
-    const item = {
+    const purchase = {
 
       id: newId(),
       productId: product.id,
       productName: product.name,
       qty,
       total,
-      date:
-        new Date().toISOString()
+      date: new Date().toISOString()
+
+    };
+
+
+    const updatedProduct = {
+
+      ...product,
+
+      stock:
+        number(product.stock) + qty
 
     };
 
 
     await saveItem(
       "purchases",
-      item
+      purchase
     );
-
-
-    product.stock =
-      safeNumber(product.stock) + qty;
 
 
     await saveItem(
       "products",
-      product
+      updatedProduct
     );
 
 
-    purchases.push(item);
+    purchases.push(purchase);
+
+
+    products =
+      products.map(
+        p =>
+          String(p.id) === String(product.id)
+            ? updatedProduct
+            : p
+      );
 
 
     renderAll();
@@ -1299,21 +1187,16 @@ window.addPurchase = async function () {
 
   } catch (error) {
 
-    toast(
-      firebaseErrorMessage(
-        error,
-        "Purchase save করা যায়নি।"
-      )
-    );
+    toast(firebaseError(error));
 
   }
 
 };
 
 
-/* =====================================================
-   DELETE PURCHASE + REDUCE STOCK
-===================================================== */
+/* =========================================================
+   DELETE PURCHASE
+   ========================================================= */
 
 window.deletePurchase = async function (id) {
 
@@ -1326,23 +1209,20 @@ window.deletePurchase = async function (id) {
 
     const purchase =
       purchases.find(
-        x =>
-          String(x.id) === String(id)
+        p => String(p.id) === String(id)
       );
 
 
     if (!purchase) {
-
-      toast("Purchase পাওয়া যায়নি");
+      toast("Purchase পাওয়া যায়নি।");
       return;
-
     }
 
 
     const product =
       products.find(
-        x =>
-          String(x.id) ===
+        p =>
+          String(p.id) ===
           String(purchase.productId)
       );
 
@@ -1350,16 +1230,16 @@ window.deletePurchase = async function (id) {
     if (product) {
 
       const currentStock =
-        safeNumber(product.stock);
+        number(product.stock);
 
-      const purchaseQty =
-        safeNumber(purchase.qty);
+      const qty =
+        number(purchase.qty);
 
 
-      if (currentStock < purchaseQty) {
+      if (currentStock < qty) {
 
         toast(
-          "এই Purchase delete করলে stock negative হবে। আগে stock check করুন।"
+          "Purchase delete করলে stock negative হবে।"
         );
 
         return;
@@ -1367,14 +1247,29 @@ window.deletePurchase = async function (id) {
       }
 
 
-      product.stock =
-        currentStock - purchaseQty;
+      const updatedProduct = {
+
+        ...product,
+
+        stock:
+          currentStock - qty
+
+      };
 
 
       await saveItem(
         "products",
-        product
+        updatedProduct
       );
+
+
+      products =
+        products.map(
+          p =>
+            String(p.id) === String(product.id)
+              ? updatedProduct
+              : p
+        );
 
     }
 
@@ -1387,53 +1282,44 @@ window.deletePurchase = async function (id) {
 
     purchases =
       purchases.filter(
-        x =>
-          String(x.id) !== String(id)
+        p =>
+          String(p.id) !== String(id)
       );
 
 
     renderAll();
 
-    toast("Purchase deleted এবং stock update হয়েছে");
+    toast("Purchase deleted");
 
   } catch (error) {
 
-    toast(
-      firebaseErrorMessage(
-        error,
-        "Purchase delete করা যায়নি।"
-      )
-    );
+    toast(firebaseError(error));
 
   }
 
 };
 
 
-/* =====================================================
+/* =========================================================
    ADD DUE
-===================================================== */
+   ========================================================= */
 
 window.addDue = async function () {
 
   try {
 
     const customer =
-      document
-        .getElementById("dueCustomer")
-        ?.value.trim() || "";
+      document.getElementById("dueCustomer")?.value.trim() || "";
 
     const amount =
-      safeNumber(
-        document
-          .getElementById("dueAmount")
-          ?.value
+      number(
+        document.getElementById("dueAmount")?.value
       );
 
 
     if (!customer || amount <= 0) {
 
-      toast("Customer ও Amount দিন");
+      toast("Customer এবং Amount দিন।");
       return;
 
     }
@@ -1444,8 +1330,7 @@ window.addDue = async function () {
       id: newId(),
       customer,
       amount,
-      date:
-        new Date().toISOString()
+      date: new Date().toISOString()
 
     };
 
@@ -1464,21 +1349,16 @@ window.addDue = async function () {
 
   } catch (error) {
 
-    toast(
-      firebaseErrorMessage(
-        error,
-        "Due save করা যায়নি।"
-      )
-    );
+    toast(firebaseError(error));
 
   }
 
 };
 
 
-/* =====================================================
+/* =========================================================
    DELETE DUE
-===================================================== */
+   ========================================================= */
 
 window.deleteDue = async function (id) {
 
@@ -1497,8 +1377,8 @@ window.deleteDue = async function (id) {
 
     duePayments =
       duePayments.filter(
-        x =>
-          String(x.id) !== String(id)
+        d =>
+          String(d.id) !== String(id)
       );
 
 
@@ -1508,42 +1388,33 @@ window.deleteDue = async function (id) {
 
   } catch (error) {
 
-    toast(
-      firebaseErrorMessage(
-        error,
-        "Due delete করা যায়নি।"
-      )
-    );
+    toast(firebaseError(error));
 
   }
 
 };
 
 
-/* =====================================================
+/* =========================================================
    ADD EXPENSE
-===================================================== */
+   ========================================================= */
 
 window.addExpense = async function () {
 
   try {
 
     const name =
-      document
-        .getElementById("expenseName")
-        ?.value.trim() || "";
+      document.getElementById("expenseName")?.value.trim() || "";
 
     const amount =
-      safeNumber(
-        document
-          .getElementById("expenseAmount")
-          ?.value
+      number(
+        document.getElementById("expenseAmount")?.value
       );
 
 
     if (!name || amount <= 0) {
 
-      toast("Expense ও Amount দিন");
+      toast("Expense এবং Amount দিন।");
       return;
 
     }
@@ -1554,8 +1425,7 @@ window.addExpense = async function () {
       id: newId(),
       name,
       amount,
-      date:
-        new Date().toISOString()
+      date: new Date().toISOString()
 
     };
 
@@ -1586,25 +1456,20 @@ window.addExpense = async function () {
 
   } catch (error) {
 
-    toast(
-      firebaseErrorMessage(
-        error,
-        "Expense save করা যায়নি।"
-      )
-    );
+    toast(firebaseError(error));
 
   }
 
 };
 
 
-/* =====================================================
+/* =========================================================
    DELETE EXPENSE
-===================================================== */
+   ========================================================= */
 
 window.deleteExpense = async function (id) {
 
-  if (!confirm("এই Expense permanently delete করবেন?")) {
+  if (!confirm("Expense permanently delete করবেন?")) {
     return;
   }
 
@@ -1626,149 +1491,100 @@ window.deleteExpense = async function (id) {
 
     renderAll();
 
-    toast("Expense permanently deleted");
+    toast("Expense deleted");
 
   } catch (error) {
 
-    toast(
-      firebaseErrorMessage(
-        error,
-        "Expense delete করা যায়নি।"
-      )
-    );
+    toast(firebaseError(error));
 
   }
 
 };
 
 
-/* =====================================================
+/* =========================================================
    RENDER ALL
-===================================================== */
+   ========================================================= */
 
 function renderAll() {
 
-  renderProducts();
-  renderSales();
-  renderPurchases();
-  renderDue();
-  renderExpenses();
-  updateSelects();
-  updateDashboard();
+  try {
 
-}
+    renderProducts();
+    renderSales();
+    renderPurchases();
+    renderDue();
+    renderExpenses();
+    updateSelects();
+    updateDashboard();
 
+  } catch (error) {
 
-/* =====================================================
-   MONEY
-===================================================== */
+    console.error("Render error:", error);
 
-function money(n) {
-
-  return "৳" +
-    safeNumber(n)
-      .toLocaleString("en-BD");
-
-}
-
-
-/* =====================================================
-   DATE
-===================================================== */
-
-function dateFormat(d) {
-
-  if (!d) {
-    return "";
   }
 
-  const date =
-    new Date(d);
-
-  if (Number.isNaN(date.getTime())) {
-    return "";
-  }
-
-  return date.toLocaleDateString("bn-BD");
-
 }
 
 
-/* =====================================================
-   PRODUCTS RENDER
-===================================================== */
+/* =========================================================
+   RENDER PRODUCTS
+   ========================================================= */
 
 function renderProducts() {
 
   const tbody =
     document.getElementById("productsTable");
 
-  if (!tbody) {
-    return;
-  }
-
-  tbody.innerHTML = "";
+  if (!tbody) return;
 
 
-  products.forEach(p => {
+  tbody.innerHTML = products.map(p => `
 
-    tbody.innerHTML += `
+    <tr>
 
-      <tr>
+      <td>${escapeHtml(p.name)}</td>
 
-        <td>${escapeHtml(p.name)}</td>
+      <td>${escapeHtml(p.barcode || "")}</td>
 
-        <td>${escapeHtml(p.barcode || "")}</td>
+      <td>${money(p.purchase)}</td>
 
-        <td>${money(p.purchase)}</td>
+      <td>${money(p.sale)}</td>
 
-        <td>${money(p.sale)}</td>
+      <td>${number(p.stock)}</td>
 
-        <td>${safeNumber(p.stock)}</td>
+      <td>
+        <button
+          class="danger"
+          onclick="deleteProduct('${String(p.id)}')">
+          Delete
+        </button>
+      </td>
 
-        <td>
+    </tr>
 
-          <button
-            class="danger"
-            onclick="deleteProduct('${escapeHtml(p.id)}')">
-
-            Delete
-
-          </button>
-
-        </td>
-
-      </tr>
-
-    `;
-
-  });
+  `).join("");
 
 }
 
 
-/* =====================================================
-   SALES RENDER
-===================================================== */
+/* =========================================================
+   RENDER SALES
+   ========================================================= */
 
 function renderSales() {
 
   const tbody =
     document.getElementById("salesTable");
 
-  if (!tbody) {
-    return;
-  }
-
-  tbody.innerHTML = "";
+  if (!tbody) return;
 
 
-  sales
-    .slice()
-    .reverse()
-    .forEach(s => {
-
-      tbody.innerHTML += `
+  tbody.innerHTML =
+    sales
+      .slice()
+      .reverse()
+      .map(s => `
 
         <tr>
 
@@ -1788,45 +1604,37 @@ function renderSales() {
 
             <button
               class="danger"
-              onclick="deleteSale('${escapeHtml(s.id)}')">
-
+              onclick="deleteSale('${String(s.id)}')">
               Delete
-
             </button>
 
           </td>
 
         </tr>
 
-      `;
-
-    });
+      `)
+      .join("");
 
 }
 
 
-/* =====================================================
-   PURCHASE RENDER
-===================================================== */
+/* =========================================================
+   RENDER PURCHASE
+   ========================================================= */
 
 function renderPurchases() {
 
   const tbody =
     document.getElementById("purchaseTable");
 
-  if (!tbody) {
-    return;
-  }
-
-  tbody.innerHTML = "";
+  if (!tbody) return;
 
 
-  purchases
-    .slice()
-    .reverse()
-    .forEach(p => {
-
-      tbody.innerHTML += `
+  tbody.innerHTML =
+    purchases
+      .slice()
+      .reverse()
+      .map(p => `
 
         <tr>
 
@@ -1834,7 +1642,7 @@ function renderPurchases() {
 
           <td>${escapeHtml(p.productName)}</td>
 
-          <td>${safeNumber(p.qty)}</td>
+          <td>${number(p.qty)}</td>
 
           <td>${money(p.total)}</td>
 
@@ -1842,45 +1650,37 @@ function renderPurchases() {
 
             <button
               class="danger"
-              onclick="deletePurchase('${escapeHtml(p.id)}')">
-
+              onclick="deletePurchase('${String(p.id)}')">
               Delete
-
             </button>
 
           </td>
 
         </tr>
 
-      `;
-
-    });
+      `)
+      .join("");
 
 }
 
 
-/* =====================================================
-   DUE RENDER
-===================================================== */
+/* =========================================================
+   RENDER DUE
+   ========================================================= */
 
 function renderDue() {
 
   const tbody =
     document.getElementById("dueTable");
 
-  if (!tbody) {
-    return;
-  }
-
-  tbody.innerHTML = "";
+  if (!tbody) return;
 
 
-  duePayments
-    .slice()
-    .reverse()
-    .forEach(d => {
-
-      tbody.innerHTML += `
+  tbody.innerHTML =
+    duePayments
+      .slice()
+      .reverse()
+      .map(d => `
 
         <tr>
 
@@ -1894,45 +1694,37 @@ function renderDue() {
 
             <button
               class="success"
-              onclick="deleteDue('${escapeHtml(d.id)}')">
-
+              onclick="deleteDue('${String(d.id)}')">
               Paid/Delete
-
             </button>
 
           </td>
 
         </tr>
 
-      `;
-
-    });
+      `)
+      .join("");
 
 }
 
 
-/* =====================================================
-   EXPENSE RENDER
-===================================================== */
+/* =========================================================
+   RENDER EXPENSE
+   ========================================================= */
 
 function renderExpenses() {
 
   const tbody =
     document.getElementById("expenseTable");
 
-  if (!tbody) {
-    return;
-  }
-
-  tbody.innerHTML = "";
+  if (!tbody) return;
 
 
-  expenses
-    .slice()
-    .reverse()
-    .forEach(e => {
-
-      tbody.innerHTML += `
+  tbody.innerHTML =
+    expenses
+      .slice()
+      .reverse()
+      .map(e => `
 
         <tr>
 
@@ -1946,26 +1738,23 @@ function renderExpenses() {
 
             <button
               class="danger"
-              onclick="deleteExpense('${escapeHtml(e.id)}')">
-
+              onclick="deleteExpense('${String(e.id)}')">
               Delete
-
             </button>
 
           </td>
 
         </tr>
 
-      `;
-
-    });
+      `)
+      .join("");
 
 }
 
 
-/* =====================================================
-   PRODUCT SELECT
-===================================================== */
+/* =========================================================
+   SELECT OPTIONS
+   ========================================================= */
 
 function updateSelects() {
 
@@ -1976,73 +1765,67 @@ function updateSelects() {
     document.getElementById("purchaseProduct");
 
 
-  if (!sale && !purchase) {
-    return;
-  }
-
-
   const html =
-    products
-      .map(
-        p => `
+    products.map(p => `
 
-          <option value="${escapeHtml(p.id)}">
+      <option value="${escapeHtml(p.id)}">
+        ${escapeHtml(p.name)}
+        - Stock: ${number(p.stock)}
+      </option>
 
-            ${escapeHtml(p.name)}
-            - Stock: ${safeNumber(p.stock)}
-
-          </option>
-
-        `
-      )
-      .join("");
+    `).join("");
 
 
   if (sale) {
-    sale.innerHTML = html;
+    sale.innerHTML =
+      html ||
+      `<option value="">No Product</option>`;
   }
 
+
   if (purchase) {
-    purchase.innerHTML = html;
+    purchase.innerHTML =
+      html ||
+      `<option value="">No Product</option>`;
   }
 
 }
 
 
-/* =====================================================
+/* =========================================================
    DASHBOARD
-===================================================== */
+   ========================================================= */
 
 function updateDashboard() {
 
   const totalSales =
     sales.reduce(
-      (a, b) =>
-        a + safeNumber(b.total),
+      (sum, item) =>
+        sum + number(item.total),
       0
     );
 
 
   const totalPurchase =
     purchases.reduce(
-      (a, b) =>
-        a + safeNumber(b.total),
+      (sum, item) =>
+        sum + number(item.total),
       0
     );
 
 
   const totalExpense =
     expenses.reduce(
-      (a, b) =>
-        a + safeNumber(b.amount),
+      (sum, item) =>
+        sum + number(item.amount),
       0
     );
 
 
   const totalDue =
     duePayments.reduce(
-      (a, b) =>
-        a + safeNumber(b.amount),
+      (sum, item) =>
+        sum + number(item.amount),
       0
     );
 
@@ -2053,57 +1836,22 @@ function updateDashboard() {
       document.getElementById(id);
 
     if (el) {
-      el.innerText = value;
+      el.textContent = value;
     }
 
   };
 
 
-  setText(
-    "totalSales",
-    money(totalSales)
-  );
+  setText("totalSales", money(totalSales));
+  setText("totalPurchase", money(totalPurchase));
+  setText("totalExpense", money(totalExpense));
+  setText("totalDue", money(totalDue));
+  setText("totalProducts", products.length);
 
-  setText(
-    "totalPurchase",
-    money(totalPurchase)
-  );
-
-  setText(
-    "totalExpense",
-    money(totalExpense)
-  );
-
-  setText(
-    "totalDue",
-    money(totalDue)
-  );
-
-  setText(
-    "totalProducts",
-    products.length
-  );
-
-
-  setText(
-    "reportSales",
-    money(totalSales)
-  );
-
-  setText(
-    "reportPurchase",
-    money(totalPurchase)
-  );
-
-  setText(
-    "reportExpense",
-    money(totalExpense)
-  );
-
-  setText(
-    "reportDue",
-    money(totalDue)
-  );
+  setText("reportSales", money(totalSales));
+  setText("reportPurchase", money(totalPurchase));
+  setText("reportExpense", money(totalExpense));
+  setText("reportDue", money(totalDue));
 
 
   const profit =
@@ -2120,73 +1868,78 @@ function updateDashboard() {
 }
 
 
-/* =====================================================
-   PAGES
-===================================================== */
+/* =========================================================
+   PAGE NAVIGATION
+   ========================================================= */
 
 window.showPage = function (page) {
 
-  document
-    .querySelectorAll("main > section")
-    .forEach(
-      x =>
-        x.classList.add("hidden")
-    );
+  try {
+
+    document
+      .querySelectorAll("main > section")
+      .forEach(section => {
+
+        section.classList.add("hidden");
+
+      });
 
 
-  const target =
-    document.getElementById(
-      "page-" + page
-    );
+    const target =
+      document.getElementById(
+        "page-" + page
+      );
 
 
-  if (target) {
+    if (target) {
 
-    target.classList.remove("hidden");
+      target.classList.remove("hidden");
 
-  }
-
-
-  document
-    .querySelectorAll("nav button")
-    .forEach(
-      x =>
-        x.classList.remove("active")
-    );
+    }
 
 
-  const nav =
-    document.getElementById(
-      "nav-" + page
-    );
+    document
+      .querySelectorAll("nav button")
+      .forEach(button => {
+
+        button.classList.remove("active");
+
+      });
 
 
-  if (nav) {
+    const nav =
+      document.getElementById(
+        "nav-" + page
+      );
 
-    nav.classList.add("active");
+
+    if (nav) {
+      nav.classList.add("active");
+    }
+
+  } catch (error) {
+
+    console.error("Page error:", error);
 
   }
 
 };
 
 
-/* =====================================================
+/* =========================================================
    SETTINGS
-===================================================== */
+   ========================================================= */
 
 window.saveSettings = async function () {
 
   try {
 
-    const storeNameInput =
+    const input =
       document.getElementById("storeName");
-
-    const headerStore =
-      document.getElementById("headerStore");
 
 
     const storeName =
-      storeNameInput?.value.trim() ||
+      input?.value.trim() ||
       "Smart Store";
 
 
@@ -2199,7 +1952,7 @@ window.saveSettings = async function () {
       doc(
         db,
         "users",
-        uid(),
+        getUID(),
         "settings",
         "main"
       ),
@@ -2207,9 +1960,12 @@ window.saveSettings = async function () {
     );
 
 
-    if (headerStore) {
-      headerStore.innerText =
-        storeName;
+    const header =
+      document.getElementById("headerStore");
+
+
+    if (header) {
+      header.textContent = storeName;
     }
 
 
@@ -2217,103 +1973,82 @@ window.saveSettings = async function () {
 
   } catch (error) {
 
-    toast(
-      firebaseErrorMessage(
-        error,
-        "Settings save করা যায়নি।"
-      )
-    );
+    toast(firebaseError(error));
 
   }
 
 };
 
 
-/* =====================================================
+/* =========================================================
    EMAIL VERIFICATION
-===================================================== */
+   ========================================================= */
 
 window.sendVerification = async function () {
 
-  const user =
-    auth?.currentUser;
-
-
-  if (!user) {
-
-    toast("Login করুন");
-    return;
-
-  }
-
-
-  if (user.emailVerified) {
-
-    toast(
-      "আপনার Email ইতিমধ্যে verified"
-    );
-
-    return;
-
-  }
-
-
   try {
 
-    await sendEmailVerification(user);
-
-    toast(
-      "Verification email পাঠানো হয়েছে"
-    );
-
-  } catch (error) {
-
-    toast(
-      firebaseErrorMessage(
-        error,
-        "Verification email পাঠানো যায়নি।"
-      )
-    );
-
-  }
-
-};
+    const user =
+      auth?.currentUser;
 
 
-/* =====================================================
-   ACCOUNT DELETE
-===================================================== */
-
-window.deleteAccount = async function () {
-
-  if (
-    !confirm(
-      "Account permanently delete করবেন?\n\nসব Products, Sales, Purchase, Due ও Expense মুছে যাবে।"
-    )
-  ) {
-    return;
-  }
+    if (!user) {
+      toast("আগে Login করুন।");
+      return;
+    }
 
 
-  try {
+    if (user.emailVerified) {
 
-    const currentUser =
-      auth.currentUser;
-
-
-    if (!currentUser) {
-
-      toast("Login করুন");
+      toast("Email ইতিমধ্যে verified।");
       return;
 
     }
 
 
-    const uidValue =
-      currentUser.uid;
+    await sendEmailVerification(user);
+
+    toast("Verification email পাঠানো হয়েছে।");
+
+  } catch (error) {
+
+    toast(firebaseError(error));
+
+  }
+
+};
 
 
-    const collections = [
+/* =========================================================
+   ACCOUNT DELETE
+   ========================================================= */
+
+window.deleteAccount = async function () {
+
+  if (!confirm(
+    "Account permanently delete করবেন?\n\n" +
+    "Products, Sales, Purchase, Due এবং Expense সব মুছে যাবে।"
+  )) {
+    return;
+  }
+
+
+  try {
+
+    const user =
+      auth?.currentUser;
+
+
+    if (!user) {
+      toast("Login করুন।");
+      return;
+    }
+
+
+    const uid = user.uid;
+
+
+    const names = [
       "products",
       "sales",
       "purchases",
@@ -2322,20 +2057,15 @@ window.deleteAccount = async function () {
     ];
 
 
-    /*
-      Delete collection documents
-      in batches of maximum 500.
-    */
-
-    for (const collectionName of collections) {
+    for (const name of names) {
 
       const snap =
         await getDocs(
           collection(
             db,
             "users",
-            uidValue,
-            collectionName
+            uid,
+            name
           )
         );
 
@@ -2353,7 +2083,7 @@ window.deleteAccount = async function () {
         count++;
 
 
-        if (count === 500) {
+        if (count === 450) {
 
           await batch.commit();
 
@@ -2368,46 +2098,33 @@ window.deleteAccount = async function () {
 
 
       if (count > 0) {
-
         await batch.commit();
-
       }
 
     }
 
 
-    /* Settings */
-
     await deleteDoc(
       doc(
         db,
         "users",
-        uidValue,
+        uid,
         "settings",
         "main"
       )
     ).catch(() => {});
 
 
-    /* User document */
-
     await deleteDoc(
       doc(
         db,
         "users",
-        uidValue
+        uid
       )
     );
 
 
-    /*
-      Firebase may require recent login
-      for account deletion.
-    */
-
-    await deleteUser(
-      currentUser
-    );
+    await deleteUser(user);
 
 
     products = [];
@@ -2417,37 +2134,29 @@ window.deleteAccount = async function () {
     duePayments = [];
 
 
-    toast(
-      "Account permanently deleted"
-    );
+    toast("Account permanently deleted");
 
   } catch (error) {
 
-    toast(
-      firebaseErrorMessage(
-        error,
-        "Account delete করা যায়নি।"
-      )
-    );
+    toast(firebaseError(error));
 
   }
 
 };
 
 
-/* =====================================================
+/* =========================================================
    BACKUP
-===================================================== */
+   ========================================================= */
 
 window.downloadBackup = function () {
 
   try {
 
-    const data = {
+    const backup = {
 
       version: 1,
-      exportedAt:
-        new Date().toISOString(),
+      exportedAt: new Date().toISOString(),
 
       settings,
       products,
@@ -2463,7 +2172,7 @@ window.downloadBackup = function () {
       new Blob(
         [
           JSON.stringify(
-            data,
+            backup,
             null,
             2
           )
@@ -2484,7 +2193,6 @@ window.downloadBackup = function () {
 
     a.href = url;
 
-
     a.download =
       "smart-store-backup-" +
       Date.now() +
@@ -2498,35 +2206,32 @@ window.downloadBackup = function () {
     a.remove();
 
 
-    setTimeout(() => {
-      URL.revokeObjectURL(url);
-    }, 1000);
+    setTimeout(
+      () => URL.revokeObjectURL(url),
+      1000
+    );
 
 
     toast("Backup downloaded");
 
   } catch (error) {
 
-    toast(
-      "Backup তৈরি করা যায়নি।"
-    );
+    toast("Backup তৈরি করা যায়নি।");
 
   }
 
 };
 
 
-/* =====================================================
-   DELETE COLLECTION DATA
-===================================================== */
+/* =========================================================
+   CLEAR COLLECTION
+   ========================================================= */
 
-async function clearUserCollection(
-  collectionName
-) {
+async function clearUserCollection(name) {
 
   const snap =
     await getDocs(
-      userCollection(collectionName)
+      userCollection(name)
     );
 
 
@@ -2543,7 +2248,7 @@ async function clearUserCollection(
     count++;
 
 
-    if (count === 500) {
+    if (count === 450) {
 
       await batch.commit();
 
@@ -2564,9 +2269,9 @@ async function clearUserCollection(
 }
 
 
-/* =====================================================
-   RESTORE
-===================================================== */
+/* =========================================================
+   RESTORE BACKUP
+   ========================================================= */
 
 window.restoreBackup = async function (event) {
 
@@ -2574,26 +2279,12 @@ window.restoreBackup = async function (event) {
     event?.target?.files?.[0];
 
 
-  if (!file) {
-    return;
-  }
-
-
-  if (
-    !confirm(
-      "Restore করলে বর্তমান data replace হবে। Continue?"
-    )
-  ) {
-
-    event.target.value = "";
-    return;
-
-  }
+  if (!file) return;
 
 
   try {
 
-    if (!auth.currentUser) {
+    if (!auth?.currentUser) {
       throw new Error("আগে Login করুন।");
     }
 
@@ -2613,7 +2304,7 @@ window.restoreBackup = async function (event) {
     } catch (_) {
 
       throw new Error(
-        "Backup fileটি valid JSON নয়।"
+        "Backup file valid JSON নয়।"
       );
 
     }
@@ -2625,13 +2316,13 @@ window.restoreBackup = async function (event) {
     ) {
 
       throw new Error(
-        "Backup file format সঠিক নয়।"
+        "Backup file format ভুল।"
       );
 
     }
 
 
-    const collections = [
+    const names = [
       "products",
       "sales",
       "purchases",
@@ -2640,11 +2331,7 @@ window.restoreBackup = async function (event) {
     ];
 
 
-    /*
-      Validate arrays
-    */
-
-    for (const name of collections) {
+    for (const name of names) {
 
       if (
         data[name] !== undefined &&
@@ -2652,7 +2339,7 @@ window.restoreBackup = async function (event) {
       ) {
 
         throw new Error(
-          `${name} data সঠিক নয়।`
+          name + " data ভুল।"
         );
 
       }
@@ -2660,28 +2347,32 @@ window.restoreBackup = async function (event) {
     }
 
 
-    /*
-      Clear old data
-    */
+    if (!confirm(
+      "বর্তমান data replace হবে।\n\nContinue?"
+    )) {
 
-    for (const collectionName of collections) {
-
-      await clearUserCollection(
-        collectionName
-      );
+      event.target.value = "";
+      return;
 
     }
 
 
-    /*
-      Restore new data
-    */
+    /* Clear old */
 
-    for (const collectionName of collections) {
+    for (const name of names) {
+
+      await clearUserCollection(name);
+
+    }
+
+
+    /* Restore */
+
+    for (const name of names) {
 
       const items =
-        Array.isArray(data[collectionName])
-          ? data[collectionName]
+        Array.isArray(data[name])
+          ? data[name]
           : [];
 
 
@@ -2693,19 +2384,13 @@ window.restoreBackup = async function (event) {
 
       for (const item of items) {
 
-        if (
-          !item ||
-          !item.id
-        ) {
+        if (!item || !item.id) {
           continue;
         }
 
 
         batch.set(
-          userDoc(
-            collectionName,
-            item.id
-          ),
+          userDoc(name, item.id),
           item
         );
 
@@ -2713,7 +2398,7 @@ window.restoreBackup = async function (event) {
         count++;
 
 
-        if (count === 500) {
+        if (count === 450) {
 
           await batch.commit();
 
@@ -2728,47 +2413,28 @@ window.restoreBackup = async function (event) {
 
 
       if (count > 0) {
-
         await batch.commit();
-
       }
 
     }
 
 
-    /*
-      Restore settings
-    */
+    settings = {
 
-    if (
-      data.settings &&
-      typeof data.settings === "object"
-    ) {
+      storeName:
+        String(
+          data.settings?.storeName ||
+          "Smart Store"
+        )
 
-      settings = {
-
-        storeName:
-          String(
-            data.settings.storeName ||
-            "Smart Store"
-          )
-
-      };
-
-    } else {
-
-      settings = {
-        storeName: "Smart Store"
-      };
-
-    }
+    };
 
 
     await setDoc(
       doc(
         db,
         "users",
-        uid(),
+        getUID(),
         "settings",
         "main"
       ),
@@ -2776,19 +2442,12 @@ window.restoreBackup = async function (event) {
     );
 
 
-    /*
-      Reload everything
-    */
-
     await loadAll();
 
 
     event.target.value = "";
 
-
-    toast(
-      "Backup restored successfully"
-    );
+    toast("Backup restored successfully");
 
   } catch (error) {
 
@@ -2796,13 +2455,9 @@ window.restoreBackup = async function (event) {
       event.target.value = "";
     }
 
-
     toast(
-      "Backup restore failed: " +
-      firebaseErrorMessage(
-        error,
-        "Restore করা যায়নি।"
-      )
+      "Restore failed: " +
+      firebaseError(error)
     );
 
   }
@@ -2810,9 +2465,118 @@ window.restoreBackup = async function (event) {
 };
 
 
-/* =====================================================
-   INITIAL RENDER
-===================================================== */
+/* =========================================================
+   AUTH STATE
+   ========================================================= */
+
+if (auth) {
+
+  onAuthStateChanged(
+    auth,
+    async user => {
+
+      const login =
+        document.getElementById("loginScreen");
+
+      const signup =
+        document.getElementById("signupScreen");
+
+      const app =
+        document.getElementById("app");
+
+
+      if (user) {
+
+        if (login) {
+          login.classList.add("hidden");
+        }
+
+        if (signup) {
+          signup.classList.add("hidden");
+        }
+
+        if (app) {
+          app.style.display = "block";
+        }
+
+
+        const emailEl =
+          document.getElementById("userEmail");
+
+        const accountEl =
+          document.getElementById("accountInfo");
+
+
+        if (emailEl) {
+          emailEl.textContent =
+            user.email || "";
+        }
+
+
+        if (accountEl) {
+
+          accountEl.textContent =
+            `${user.displayName || "User"} | ${user.email || ""}`;
+
+        }
+
+
+        try {
+
+          await loadAll();
+
+          /* Dashboard থাকলে শুধু তখনই দেখাবে */
+
+          const dashboard =
+            document.getElementById(
+              "page-dashboard"
+            );
+
+
+          if (dashboard) {
+            window.showPage("dashboard");
+          }
+
+        } catch (error) {
+
+          console.error(
+            "DATA LOAD ERROR:",
+            error
+          );
+
+
+          toast(
+            "Data load হয়নি: " +
+            firebaseError(error)
+          );
+
+        }
+
+      } else {
+
+        if (app) {
+          app.style.display = "none";
+        }
+
+        if (signup) {
+          signup.classList.add("hidden");
+        }
+
+        if (login) {
+          login.classList.remove("hidden");
+        }
+
+      }
+
+    }
+  );
+
+}
+
+
+/* =========================================================
+   DOM READY
+   ========================================================= */
 
 document.addEventListener(
   "DOMContentLoaded",
@@ -2822,8 +2586,13 @@ document.addEventListener(
 
       renderAll();
 
-    } catch (_) {
-      // HTML load হওয়ার সময় data না থাকলে ignore
+    } catch (error) {
+
+      console.error(
+        "Initial render error:",
+        error
+      );
+
     }
 
   }
