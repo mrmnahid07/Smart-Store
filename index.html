@@ -1,4161 +1,2264 @@
-<script type="module">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Store Management</title>
 
-/* =========================================================
-   FIREBASE
-========================================================= */
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
 
-import { initializeApp } 
-from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:Arial,sans-serif}
+body{background:#f1f5f9;color:#1e293b}
+#loginScreen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0f172a,#1e3a8a);padding:20px}
+.loginBox{width:390px;max-width:100%;background:white;border-radius:18px;padding:30px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.loginBox h1{text-align:center;margin-bottom:8px}.loginBox p{text-align:center;color:#64748b;margin-bottom:20px}
+.loginBox input{width:100%;padding:13px;border:1px solid #cbd5e1;border-radius:8px;margin-bottom:12px;font-size:15px}
+.loginBox button{width:100%;padding:13px;border:0;border-radius:8px;background:#2563eb;color:white;font-size:16px;cursor:pointer;margin-top:5px}
+.loginBox .linkBtn{background:none;color:#2563eb;margin-top:12px}
+#message{text-align:center;margin-top:10px}
+#app{display:none}
+.sidebar{position:fixed;left:0;top:0;width:240px;height:100vh;background:#0f172a;color:white;padding:20px 12px;overflow-y:auto}
+.logo{font-size:23px;font-weight:bold;text-align:center;padding:10px;margin-bottom:20px}
+.storeUser{background:#1e293b;padding:10px;border-radius:8px;margin-bottom:15px;font-size:13px;text-align:center}
+.navBtn{display:block;width:100%;padding:13px 15px;border:0;background:transparent;color:#cbd5e1;text-align:left;border-radius:8px;cursor:pointer;font-size:15px;margin-bottom:5px}
+.navBtn:hover,.navBtn.active{background:#2563eb;color:white}
+.logoutBtn{background:#dc2626;color:white;margin-top:20px}
+.main{margin-left:240px;padding:25px}
+.section{display:none}.section.active{display:block}
+.pageTitle{font-size:25px;font-weight:bold;margin-bottom:20px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:15px;margin-bottom:25px}
+.card{background:white;border-radius:12px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.card h4{color:#64748b;font-size:14px;margin-bottom:8px}.card strong{font-size:24px}
+.cardIcon{font-size:28px;margin-bottom:8px}
+.panel{background:white;padding:20px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.07);margin-bottom:20px}
+.panel h3{margin-bottom:15px}
+.formGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+input,select,textarea{width:100%;padding:11px;border:1px solid #cbd5e1;border-radius:7px;font-size:14px}
+textarea{min-height:80px}
+button{border:0;padding:10px 15px;border-radius:7px;cursor:pointer;background:#2563eb;color:white;font-size:14px}
+button:hover{opacity:.9}
+.btnGreen{background:#16a34a}.btnRed{background:#dc2626}.btnOrange{background:#ea580c}.btnDark{background:#0f172a}.btnGray{background:#64748b}
+.tableWrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;margin-top:10px}
+th,td{padding:11px 9px;border-bottom:1px solid #e2e8f0;text-align:left;white-space:nowrap}
+th{background:#f8fafc}
+.lowStock{color:#dc2626;font-weight:bold}.goodStock{color:#16a34a;font-weight:bold}
+.saleRow{display:grid;grid-template-columns:2fr 100px 130px 130px 50px;gap:8px;margin-bottom:8px}
+.saleRow input{width:100%}
+.badge{display:inline-block;padding:4px 8px;border-radius:15px;font-size:12px;background:#e2e8f0}
+.badgeRed{background:#fee2e2;color:#b91c1c}.badgeGreen{background:#dcfce7;color:#15803d}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:1000;padding:20px}
+.modalBox{background:white;padding:25px;border-radius:12px;width:500px;max-width:100%}
+.modalBox h3{margin-bottom:15px}.modalButtons{display:flex;gap:8px;margin-top:15px}
+#barcodeModal svg{max-width:100%}
+#printInvoice{display:none}
+.migrationInfo{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px;margin-bottom:15px;color:#475569}
+@media(max-width:800px){
+.sidebar{width:190px}.main{margin-left:190px;padding:15px}
+.saleRow{grid-template-columns:1fr 80px 100px 100px 40px}
+}
+@media(max-width:600px){
+.sidebar{position:relative;width:100%;height:auto}.main{margin-left:0}
+.navBtn{display:inline-block;width:auto;margin:2px}.saleRow{grid-template-columns:1fr}
+}
+@media print{
+body *{visibility:hidden}
+#printInvoice,#printInvoice *{visibility:visible}
+#printInvoice{display:block!important;position:absolute;left:0;top:0;width:210mm;min-height:297mm;padding:15mm;background:white;color:#000}
+.noPrint{display:none!important}
+}
+</style>
+</head>
 
-import {
-  getAuth,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  sendPasswordResetEmail,
-  sendEmailVerification,
-  updateProfile,
-  onAuthStateChanged,
-  deleteUser,
-  signOut
-} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+<body>
 
-import {
-  getFirestore,
-  doc,
-  getDoc,
-  setDoc,
-  deleteDoc,
-  collection,
-  getDocs,
-  writeBatch
-} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+<!-- LOGIN -->
+<div id="loginScreen">
+<div class="loginBox">
+
+<div id="loginForm">
+<h1>🏪 Smart Store</h1>
+<p>Account Login</p>
+
+<input id="loginEmail" type="email" placeholder="Email">
+<input id="loginPassword" type="password" placeholder="Password">
+
+<button onclick="loginAccount()">🔐 Login</button>
+<button class="linkBtn" onclick="showCreateAccount()">Create New Account</button>
+<button class="linkBtn" onclick="showForgotPassword()">🔑 Forgot Account / Password?</button>
+</div>
+
+<div id="createForm" style="display:none">
+<h1>🏪 Smart Store</h1>
+<p>Create Account</p>
+
+<input id="createName" placeholder="Your Name">
+<input id="createEmail" type="email" placeholder="Email">
+<input id="createPassword" type="password" placeholder="Password">
+<input id="createPassword2" type="password" placeholder="Confirm Password">
+
+<button onclick="createAccount()">Create Account</button>
+<button class="linkBtn" onclick="showLogin()">Already have account? Login</button>
+</div>
+
+<div id="forgotForm" style="display:none">
+<h1>🏪 Smart Store</h1>
+<p>Reset Your Password</p>
+
+<input id="forgotEmail" type="email" placeholder="Enter your Gmail">
+
+<button onclick="sendResetCode()">📧 Send Verification Code</button>
+
+<div id="codeSection" style="display:none">
+<p>📩 Demo verification code generated below</p>
+
+<input id="verificationCode" type="text" inputmode="numeric" maxlength="6" placeholder="Enter 6-digit Code">
+<input id="newPassword" type="password" placeholder="New Password">
+<input id="newPassword2" type="password" placeholder="Confirm New Password">
+
+<button onclick="resetPassword()">🔄 Reset Password</button>
+</div>
+
+<button class="linkBtn" onclick="showLogin()">← Back to Login</button>
+</div>
+
+<div id="message"></div>
+</div>
+</div>
 
 
-/* =========================================================
-   🔥 YOUR FIREBASE CONFIG
-   এখানে নিজের Firebase config বসাও
-========================================================= */
+<!-- APP -->
+<div id="app">
 
-const firebaseConfig = {
+<div class="sidebar">
+<div class="logo">🏪 Smart Store</div>
 
-  apiKey: "YOUR_FIREBASE_API_KEY",
+<div class="storeUser">
+<div id="sideUserName">Account</div>
+<small id="sideUserEmail"></small>
+</div>
 
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
+<button class="navBtn active" onclick="showSection('dashboard',this)">🏠 Dashboard</button>
+<button class="navBtn" onclick="showSection('products',this)">📦 Products</button>
+<button class="navBtn" onclick="showSection('sales',this)">🛒 Sales</button>
+<button class="navBtn" onclick="showSection('purchase',this)">🚚 Purchase</button>
+<button class="navBtn" onclick="showSection('customers',this)">👥 Customers</button>
+<button class="navBtn" onclick="showSection('expenses',this)">💸 Expenses</button>
+<button class="navBtn" onclick="showSection('reports',this)">📊 Reports</button>
+<button class="navBtn" onclick="showSection('settings',this)">⚙️ Settings</button>
+<button class="navBtn logoutBtn" onclick="logoutAccount()">🔒 Logout</button>
+</div>
 
-  projectId: "YOUR_PROJECT_ID",
 
-  storageBucket: "YOUR_PROJECT.firebasestorage.app",
+<div class="main">
 
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+<!-- DASHBOARD -->
+<section id="dashboard" class="section active">
+<div class="pageTitle">🏠 Dashboard</div>
 
-  appId: "YOUR_FIREBASE_APP_ID"
+<div class="cards">
 
+<div class="card">
+<div class="cardIcon">💰</div>
+<h4>Today's Sales</h4>
+<strong id="todaySales">৳0</strong>
+</div>
+
+<div class="card">
+<div class="cardIcon">📦</div>
+<h4>Total Products</h4>
+<strong id="totalProducts">0</strong>
+</div>
+
+<div class="card">
+<div class="cardIcon">📈</div>
+<h4>Total Profit</h4>
+<strong id="totalProfit">৳0</strong>
+</div>
+
+<div class="card">
+<div class="cardIcon">💸</div>
+<h4>Total Expense</h4>
+<strong id="totalExpense">৳0</strong>
+</div>
+
+<div class="card">
+<div class="cardIcon">👥</div>
+<h4>Customer Due</h4>
+<strong id="customerDue">৳0</strong>
+</div>
+
+<div class="card">
+<div class="cardIcon">💎</div>
+<h4>Stock Value</h4>
+<strong id="stockValue">৳0</strong>
+</div>
+
+<div class="card">
+<div class="cardIcon">⚠️</div>
+<h4>Low Stock</h4>
+<strong id="lowStockCount">0</strong>
+</div>
+
+<div class="card">
+<div class="cardIcon">💵</div>
+<h4>Net Profit</h4>
+<strong id="netProfit">৳0</strong>
+</div>
+
+</div>
+
+<div class="panel">
+<h3>⚠️ Low Stock Products</h3>
+<div class="tableWrap">
+<table>
+<thead>
+<tr><th>Product</th><th>Code</th><th>Stock</th><th>Minimum</th></tr>
+</thead>
+<tbody id="lowStockTable"></tbody>
+</table>
+</div>
+</div>
+</section>
+
+
+<!-- PRODUCTS -->
+<section id="products" class="section">
+<div class="pageTitle">📦 Products</div>
+
+<div class="panel">
+<h3>➕ Add Product</h3>
+
+<div class="formGrid">
+<input id="productName" placeholder="Product Name">
+<input id="productCode" placeholder="Product Code / Barcode">
+<input id="productCategory" placeholder="Category">
+<input id="purchasePrice" type="number" placeholder="Purchase Price">
+<input id="sellingPrice" type="number" placeholder="Selling Price">
+<input id="productStock" type="number" placeholder="Stock">
+<input id="productUnit" list="unitList" placeholder="Unit">
+<datalist id="unitList">
+<option value="pcs"><option value="kg"><option value="gram">
+<option value="liter"><option value="box"><option value="packet"><option value="dozen">
+</datalist>
+<input id="minStock" type="number" placeholder="Minimum Stock">
+</div>
+
+<br>
+<button onclick="addProduct()">➕ Add Product</button>
+<button class="btnGray" onclick="clearProductForm()">Clear</button>
+</div>
+
+<div class="panel">
+<h3>📋 Product List</h3>
+
+<input id="productSearch" oninput="renderProducts()" placeholder="🔎 Search product, code or category">
+
+<div class="tableWrap">
+<table>
+<thead>
+<tr>
+<th>Product</th><th>Code</th><th>Category</th><th>Purchase</th>
+<th>Sale</th><th>Stock</th><th>Unit</th><th>Action</th>
+</tr>
+</thead>
+<tbody id="productTable"></tbody>
+</table>
+</div>
+</div>
+</section>
+
+
+<!-- SALES -->
+<section id="sales" class="section">
+<div class="pageTitle">🛒 Sales</div>
+
+<div class="panel">
+<h3>🧾 New Sale</h3>
+
+<div class="formGrid">
+<input id="saleDate" type="date">
+<input id="saleCustomer" placeholder="Customer Name">
+<input id="salePayment" list="paymentList" placeholder="Payment Method">
+<datalist id="paymentList">
+<option value="Cash"><option value="bKash"><option value="Nagad">
+<option value="Rocket"><option value="Bank"><option value="Due">
+</datalist>
+</div>
+
+<br>
+<div id="saleRows"></div>
+
+<button onclick="addSaleRow()">➕ Add Product</button>
+
+<br><br>
+
+<div class="formGrid">
+<input id="salePaid" type="number" oninput="calculateSale()" placeholder="Paid Amount">
+<input id="saleTotal" readonly placeholder="Total">
+<input id="saleDue" readonly placeholder="Due">
+</div>
+
+<br>
+<button class="btnGreen" onclick="completeSale()">✅ Complete Sale</button>
+</div>
+
+<div class="panel">
+<h3>📋 Sales History</h3>
+<div class="tableWrap">
+<table>
+<thead>
+<tr><th>Date</th><th>Customer</th><th>Total</th><th>Paid</th><th>Due</th><th>Action</th></tr>
+</thead>
+<tbody id="salesTable"></tbody>
+</table>
+</div>
+</div>
+</section>
+
+
+<!-- PURCHASE -->
+<section id="purchase" class="section">
+<div class="pageTitle">🚚 Purchase</div>
+
+<div class="panel">
+<h3>➕ Add Purchase</h3>
+
+<div class="formGrid">
+<input id="purchaseDate" type="date">
+<input id="purchaseProduct" list="purchaseProductList" placeholder="Type Product Name / Code" oninput="purchaseProductChanged()">
+<datalist id="purchaseProductList"></datalist>
+<input id="purchaseQty" type="number" placeholder="Quantity">
+<input id="purchasePrice2" type="number" placeholder="Purchase Price">
+<input id="supplier" placeholder="Supplier">
+</div>
+
+<br>
+<button onclick="addPurchase()">➕ Add Purchase</button>
+</div>
+
+<div class="panel">
+<h3>📋 Purchase History</h3>
+<div class="tableWrap">
+<table>
+<thead>
+<tr><th>Date</th><th>Product</th><th>Qty</th><th>Price</th><th>Supplier</th><th>Total</th><th>Action</th></tr>
+</thead>
+<tbody id="purchaseTable"></tbody>
+</table>
+</div>
+</div>
+</section>
+
+
+<!-- CUSTOMERS -->
+<section id="customers" class="section">
+<div class="pageTitle">👥 Customers</div>
+
+<div class="panel">
+<h3>💰 Customer Due</h3>
+<div class="tableWrap">
+<table>
+<thead>
+<tr><th>Customer</th><th>Total Purchase</th><th>Paid</th><th>Due</th><th>Action</th></tr>
+</thead>
+<tbody id="customerTable"></tbody>
+</table>
+</div>
+</div>
+</section>
+
+
+<!-- EXPENSES -->
+<section id="expenses" class="section">
+<div class="pageTitle">💸 Expenses</div>
+
+<div class="panel">
+<h3>➕ Add Expense</h3>
+
+<div class="formGrid">
+<input id="expenseDate" type="date">
+<input id="expenseName" placeholder="Expense Name">
+<input id="expenseAmount" type="number" placeholder="Amount">
+<input id="expenseNote" placeholder="Note">
+</div>
+
+<br>
+<button onclick="addExpense()">➕ Add Expense</button>
+</div>
+
+<div class="panel">
+<h3>📋 Expense History</h3>
+<div class="tableWrap">
+<table>
+<thead>
+<tr><th>Date</th><th>Name</th><th>Amount</th><th>Note</th><th>Action</th></tr>
+</thead>
+<tbody id="expenseTable"></tbody>
+</table>
+</div>
+</div>
+</section>
+
+
+<!-- REPORTS -->
+<section id="reports" class="section">
+<div class="pageTitle">📊 Reports</div>
+
+<div class="cards">
+
+<div class="card">
+<div class="cardIcon">💰</div>
+<h4>Total Sales</h4>
+<strong id="reportSales">৳0</strong>
+</div>
+
+<div class="card">
+<div class="cardIcon">🚚</div>
+<h4>Total Purchase</h4>
+<strong id="reportPurchase">৳0</strong>
+</div>
+
+<div class="card">
+<div class="cardIcon">📈</div>
+<h4>Gross Profit</h4>
+<strong id="reportGross">৳0</strong>
+</div>
+
+<div class="card">
+<div class="cardIcon">💸</div>
+<h4>Expenses</h4>
+<strong id="reportExpense">৳0</strong>
+</div>
+
+<div class="card">
+<div class="cardIcon">💵</div>
+<h4>Net Profit</h4>
+<strong id="reportNet">৳0</strong>
+</div>
+
+<div class="card">
+<div class="cardIcon">👥</div>
+<h4>Customer Due</h4>
+<strong id="reportDue">৳0</strong>
+</div>
+
+<div class="card">
+<div class="cardIcon">💎</div>
+<h4>Stock Value</h4>
+<strong id="reportStock">৳0</strong>
+</div>
+
+</div>
+</section>
+
+
+<!-- SETTINGS -->
+<section id="settings" class="section">
+<div class="pageTitle">⚙️ Settings</div>
+
+<div class="panel">
+<h3>🏪 Store Information</h3>
+
+<div class="formGrid">
+<input id="storeName" placeholder="Store Name">
+<input id="storeOwner" placeholder="Owner Name">
+<input id="storePhone" placeholder="Mobile Number">
+<input id="storeAddress" placeholder="Address">
+</div>
+
+<br>
+<button onclick="saveSettings()">💾 Save Settings</button>
+</div>
+
+
+<div class="panel">
+<h3>🔐 Account</h3>
+<p id="accountInfo"></p>
+<br>
+<button class="btnRed" onclick="deleteCurrentAccount()">🗑️ Delete Account</button>
+</div>
+
+
+<div class="panel">
+<h3>💾 Backup / Restore</h3>
+<p style="color:#64748b;margin-bottom:15px">
+আপনার store data একটি JSON backup হিসেবে save করতে পারবেন।
+</p>
+
+<button onclick="backupData()">⬇️ Download Backup</button>
+<button class="btnOrange" onclick="document.getElementById('restoreFile').click()">⬆️ Restore Backup</button>
+
+<input id="restoreFile" type="file" accept=".json" style="display:none" onchange="restoreData(event)">
+</div>
+
+
+<!-- MIGRATION -->
+<div class="panel">
+<h3>🔄 Old Data Migration</h3>
+
+<div class="migrationInfo">
+পুরোনো Smart Store-এর localStorage data থাকলে এখান থেকে বর্তমান account-এ migrate করতে পারবেন।
+<br><br>
+<strong>🔄</strong> Migration করা data আলাদাভাবে চিহ্নিত থাকবে।
+</div>
+
+<button class="btnDark" onclick="migrateOldData(true)">
+🔄 Migrate Old Data
+</button>
+
+<button class="btnGreen" onclick="showMigratedExpenses()">
+👁️ Show Migrated Expenses
+</button>
+
+<button class="btnRed" onclick="deleteMigratedExpenses()">
+🗑️ Delete Migrated Expenses
+</button>
+
+<br><br>
+
+<div id="migrationResult" style="color:#475569"></div>
+</div>
+
+</section>
+
+</div>
+</div>
+
+
+<!-- BARCODE MODAL -->
+<div class="modal" id="barcodeModal">
+<div class="modalBox">
+<h3>📦 Product Barcode</h3>
+<svg id="barcodeSvg"></svg>
+
+<div class="modalButtons">
+<button onclick="window.print()">🖨️ Print</button>
+<button class="btnGray" onclick="closeModal('barcodeModal')">Close</button>
+</div>
+</div>
+</div>
+
+
+<!-- DUE MODAL -->
+<div class="modal" id="dueModal">
+<div class="modalBox">
+<h3>💰 Receive Due Payment</h3>
+<p id="dueCustomerName"></p>
+<br>
+
+<input id="dueAmount" type="number" placeholder="Payment Amount">
+<br><br>
+<input id="dueNote" placeholder="Note">
+
+<div class="modalButtons">
+<button class="btnGreen" onclick="receiveDue()">Receive Payment</button>
+<button class="btnGray" onclick="closeModal('dueModal')">Cancel</button>
+</div>
+</div>
+</div>
+
+
+<!-- INVOICE -->
+<div id="printInvoice">
+
+<div style="text-align:center;border-bottom:2px solid #000;padding-bottom:10px">
+<h1 id="invoiceStoreName">Smart Store</h1>
+<p id="invoiceAddress"></p>
+<p id="invoicePhone"></p>
+</div>
+
+<br>
+
+<table style="width:100%;border-collapse:collapse">
+<tr>
+<td><b>Invoice:</b> <span id="invoiceNumber"></span></td>
+<td><b>Date:</b> <span id="invoiceDate"></span></td>
+</tr>
+<tr>
+<td><b>Customer:</b> <span id="invoiceCustomer"></span></td>
+<td></td>
+</tr>
+</table>
+
+<br>
+
+<table style="width:100%;border-collapse:collapse">
+<thead>
+<tr>
+<th style="border:1px solid #000;padding:8px">Product</th>
+<th style="border:1px solid #000;padding:8px">Qty</th>
+<th style="border:1px solid #000;padding:8px">Price</th>
+<th style="border:1px solid #000;padding:8px">Total</th>
+</tr>
+</thead>
+<tbody id="invoiceItems"></tbody>
+</table>
+
+<br>
+
+<div style="text-align:right">
+<p><b>Total: ৳<span id="invoiceTotal"></span></b></p>
+<p>Paid: ৳<span id="invoicePaid"></span></p>
+<p>Due: ৳<span id="invoiceDue"></span></p>
+</div>
+
+<br><br>
+<p>Thank you for shopping with us.</p>
+
+<br><br>
+
+<div style="text-align:right">
+<p>________________________</p>
+<p id="invoiceOwner"></p>
+<p>Authorized Signature</p>
+</div>
+
+</div>
+
+
+<script>
+
+/* =========================
+   ACCOUNT SYSTEM
+========================= */
+
+let accounts=JSON.parse(localStorage.getItem("smartStoreAccounts"))||[];
+let currentAccountId=localStorage.getItem("smartStoreCurrentAccount")||null;
+
+let products=[];
+let sales=[];
+let purchases=[];
+let expenses=[];
+let duePayments=[];
+
+let settings={
+name:"Smart Store",
+owner:"",
+address:"",
+phone:""
 };
 
 
-const firebaseApp = initializeApp(firebaseConfig);
-
-const auth = getAuth(firebaseApp);
-
-const db = getFirestore(firebaseApp);
-
-
-/* =========================================================
-   GLOBAL DATA
-========================================================= */
-
-let products = [];
-let sales = [];
-let purchases = [];
-let expenses = [];
-let duePayments = [];
-
-let settings = {
-  name: "Smart Store",
-  owner: "",
-  address: "",
-  phone: ""
-};
-
-let saleRowCounter = 0;
-let selectedDueCustomer = "";
-
-
-/* =========================================================
+/* =========================
    HELPERS
-========================================================= */
+========================= */
 
 function uid(){
-
-  return Date.now().toString(36) +
-    Math.random().toString(36).substring(2);
-
+return Date.now().toString(36)+Math.random().toString(36).substring(2);
 }
-
 
 function money(n){
-
-  return "৳" + Number(n || 0).toLocaleString("en-BD", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  });
-
+return "৳"+Number(n||0).toLocaleString("en-BD",{
+minimumFractionDigits:2,
+maximumFractionDigits:2
+});
 }
-
 
 function today(){
-
-  return new Date().toISOString().split("T")[0];
-
+return new Date().toISOString().split("T")[0];
 }
-
 
 function escapeHtml(str){
-
-  return String(str ?? "")
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;")
-    .replace(/'/g,"&#039;");
-
+return String(str??"")
+.replace(/&/g,"&amp;")
+.replace(/</g,"&lt;")
+.replace(/>/g,"&gt;")
+.replace(/"/g,"&quot;")
+.replace(/'/g,"&#039;");
 }
 
 
-/* =========================================================
-   FIRESTORE REFERENCES
-========================================================= */
-
-function userRef(){
-
-  return doc(db,"users",auth.currentUser.uid);
-
-}
-
-
-function collectionRef(name){
-
-  return collection(
-    db,
-    "users",
-    auth.currentUser.uid,
-    name
-  );
-
-}
-
-
-function documentRef(name,id){
-
-  return doc(
-    db,
-    "users",
-    auth.currentUser.uid,
-    name,
-    id
-  );
-
-}
-
-
-/* =========================================================
-   ACCOUNT UI
-========================================================= */
+/* =========================
+   LOGIN / ACCOUNT
+========================= */
 
 function showCreateAccount(){
-
-  document.getElementById("loginForm").style.display="none";
-
-  document.getElementById("createForm").style.display="block";
-
-  document.getElementById("forgotForm").style.display="none";
-
+document.getElementById("loginForm").style.display="none";
+document.getElementById("createForm").style.display="block";
+document.getElementById("forgotForm").style.display="none";
 }
-
 
 function showLogin(){
-
-  document.getElementById("loginForm").style.display="block";
-
-  document.getElementById("createForm").style.display="none";
-
-  document.getElementById("forgotForm").style.display="none";
-
-  document.getElementById("codeSection").style.display="none";
-
+document.getElementById("loginForm").style.display="block";
+document.getElementById("createForm").style.display="none";
+document.getElementById("forgotForm").style.display="none";
+document.getElementById("codeSection").style.display="none";
 }
-
 
 function showForgotPassword(){
-
-  document.getElementById("loginForm").style.display="none";
-
-  document.getElementById("createForm").style.display="none";
-
-  document.getElementById("forgotForm").style.display="block";
-
+document.getElementById("loginForm").style.display="none";
+document.getElementById("createForm").style.display="none";
+document.getElementById("forgotForm").style.display="block";
 }
 
+function createAccount(){
 
-/* =========================================================
-   CREATE ACCOUNT
-========================================================= */
+let name=document.getElementById("createName").value.trim();
+let email=document.getElementById("createEmail").value.trim().toLowerCase();
+let pass=document.getElementById("createPassword").value;
+let pass2=document.getElementById("createPassword2").value;
 
-async function createAccount(){
-
-  const name =
-    document.getElementById("createName").value.trim();
-
-  const email =
-    document.getElementById("createEmail").value.trim().toLowerCase();
-
-  const pass =
-    document.getElementById("createPassword").value;
-
-  const pass2 =
-    document.getElementById("createPassword2").value;
-
-
-  if(!name || !email || !pass){
-
-    alert("সব তথ্য পূরণ করুন।");
-
-    return;
-
-  }
-
-
-  if(pass.length < 6){
-
-    alert("Firebase অনুযায়ী Password কমপক্ষে 6 characters হতে হবে।");
-
-    return;
-
-  }
-
-
-  if(pass !== pass2){
-
-    alert("Password মিলছে না।");
-
-    return;
-
-  }
-
-
-  try{
-
-    const result =
-      await createUserWithEmailAndPassword(
-        auth,
-        email,
-        pass
-      );
-
-
-    const user = result.user;
-
-
-    await updateProfile(user,{
-      displayName:name
-    });
-
-
-    await setDoc(
-      userRef(),
-      {
-        uid:user.uid,
-        name:name,
-        email:email,
-        createdAt:new Date().toISOString()
-      }
-    );
-
-
-    await setDoc(
-      doc(
-        db,
-        "users",
-        user.uid,
-        "settings",
-        "main"
-      ),
-      {
-        name:"Smart Store",
-        owner:name,
-        address:"",
-        phone:""
-      }
-    );
-
-
-    try{
-
-      await sendEmailVerification(user);
-
-    }catch(e){
-
-      console.log("Verification email:",e);
-
-    }
-
-
-    products=[];
-    sales=[];
-    purchases=[];
-    expenses=[];
-    duePayments=[];
-
-    settings={
-      name:"Smart Store",
-      owner:name,
-      address:"",
-      phone:""
-    };
-
-
-    alert(
-      "Account successfully created!\n\n" +
-      "আপনার email-এ verification link পাঠানো হয়েছে।"
-    );
-
-
-    openApp();
-
-  }catch(error){
-
-    showFirebaseError(error);
-
-  }
-
+if(!name||!email||!pass){
+alert("সব তথ্য পূরণ করুন।");
+return;
 }
 
-
-/* =========================================================
-   LOGIN
-========================================================= */
-
-async function loginAccount(){
-
-  const email =
-    document.getElementById("loginEmail").value.trim().toLowerCase();
-
-  const pass =
-    document.getElementById("loginPassword").value;
-
-
-  if(!email || !pass){
-
-    alert("Email এবং Password দিন।");
-
-    return;
-
-  }
-
-
-  try{
-
-    const result =
-      await signInWithEmailAndPassword(
-        auth,
-        email,
-        pass
-      );
-
-
-    await loadAccountData();
-
-
-    openApp();
-
-
-  }catch(error){
-
-    showFirebaseError(error);
-
-  }
-
+if(pass.length<4){
+alert("Password কমপক্ষে 4 characters হতে হবে।");
+return;
 }
 
-
-/* =========================================================
-   FIREBASE ERROR
-========================================================= */
-
-function showFirebaseError(error){
-
-  console.error(error);
-
-
-  let msg = error.message || "Unknown error";
-
-
-  if(error.code === "auth/invalid-credential"){
-
-    msg = "Email অথবা Password ভুল।";
-
-  }
-
-  else if(error.code === "auth/user-not-found"){
-
-    msg = "এই Email দিয়ে Account পাওয়া যায়নি।";
-
-  }
-
-  else if(error.code === "auth/email-already-in-use"){
-
-    msg = "এই Email দিয়ে Account আগে থেকেই আছে।";
-
-  }
-
-  else if(error.code === "auth/weak-password"){
-
-    msg = "Password কমপক্ষে 6 characters হতে হবে।";
-
-  }
-
-  else if(error.code === "auth/invalid-email"){
-
-    msg = "Email সঠিক নয়।";
-
-  }
-
-  else if(error.code === "auth/api-key-not-valid"){
-
-    msg =
-      "Firebase API Key সঠিক নয়। firebaseConfig ঠিক করুন।";
-
-  }
-
-  else if(error.code === "permission-denied"){
-
-    msg =
-      "Firestore permission denied। Firestore Rules ঠিক করুন।";
-
-  }
-
-
-  alert(msg);
-
+if(pass!==pass2){
+alert("Password মিলছে না।");
+return;
 }
 
+if(accounts.some(a=>a.email===email)){
+alert("এই email দিয়ে account আগে থেকেই আছে।");
+return;
+}
 
-/* =========================================================
-   OPEN APP
-========================================================= */
+let account={
+id:uid(),
+name:name,
+email:email,
+password:pass,
+data:{
+products:[],
+sales:[],
+purchases:[],
+expenses:[],
+duePayments:[],
+settings:{
+name:"Smart Store",
+owner:name,
+address:"",
+phone:""
+}
+}
+};
+
+accounts.push(account);
+localStorage.setItem("smartStoreAccounts",JSON.stringify(accounts));
+
+currentAccountId=account.id;
+localStorage.setItem("smartStoreCurrentAccount",currentAccountId);
+
+loadAccountData();
+
+/* নতুন account হলে পুরোনো localStorage data থাকলে migrate করার সুযোগ */
+if(hasLegacyData()){
+migrateOldData(false);
+}
+
+alert("Account successfully created!");
+openApp();
+}
+
+function loginAccount(){
+
+let email=document.getElementById("loginEmail").value.trim().toLowerCase();
+let pass=document.getElementById("loginPassword").value;
+
+let account=accounts.find(a=>a.email===email&&a.password===pass);
+
+if(!account){
+alert("Email অথবা Password ভুল।");
+return;
+}
+
+currentAccountId=account.id;
+localStorage.setItem("smartStoreCurrentAccount",currentAccountId);
+
+loadAccountData();
+openApp();
+}
 
 function openApp(){
 
-  document.getElementById("loginScreen").style.display="none";
+document.getElementById("loginScreen").style.display="none";
+document.getElementById("app").style.display="block";
 
-  document.getElementById("app").style.display="block";
-
-  updateAccountUI();
-
-  loadSettings();
-
-  renderAll();
-
+updateAccountUI();
+loadSettings();
+renderAll();
 }
 
+function logoutAccount(){
 
-/* =========================================================
-   LOGOUT
-========================================================= */
+currentAccountId=null;
+localStorage.removeItem("smartStoreCurrentAccount");
 
-async function logoutAccount(){
+document.getElementById("app").style.display="none";
+document.getElementById("loginScreen").style.display="flex";
 
-  try{
-
-    await signOut(auth);
-
-    products=[];
-    sales=[];
-    purchases=[];
-    expenses=[];
-    duePayments=[];
-
-    document.getElementById("app").style.display="none";
-
-    document.getElementById("loginScreen").style.display="flex";
-
-    showLogin();
-
-  }catch(error){
-
-    showFirebaseError(error);
-
-  }
-
+showLogin();
 }
 
-
-/* =========================================================
-   LOAD FIRESTORE DATA
-========================================================= */
-
-async function loadAccountData(){
-
-  const user = auth.currentUser;
-
-  if(!user) return;
-
-
-  try{
-
-    const profileSnap =
-      await getDoc(
-        doc(db,"users",user.uid)
-      );
-
-
-    const profile =
-      profileSnap.exists()
-      ? profileSnap.data()
-      : {};
-
-
-    const settingsSnap =
-      await getDoc(
-        doc(
-          db,
-          "users",
-          user.uid,
-          "settings",
-          "main"
-        )
-      );
-
-
-    if(settingsSnap.exists()){
-
-      settings = settingsSnap.data();
-
-    }else{
-
-      settings={
-        name:"Smart Store",
-        owner:profile.name || user.displayName || "",
-        address:"",
-        phone:""
-      };
-
-    }
-
-
-    products =
-      await loadCollection("products");
-
-
-    sales =
-      await loadCollection("sales");
-
-
-    purchases =
-      await loadCollection("purchases");
-
-
-    expenses =
-      await loadCollection("expenses");
-
-
-    duePayments =
-      await loadCollection("duePayments");
-
-
-  }catch(error){
-
-    console.error(error);
-
-    showFirebaseError(error);
-
-  }
-
+function currentAccount(){
+return accounts.find(a=>a.id===currentAccountId);
 }
 
+function loadAccountData(){
 
-/* =========================================================
-   LOAD COLLECTION
-========================================================= */
+let account=currentAccount();
 
-async function loadCollection(name){
+if(!account)return;
 
-  const snap =
-    await getDocs(
-      collectionRef(name)
-    );
+if(!account.data)account.data={};
 
+products=account.data.products||[];
+sales=account.data.sales||[];
+purchases=account.data.purchases||[];
+expenses=account.data.expenses||[];
+duePayments=account.data.duePayments||[];
 
-  return snap.docs.map(d=>({
-
-    id:d.id,
-
-    ...d.data()
-
-  }));
-
+settings=account.data.settings||{
+name:"Smart Store",
+owner:account.name,
+address:"",
+phone:""
+};
 }
 
+function saveData(){
 
-/* =========================================================
-   SAVE ONE DOCUMENT
-========================================================= */
+let account=currentAccount();
 
-async function saveDocument(collectionName,data){
+if(!account)return;
 
-  if(!auth.currentUser)return;
+account.data={
+products,
+sales,
+purchases,
+expenses,
+duePayments,
+settings
+};
 
-  const id =
-    data.id || uid();
-
-
-  data.id=id;
-
-
-  await setDoc(
-    documentRef(collectionName,id),
-    data
-  );
-
+localStorage.setItem("smartStoreAccounts",JSON.stringify(accounts));
 }
-
-
-/* =========================================================
-   SAVE ALL DATA
-========================================================= */
-
-async function saveData(){
-
-  if(!auth.currentUser)return;
-
-
-  try{
-
-    await setDoc(
-      doc(
-        db,
-        "users",
-        auth.currentUser.uid,
-        "settings",
-        "main"
-      ),
-      settings
-    );
-
-
-    await saveCollection("products",products);
-
-    await saveCollection("sales",sales);
-
-    await saveCollection("purchases",purchases);
-
-    await saveCollection("expenses",expenses);
-
-    await saveCollection("duePayments",duePayments);
-
-
-  }catch(error){
-
-    console.error(error);
-
-    showFirebaseError(error);
-
-  }
-
-}
-
-
-/* =========================================================
-   SAVE COLLECTION WITHOUT 500 BATCH LIMIT PROBLEM
-========================================================= */
-
-async function saveCollection(name,data){
-
-  for(let i=0;i<data.length;i++){
-
-    const item = data[i];
-
-    await setDoc(
-      documentRef(
-        name,
-        item.id || uid()
-      ),
-      item
-    );
-
-  }
-
-}
-
-
-/* =========================================================
-   DELETE FIRESTORE DOCUMENT
-========================================================= */
-
-async function deleteCollectionDocument(name,id){
-
-  if(!auth.currentUser)return;
-
-  await deleteDoc(
-    documentRef(name,id)
-  );
-
-}
-
-
-/* =========================================================
-   ACCOUNT UI
-========================================================= */
 
 function updateAccountUI(){
 
-  const user=auth.currentUser;
+let account=currentAccount();
 
-  if(!user)return;
+if(!account)return;
 
+document.getElementById("sideUserName").textContent=account.name;
+document.getElementById("sideUserEmail").textContent=account.email;
 
-  const name =
-    user.displayName ||
-    settings.owner ||
-    "Account";
-
-
-  document.getElementById("sideUserName")
-    .textContent=name;
-
-
-  document.getElementById("sideUserEmail")
-    .textContent=user.email;
-
-
-  document.getElementById("accountInfo").innerHTML =
-
-    "<b>Name:</b> "+
-    escapeHtml(name)+
-
-    "<br><b>Email:</b> "+
-    escapeHtml(user.email || "") +
-
-    "<br><b>Firebase UID:</b> "+
-    escapeHtml(user.uid);
-
+document.getElementById("accountInfo").innerHTML=
+"<b>Name:</b> "+escapeHtml(account.name)+
+"<br><b>Email:</b> "+escapeHtml(account.email);
 }
 
 
-/* =========================================================
+/* =========================
    FORGOT PASSWORD
-========================================================= */
+========================= */
 
-async function sendResetCode(){
+let resetCode="";
+let resetEmail="";
 
-  const email =
-    document.getElementById("forgotEmail").value.trim().toLowerCase();
+function sendResetCode(){
 
+let email=document.getElementById("forgotEmail").value.trim().toLowerCase();
 
-  if(!email){
-
-    alert("Email দিন।");
-
-    return;
-
-  }
-
-
-  try{
-
-    await sendPasswordResetEmail(
-      auth,
-      email
-    );
-
-
-    alert(
-      "Password reset link আপনার email-এ পাঠানো হয়েছে।\n\n" +
-      "Email খুলে link-এ গিয়ে নতুন Password দিন।"
-    );
-
-
-    showLogin();
-
-
-  }catch(error){
-
-    showFirebaseError(error);
-
-  }
-
+if(!email){
+alert("Gmail দিন।");
+return;
 }
 
+let account=accounts.find(a=>a.email===email);
 
-/* পুরোনো demo OTP আর ব্যবহার হচ্ছে না */
+if(!account){
+alert("এই email দিয়ে কোনো account পাওয়া যায়নি।");
+return;
+}
+
+/*
+এই HTML app-এর কোনো server/Gmail API নেই।
+তাই এখানে demo verification code তৈরি হচ্ছে।
+Real Gmail OTP-এর জন্য backend প্রয়োজন।
+*/
+
+resetCode=String(Math.floor(100000+Math.random()*900000));
+resetEmail=email;
+
+document.getElementById("codeSection").style.display="block";
+
+alert("Demo Verification Code: "+resetCode);
+}
 
 function resetPassword(){
 
-  alert(
-    "এখন Password reset করতে email-এর Reset Password link ব্যবহার করুন।"
-  );
+let code=document.getElementById("verificationCode").value.trim();
+let pass=document.getElementById("newPassword").value;
+let pass2=document.getElementById("newPassword2").value;
 
+if(code!==resetCode){
+alert("Verification code ভুল।");
+return;
+}
+
+if(pass.length<4){
+alert("Password কমপক্ষে 4 characters হতে হবে।");
+return;
+}
+
+if(pass!==pass2){
+alert("Password মিলছে না।");
+return;
+}
+
+let account=accounts.find(a=>a.email===resetEmail);
+
+if(!account){
+alert("Account পাওয়া যায়নি।");
+return;
+}
+
+account.password=pass;
+
+localStorage.setItem("smartStoreAccounts",JSON.stringify(accounts));
+
+resetCode="";
+resetEmail="";
+
+alert("Password successfully reset!");
+
+showLogin();
 }
 
 
-/* =========================================================
-   EMAIL VERIFICATION
-========================================================= */
-
-async function sendVerificationEmail(){
-
-  const user=auth.currentUser;
-
-  if(!user)return;
-
-
-  try{
-
-    await sendEmailVerification(user);
-
-    alert("Verification email আবার পাঠানো হয়েছে।");
-
-  }catch(error){
-
-    showFirebaseError(error);
-
-  }
-
-}
-
-
-/* =========================================================
+/* =========================
    OLD DATA MIGRATION
-========================================================= */
+========================= */
 
 function hasLegacyData(){
 
-  try{
+let p=JSON.parse(localStorage.getItem("products")||"[]");
+let s=JSON.parse(localStorage.getItem("sales")||"[]");
+let pu=JSON.parse(localStorage.getItem("purchases")||"[]");
+let e=JSON.parse(localStorage.getItem("expenses")||"[]");
 
-    const p =
-      JSON.parse(
-        localStorage.getItem("products") || "[]"
-      );
-
-    const s =
-      JSON.parse(
-        localStorage.getItem("sales") || "[]"
-      );
-
-    const pu =
-      JSON.parse(
-        localStorage.getItem("purchases") || "[]"
-      );
-
-    const e =
-      JSON.parse(
-        localStorage.getItem("expenses") || "[]"
-      );
-
-
-    return (
-      p.length ||
-      s.length ||
-      pu.length ||
-      e.length
-    );
-
-  }catch(e){
-
-    return false;
-
-  }
-
+return p.length||s.length||pu.length||e.length;
 }
 
-
+/* stable ID: old record-এ id না থাকলেও duplicate migration আটকাবে */
 function stableHash(str){
 
-  let h=0;
+let h=0;
 
-  for(let i=0;i<str.length;i++){
-
-    h=((h<<5)-h)+str.charCodeAt(i);
-
-    h|=0;
-
-  }
-
-  return Math.abs(h).toString(36);
-
+for(let i=0;i<str.length;i++){
+h=((h<<5)-h)+str.charCodeAt(i);
+h|=0;
 }
 
+return Math.abs(h).toString(36);
+}
 
 function migrationKey(type,obj){
 
-  if(
-    obj &&
-    obj.id !== undefined &&
-    obj.id !== null
-  ){
+if(obj&&obj.id!==undefined&&obj.id!==null){
+return type+"_"+String(obj.id);
+}
 
-    return type+"_"+String(obj.id);
+let copy={...(obj||{})};
 
-  }
+delete copy.migrated;
+delete copy.migratedAt;
+delete copy.oldMigrationId;
 
+return type+"_"+stableHash(JSON.stringify(copy));
+}
 
-  const copy={...(obj||{})};
+function migrateOldData(showMessage=false){
 
-  delete copy.migrated;
-  delete copy.migratedAt;
-  delete copy.oldMigrationId;
+let oldProducts=JSON.parse(localStorage.getItem("products")||"[]");
+let oldSales=JSON.parse(localStorage.getItem("sales")||"[]");
+let oldPurchases=JSON.parse(localStorage.getItem("purchases")||"[]");
+let oldExpenses=JSON.parse(localStorage.getItem("expenses")||"[]");
 
+let oldSettings=JSON.parse(
+localStorage.getItem("storeSettings")||"null"
+);
 
-  return type+"_"+stableHash(
-    JSON.stringify(copy)
-  );
+let hasOld=
+oldProducts.length||
+oldSales.length||
+oldPurchases.length||
+oldExpenses.length;
 
+if(!hasOld){
+
+if(showMessage)alert("পুরোনো data পাওয়া যায়নি।");
+
+return false;
+}
+
+if(!currentAccount()){
+
+if(showMessage)alert("আগে Login করুন।");
+
+return false;
+}
+
+/* আগে migrate করা record-এর key সংগ্রহ */
+let existingKeys=new Set();
+
+[...products,...sales,...purchases,...expenses].forEach(item=>{
+if(item.oldMigrationId){
+existingKeys.add(item.oldMigrationId);
+}
+});
+
+let migratedProducts=[];
+let migratedSales=[];
+let migratedPurchases=[];
+let migratedExpenses=[];
+
+oldProducts.forEach(p=>{
+
+let key=migrationKey("product",p);
+
+if(existingKeys.has(key))return;
+
+migratedProducts.push({
+...p,
+id:p.id||uid(),
+migrated:true,
+migratedAt:new Date().toISOString(),
+oldMigrationId:key
+});
+
+existingKeys.add(key);
+});
+
+oldSales.forEach(s=>{
+
+let key=migrationKey("sale",s);
+
+if(existingKeys.has(key))return;
+
+migratedSales.push({
+...s,
+id:s.id||uid(),
+migrated:true,
+migratedAt:new Date().toISOString(),
+oldMigrationId:key
+});
+
+existingKeys.add(key);
+});
+
+oldPurchases.forEach(p=>{
+
+let key=migrationKey("purchase",p);
+
+if(existingKeys.has(key))return;
+
+migratedPurchases.push({
+...p,
+id:p.id||uid(),
+migrated:true,
+migratedAt:new Date().toISOString(),
+oldMigrationId:key
+});
+
+existingKeys.add(key);
+});
+
+oldExpenses.forEach(e=>{
+
+let key=migrationKey("expense",e);
+
+if(existingKeys.has(key))return;
+
+migratedExpenses.push({
+...e,
+id:e.id||uid(),
+migrated:true,
+migratedAt:new Date().toISOString(),
+oldMigrationId:key
+});
+
+existingKeys.add(key);
+});
+
+products=[...products,...migratedProducts];
+sales=[...sales,...migratedSales];
+purchases=[...purchases,...migratedPurchases];
+expenses=[...expenses,...migratedExpenses];
+
+if(oldSettings){
+settings={...settings,...oldSettings};
+}
+
+saveData();
+loadSettings();
+renderAll();
+
+let msg=
+"Migration complete: "+
+migratedProducts.length+" Products, "+
+migratedSales.length+" Sales, "+
+migratedPurchases.length+" Purchases, "+
+migratedExpenses.length+" Expenses.";
+
+document.getElementById("migrationResult").textContent=msg;
+
+if(showMessage)alert(msg);
+
+return true;
 }
 
 
-/* =========================================================
-   MIGRATE OLD DATA
-========================================================= */
-
-async function migrateOldData(showMessage=false){
-
-  if(!auth.currentUser){
-
-    if(showMessage)
-      alert("আগে Login করুন।");
-
-    return false;
-
-  }
-
-
-  try{
-
-    const oldProducts =
-      JSON.parse(
-        localStorage.getItem("products") || "[]"
-      );
-
-
-    const oldSales =
-      JSON.parse(
-        localStorage.getItem("sales") || "[]"
-      );
-
-
-    const oldPurchases =
-      JSON.parse(
-        localStorage.getItem("purchases") || "[]"
-      );
-
-
-    const oldExpenses =
-      JSON.parse(
-        localStorage.getItem("expenses") || "[]"
-      );
-
-
-    const oldSettings =
-      JSON.parse(
-        localStorage.getItem("storeSettings") || "null"
-      );
-
-
-    const hasOld =
-      oldProducts.length ||
-      oldSales.length ||
-      oldPurchases.length ||
-      oldExpenses.length;
-
-
-    if(!hasOld){
-
-      if(showMessage)
-        alert("পুরোনো data পাওয়া যায়নি।");
-
-      return false;
-
-    }
-
-
-    const existingKeys=new Set();
-
-
-    [
-      ...products,
-      ...sales,
-      ...purchases,
-      ...expenses
-    ].forEach(item=>{
-
-      if(item.oldMigrationId){
-
-        existingKeys.add(
-          item.oldMigrationId
-        );
-
-      }
-
-    });
-
-
-    const productIdMap={};
-
-
-    const migratedProducts=[];
-
-
-    oldProducts.forEach(old=>{
-
-      const key=
-        migrationKey("product",old);
-
-
-      if(existingKeys.has(key))return;
-
-
-      const newId=uid();
-
-
-      if(old.id){
-
-        productIdMap[String(old.id)]=newId;
-
-      }
-
-
-      migratedProducts.push({
-
-        ...old,
-
-        id:newId,
-
-        migrated:true,
-
-        migratedAt:new Date().toISOString(),
-
-        oldMigrationId:key
-
-      });
-
-
-      existingKeys.add(key);
-
-    });
-
-
-    const migratedSales=[];
-
-
-    oldSales.forEach(old=>{
-
-      const key=
-        migrationKey("sale",old);
-
-
-      if(existingKeys.has(key))return;
-
-
-      const newItems =
-        (old.items || []).map(item=>({
-
-          ...item,
-
-          productId:
-            productIdMap[String(item.productId)] ||
-            item.productId
-
-        }));
-
-
-      migratedSales.push({
-
-        ...old,
-
-        id:uid(),
-
-        items:newItems,
-
-        migrated:true,
-
-        migratedAt:new Date().toISOString(),
-
-        oldMigrationId:key
-
-      });
-
-
-      existingKeys.add(key);
-
-    });
-
-
-    const migratedPurchases=[];
-
-
-    oldPurchases.forEach(old=>{
-
-      const key=
-        migrationKey("purchase",old);
-
-
-      if(existingKeys.has(key))return;
-
-
-      migratedPurchases.push({
-
-        ...old,
-
-        id:uid(),
-
-        productId:
-          productIdMap[String(old.productId)] ||
-          old.productId,
-
-        migrated:true,
-
-        migratedAt:new Date().toISOString(),
-
-        oldMigrationId:key
-
-      });
-
-
-      existingKeys.add(key);
-
-    });
-
-
-    const migratedExpenses=[];
-
-
-    oldExpenses.forEach(old=>{
-
-      const key=
-        migrationKey("expense",old);
-
-
-      if(existingKeys.has(key))return;
-
-
-      migratedExpenses.push({
-
-        ...old,
-
-        id:uid(),
-
-        migrated:true,
-
-        migratedAt:new Date().toISOString(),
-
-        oldMigrationId:key
-
-      });
-
-
-      existingKeys.add(key);
-
-    });
-
-
-    products=[
-      ...products,
-      ...migratedProducts
-    ];
-
-
-    sales=[
-      ...sales,
-      ...migratedSales
-    ];
-
-
-    purchases=[
-      ...purchases,
-      ...migratedPurchases
-    ];
-
-
-    expenses=[
-      ...expenses,
-      ...migratedExpenses
-    ];
-
-
-    if(oldSettings){
-
-      settings={
-        ...settings,
-        ...oldSettings
-      };
-
-    }
-
-
-    await saveData();
-
-
-    loadSettings();
-
-    renderAll();
-
-
-    const msg=
-
-      "Migration complete: "+
-
-      migratedProducts.length+
-      " Products, "+
-
-      migratedSales.length+
-      " Sales, "+
-
-      migratedPurchases.length+
-      " Purchases, "+
-
-      migratedExpenses.length+
-      " Expenses.";
-
-
-    document.getElementById(
-      "migrationResult"
-    ).textContent=msg;
-
-
-    if(showMessage)
-      alert(msg);
-
-
-    return true;
-
-
-  }catch(error){
-
-    console.error(error);
-
-    alert(
-      "Migration failed: "+
-      error.message
-    );
-
-    return false;
-
-  }
-
-}
-
-
-/* =========================================================
+/* =========================
    MIGRATED EXPENSE
-========================================================= */
+========================= */
 
 function showMigratedExpenses(){
 
-  const migrated =
-    expenses.filter(
-      e=>e.migrated===true
-    );
+let migrated=expenses.filter(e=>e.migrated===true);
 
+if(!migrated.length){
 
-  if(!migrated.length){
+document.getElementById("migrationResult").textContent=
+"কোনো migrated expense পাওয়া যায়নি।";
 
-    document.getElementById(
-      "migrationResult"
-    ).textContent=
-      "কোনো migrated expense পাওয়া যায়নি।";
+alert("কোনো migrated expense পাওয়া যায়নি।");
+return;
+}
 
+let text="Migrated Expenses:\n\n";
 
-    alert(
-      "কোনো migrated expense পাওয়া যায়নি।"
-    );
+migrated.forEach((e,i)=>{
+text+=(i+1)+". "+
+(e.name||"Expense")+
+" | "+
+money(e.amount)+
+" | "+
+(e.date||"")+
+"\n";
+});
 
-    return;
+alert(text);
 
-  }
+document.getElementById("migrationResult").textContent=
+"মোট "+migrated.length+"টি migrated expense পাওয়া গেছে।";
+}
 
+function deleteMigratedExpenses(){
 
-  let text=
-    "Migrated Expenses:\n\n";
+let count=expenses.filter(e=>e.migrated===true).length;
 
+if(!count){
 
-  migrated.forEach((e,i)=>{
+alert("কোনো migrated expense নেই।");
+return;
+}
 
-    text +=
+let ok=confirm(
+"মোট "+count+
+"টি migrated expense delete করবেন?\n\n"+
+"Delete করলে Dashboard এবং Reports-এর expense/profit হিসাবও update হবে।"
+);
 
-      (i+1)+". "+
+if(!ok)return;
 
-      (e.name||"Expense")+
+expenses=expenses.filter(e=>e.migrated!==true);
 
-      " | "+
+saveData();
+renderAll();
 
-      money(e.amount)+
+document.getElementById("migrationResult").textContent=
+count+"টি migrated expense delete করা হয়েছে।";
 
-      " | "+
-
-      (e.date||"")+
-
-      "\n";
-
-  });
-
-
-  alert(text);
-
-
-  document.getElementById(
-    "migrationResult"
-  ).textContent=
-
-    "মোট "+
-    migrated.length+
-    "টি migrated expense পাওয়া গেছে।";
-
+alert(count+"টি migrated expense successfully deleted!");
 }
 
 
-async function deleteMigratedExpenses(){
-
-  const list =
-    expenses.filter(
-      e=>e.migrated===true
-    );
-
-
-  if(!list.length){
-
-    alert(
-      "কোনো migrated expense নেই।"
-    );
-
-    return;
-
-  }
-
-
-  if(!confirm(
-    "মোট "+list.length+
-    "টি migrated expense delete করবেন?"
-  ))return;
-
-
-  for(const e of list){
-
-    await deleteCollectionDocument(
-      "expenses",
-      e.id
-    );
-
-  }
-
-
-  expenses =
-    expenses.filter(
-      e=>e.migrated!==true
-    );
-
-
-  renderAll();
-
-
-  document.getElementById(
-    "migrationResult"
-  ).textContent=
-    list.length+
-    "টি migrated expense delete করা হয়েছে।";
-
-
-  alert(
-    list.length+
-    "টি migrated expense successfully deleted!"
-  );
-
-}
-
-
-/* =========================================================
+/* =========================
    NAVIGATION
-========================================================= */
+========================= */
 
 function showSection(id,btn){
 
-  document.querySelectorAll(".section")
-    .forEach(
-      s=>s.classList.remove("active")
-    );
+document.querySelectorAll(".section")
+.forEach(s=>s.classList.remove("active"));
 
+document.getElementById(id).classList.add("active");
 
-  document.getElementById(id)
-    .classList.add("active");
+document.querySelectorAll(".navBtn")
+.forEach(b=>b.classList.remove("active"));
 
-
-  document.querySelectorAll(".navBtn")
-    .forEach(
-      b=>b.classList.remove("active")
-    );
-
-
-  if(btn)
-    btn.classList.add("active");
-
+if(btn)btn.classList.add("active");
 }
 
 
-/* =========================================================
+/* =========================
    PRODUCTS
-========================================================= */
+========================= */
 
-async function addProduct(){
+function addProduct(){
 
-  const name =
-    document.getElementById("productName")
-      .value.trim();
+let name=document.getElementById("productName").value.trim();
 
-
-  if(!name){
-
-    alert("Product name দিন।");
-
-    return;
-
-  }
-
-
-  const code =
-    document.getElementById("productCode")
-      .value.trim()
-      || "P"+Date.now();
-
-
-  if(products.some(
-    p=>
-      String(p.code).toLowerCase()
-      ===
-      code.toLowerCase()
-  )){
-
-    alert(
-      "এই Product Code আগে থেকেই আছে।"
-    );
-
-    return;
-
-  }
-
-
-  const product={
-
-    id:uid(),
-
-    name,
-
-    code,
-
-    category:
-      document.getElementById("productCategory")
-        .value.trim(),
-
-    purchasePrice:
-      Number(
-        document.getElementById("purchasePrice")
-          .value
-      )||0,
-
-    sellingPrice:
-      Number(
-        document.getElementById("sellingPrice")
-          .value
-      )||0,
-
-    stock:
-      Number(
-        document.getElementById("productStock")
-          .value
-      )||0,
-
-    unit:
-      document.getElementById("productUnit")
-        .value.trim()
-      ||"pcs",
-
-    minStock:
-      Number(
-        document.getElementById("minStock")
-          .value
-      )||0
-
-  };
-
-
-  try{
-
-    await saveDocument(
-      "products",
-      product
-    );
-
-
-    products.push(product);
-
-
-    clearProductForm();
-
-    renderAll();
-
-
-    alert(
-      "Product added successfully!"
-    );
-
-  }catch(error){
-
-    showFirebaseError(error);
-
-  }
-
+if(!name){
+alert("Product name দিন।");
+return;
 }
 
+let code=document.getElementById("productCode").value.trim();
+
+if(!code)code="P"+Date.now();
+
+if(products.some(p=>
+String(p.code).toLowerCase()===code.toLowerCase()
+)){
+alert("এই Product Code আগে থেকেই আছে।");
+return;
+}
+
+products.push({
+id:uid(),
+name,
+code,
+category:document.getElementById("productCategory").value.trim(),
+purchasePrice:Number(document.getElementById("purchasePrice").value)||0,
+sellingPrice:Number(document.getElementById("sellingPrice").value)||0,
+stock:Number(document.getElementById("productStock").value)||0,
+unit:document.getElementById("productUnit").value.trim()||"pcs",
+minStock:Number(document.getElementById("minStock").value)||0
+});
+
+saveData();
+clearProductForm();
+renderAll();
+
+alert("Product added successfully!");
+}
 
 function clearProductForm(){
 
-  [
-    "productName",
-    "productCode",
-    "productCategory",
-    "purchasePrice",
-    "sellingPrice",
-    "productStock",
-    "productUnit",
-    "minStock"
-  ].forEach(id=>{
-
-    document.getElementById(id).value="";
-
-  });
-
+[
+"productName","productCode","productCategory",
+"purchasePrice","sellingPrice","productStock",
+"productUnit","minStock"
+].forEach(id=>{
+document.getElementById(id).value="";
+});
 }
-
 
 function renderProducts(){
 
-  const search =
-    document.getElementById(
-      "productSearch"
-    )?.value.toLowerCase() || "";
+let search=
+document.getElementById("productSearch")?.value.toLowerCase()||"";
 
+let list=products.filter(p=>
+String(p.name||"").toLowerCase().includes(search)||
+String(p.code||"").toLowerCase().includes(search)||
+String(p.category||"").toLowerCase().includes(search)
+);
 
-  const list =
-    products.filter(p=>
+document.getElementById("productTable").innerHTML=
+list.map(p=>`
 
-      String(p.name||"")
-        .toLowerCase()
-        .includes(search)
+<tr>
+<td>${p.migrated?"🔄 ":""}${escapeHtml(p.name)}</td>
+<td>${escapeHtml(p.code)}</td>
+<td>${escapeHtml(p.category)}</td>
+<td>${money(p.purchasePrice)}</td>
+<td>${money(p.sellingPrice)}</td>
+<td class="${p.stock<=p.minStock?'lowStock':'goodStock'}">${p.stock}</td>
+<td>${escapeHtml(p.unit)}</td>
+<td>
+<button onclick="editProduct('${p.id}')">✏️</button>
+<button class="btnRed" onclick="deleteProduct('${p.id}')">🗑️</button>
+<button class="btnDark" onclick="showBarcode('${p.id}')">▣</button>
+</td>
+</tr>
 
-      ||
+`).join("");
+}
 
-      String(p.code||"")
-        .toLowerCase()
-        .includes(search)
+function editProduct(id){
 
-      ||
+let p=products.find(x=>x.id===id);
+if(!p)return;
 
-      String(p.category||"")
-        .toLowerCase()
-        .includes(search)
+let price=prompt("নতুন Selling Price:",p.sellingPrice);
 
-    );
+if(price===null)return;
 
+p.sellingPrice=Number(price)||0;
 
-  document.getElementById(
-    "productTable"
-  ).innerHTML=
+saveData();
+renderAll();
+}
 
-    list.map(p=>`
+function deleteProduct(id){
 
-      <tr>
+if(!confirm("Product delete করবেন?"))return;
 
-        <td>
-          ${p.migrated?"🔄 ":""}
-          ${escapeHtml(p.name)}
-        </td>
+products=products.filter(p=>p.id!==id);
 
-        <td>
-          ${escapeHtml(p.code)}
-        </td>
-
-        <td>
-          ${escapeHtml(p.category)}
-        </td>
-
-        <td>
-          ${money(p.purchasePrice)}
-        </td>
-
-        <td>
-          ${money(p.sellingPrice)}
-        </td>
-
-        <td class="${p.stock<=p.minStock?'lowStock':'goodStock'}">
-          ${p.stock}
-        </td>
-
-        <td>
-          ${escapeHtml(p.unit)}
-        </td>
-
-        <td>
-
-          <button
-            onclick="editProduct('${p.id}')">
-            ✏️
-          </button>
-
-          <button
-            class="btnRed"
-            onclick="deleteProduct('${p.id}')">
-            🗑️
-          </button>
-
-          <button
-            class="btnDark"
-            onclick="showBarcode('${p.id}')">
-            ▣
-          </button>
-
-        </td>
-
-      </tr>
-
-    `).join("");
-
+saveData();
+renderAll();
 }
 
 
-async function editProduct(id){
-
-  const p =
-    products.find(x=>x.id===id);
-
-
-  if(!p)return;
-
-
-  const price =
-    prompt(
-      "নতুন Selling Price:",
-      p.sellingPrice
-    );
-
-
-  if(price===null)return;
-
-
-  p.sellingPrice =
-    Number(price)||0;
-
-
-  try{
-
-    await saveDocument(
-      "products",
-      p
-    );
-
-
-    renderAll();
-
-  }catch(error){
-
-    showFirebaseError(error);
-
-  }
-
-}
-
-
-async function deleteProduct(id){
-
-  if(!confirm(
-    "Product delete করবেন?"
-  ))return;
-
-
-  try{
-
-    await deleteCollectionDocument(
-      "products",
-      id
-    );
-
-
-    products =
-      products.filter(
-        p=>p.id!==id
-      );
-
-
-    renderAll();
-
-  }catch(error){
-
-    showFirebaseError(error);
-
-  }
-
-}
-
-
-/* =========================================================
+/* =========================
    BARCODE
-========================================================= */
+========================= */
 
 function showBarcode(id){
 
-  const p =
-    products.find(x=>x.id===id);
+let p=products.find(x=>x.id===id);
+if(!p)return;
 
+document.getElementById("barcodeModal").style.display="flex";
 
-  if(!p)return;
-
-
-  document.getElementById(
-    "barcodeModal"
-  ).style.display="flex";
-
-
-  JsBarcode(
-    "#barcodeSvg",
-    String(p.code),
-    {
-      format:"CODE128",
-      displayValue:true,
-      text:p.name,
-      width:2,
-      height:80,
-      margin:10
-    }
-  );
-
+JsBarcode("#barcodeSvg",String(p.code),{
+format:"CODE128",
+displayValue:true,
+text:p.name,
+width:2,
+height:80,
+margin:10
+});
 }
-
 
 function closeModal(id){
-
-  document.getElementById(id)
-    .style.display="none";
-
+document.getElementById(id).style.display="none";
 }
 
 
-/* =========================================================
+/* =========================
    SALES
-========================================================= */
+========================= */
+
+let saleRowCounter=0;
 
 function addSaleRow(){
 
-  saleRowCounter++;
+saleRowCounter++;
 
+let id=saleRowCounter;
 
-  const id=saleRowCounter;
+let div=document.createElement("div");
 
+div.className="saleRow";
+div.id="saleRow_"+id;
 
-  const div=
-    document.createElement("div");
+div.innerHTML=`
 
+<input list="saleProductList"
+class="saleProduct"
+placeholder="Type Product Name / Code"
+oninput="saleProductChanged(${id})">
 
-  div.className="saleRow";
+<input type="number"
+class="saleQty"
+value="1"
+min="1"
+oninput="calculateSale()">
 
-  div.id="saleRow_"+id;
+<input class="salePrice" readonly placeholder="Price">
 
+<input class="saleSubtotal" readonly placeholder="Subtotal">
 
-  div.innerHTML=`
+<button class="btnRed" onclick="removeSaleRow(${id})">✕</button>
+`;
 
-    <input
-      list="saleProductList"
-      class="saleProduct"
-      placeholder="Type Product Name / Code"
-      oninput="saleProductChanged(${id})">
+document.getElementById("saleRows").appendChild(div);
 
-
-    <input
-      type="number"
-      class="saleQty"
-      value="1"
-      min="1"
-      oninput="calculateSale()">
-
-
-    <input
-      class="salePrice"
-      readonly
-      placeholder="Price">
-
-
-    <input
-      class="saleSubtotal"
-      readonly
-      placeholder="Subtotal">
-
-
-    <button
-      class="btnRed"
-      onclick="removeSaleRow(${id})">
-      ✕
-    </button>
-
-  `;
-
-
-  document.getElementById(
-    "saleRows"
-  ).appendChild(div);
-
-
-  renderSaleProductList();
-
+renderSaleProductList();
 }
-
 
 function removeSaleRow(id){
 
-  document.getElementById(
-    "saleRow_"+id
-  )?.remove();
+document.getElementById("saleRow_"+id)?.remove();
 
-
-  calculateSale();
-
+calculateSale();
 }
-
 
 function renderSaleProductList(){
 
-  let old =
-    document.getElementById(
-      "saleProductList"
-    );
+let old=document.getElementById("saleProductList");
 
+if(old)old.remove();
 
-  if(old)old.remove();
+let list=document.createElement("datalist");
 
+list.id="saleProductList";
 
-  const list =
-    document.createElement("datalist");
+products.forEach(p=>{
 
+let o=document.createElement("option");
 
-  list.id="saleProductList";
+o.value=p.name;
+o.label=p.code+" | "+p.name;
 
+list.appendChild(o);
+});
 
-  products.forEach(p=>{
-
-    const o =
-      document.createElement("option");
-
-
-    o.value=p.name;
-
-    o.label=
-      p.code+" | "+p.name;
-
-
-    list.appendChild(o);
-
-  });
-
-
-  document.body.appendChild(list);
-
+document.body.appendChild(list);
 }
-
 
 function findProduct(text){
 
-  const value=
-    String(text||"")
-      .trim()
-      .toLowerCase();
+let value=String(text||"").trim().toLowerCase();
 
-
-  return products.find(p=>
-
-    String(p.name||"")
-      .toLowerCase()===value
-
-    ||
-
-    String(p.code||"")
-      .toLowerCase()===value
-
-  );
-
+return products.find(p=>
+String(p.name||"").toLowerCase()===value||
+String(p.code||"").toLowerCase()===value
+);
 }
-
 
 function saleProductChanged(id){
 
-  const row =
-    document.getElementById(
-      "saleRow_"+id
-    );
+let row=document.getElementById("saleRow_"+id);
 
+if(!row)return;
 
-  if(!row)return;
+let input=row.querySelector(".saleProduct");
+let p=findProduct(input.value);
 
+row.querySelector(".salePrice").value=
+p?p.sellingPrice:"";
 
-  const input =
-    row.querySelector(
-      ".saleProduct"
-    );
-
-
-  const p =
-    findProduct(input.value);
-
-
-  row.querySelector(
-    ".salePrice"
-  ).value =
-    p ? p.sellingPrice : "";
-
-
-  calculateSale();
-
+calculateSale();
 }
-
 
 function calculateSale(){
 
-  let total=0;
+let total=0;
 
+document.querySelectorAll(".saleRow").forEach(row=>{
 
-  document.querySelectorAll(
-    ".saleRow"
-  ).forEach(row=>{
+let qty=Number(row.querySelector(".saleQty").value)||0;
+let price=Number(row.querySelector(".salePrice").value)||0;
 
-    const qty =
-      Number(
-        row.querySelector(".saleQty")
-          .value
-      )||0;
+let sub=qty*price;
 
+row.querySelector(".saleSubtotal").value=sub.toFixed(2);
 
-    const price =
-      Number(
-        row.querySelector(".salePrice")
-          .value
-      )||0;
+total+=sub;
+});
 
+document.getElementById("saleTotal").value=total.toFixed(2);
 
-    const sub=qty*price;
+let paid=Number(document.getElementById("salePaid").value)||0;
 
-
-    row.querySelector(
-      ".saleSubtotal"
-    ).value=
-      sub.toFixed(2);
-
-
-    total+=sub;
-
-  });
-
-
-  document.getElementById(
-    "saleTotal"
-  ).value=
-    total.toFixed(2);
-
-
-  const paid =
-    Number(
-      document.getElementById(
-        "salePaid"
-      ).value
-    )||0;
-
-
-  document.getElementById(
-    "saleDue"
-  ).value=
-    Math.max(
-      0,
-      total-paid
-    ).toFixed(2);
-
+document.getElementById("saleDue").value=
+Math.max(0,total-paid).toFixed(2);
 }
 
+function completeSale(){
 
-async function completeSale(){
+let rows=[...document.querySelectorAll(".saleRow")];
 
-  const rows =
-    [...document.querySelectorAll(
-      ".saleRow"
-    )];
-
-
-  if(!rows.length){
-
-    alert(
-      "কমপক্ষে একটি product যোগ করুন।"
-    );
-
-    return;
-
-  }
-
-
-  const items=[];
-
-
-  for(const row of rows){
-
-    const input =
-      row.querySelector(
-        ".saleProduct"
-      );
-
-
-    const p =
-      findProduct(input.value);
-
-
-    const qty =
-      Number(
-        row.querySelector(".saleQty")
-          .value
-      )||0;
-
-
-    if(!p){
-
-      alert(
-        "Product পাওয়া যায়নি: "+
-        input.value
-      );
-
-      return;
-
-    }
-
-
-    if(qty<=0){
-
-      alert(
-        "Quantity সঠিক দিন।"
-      );
-
-      return;
-
-    }
-
-
-    if(p.stock<qty){
-
-      alert(
-        p.name+
-        " এর stock পর্যাপ্ত নেই। Current stock: "+
-        p.stock
-      );
-
-      return;
-
-    }
-
-
-    items.push({
-
-      productId:p.id,
-
-      name:p.name,
-
-      code:p.code,
-
-      qty,
-
-      price:p.sellingPrice,
-
-      purchasePrice:p.purchasePrice,
-
-      subtotal:
-        qty*p.sellingPrice
-
-    });
-
-  }
-
-
-  const total =
-    items.reduce(
-      (sum,i)=>sum+i.subtotal,
-      0
-    );
-
-
-  const paid =
-    Number(
-      document.getElementById(
-        "salePaid"
-      ).value
-    )||0;
-
-
-  if(paid>total){
-
-    alert(
-      "Paid amount total-এর চেয়ে বেশি হতে পারবে না।"
-    );
-
-    return;
-
-  }
-
-
-  const sale={
-
-    id:uid(),
-
-    invoice:
-      "INV-"+Date.now(),
-
-    date:
-      document.getElementById(
-        "saleDate"
-      ).value||today(),
-
-    customer:
-      document.getElementById(
-        "saleCustomer"
-      ).value.trim()
-      ||"Walk-in Customer",
-
-    payment:
-      document.getElementById(
-        "salePayment"
-      ).value.trim()
-      ||"Cash",
-
-    items,
-
-    total,
-
-    paid,
-
-    due:
-      total-paid
-
-  };
-
-
-  try{
-
-    for(const item of items){
-
-      const p =
-        products.find(
-          x=>x.id===item.productId
-        );
-
-
-      if(p){
-
-        p.stock-=item.qty;
-
-
-        await saveDocument(
-          "products",
-          p
-        );
-
-      }
-
-    }
-
-
-    await saveDocument(
-      "sales",
-      sale
-    );
-
-
-    sales.push(sale);
-
-
-    printInvoiceForSale(sale);
-
-
-    document.getElementById(
-      "saleRows"
-    ).innerHTML="";
-
-
-    document.getElementById(
-      "salePaid"
-    ).value="";
-
-
-    document.getElementById(
-      "saleCustomer"
-    ).value="";
-
-
-    document.getElementById(
-      "saleTotal"
-    ).value="0";
-
-
-    document.getElementById(
-      "saleDue"
-    ).value="0";
-
-
-    addSaleRow();
-
-
-    renderAll();
-
-  }catch(error){
-
-    showFirebaseError(error);
-
-  }
-
+if(!rows.length){
+alert("কমপক্ষে একটি product যোগ করুন।");
+return;
 }
 
+let items=[];
 
-async function deleteSale(id){
+for(let row of rows){
 
-  const sale =
-    sales.find(
-      s=>s.id===id
-    );
+let input=row.querySelector(".saleProduct");
+let p=findProduct(input.value);
 
+let qty=Number(row.querySelector(".saleQty").value)||0;
 
-  if(!sale)return;
-
-
-  if(!confirm(
-    "Sale delete করবেন? Stock আবার যোগ হবে।"
-  ))return;
-
-
-  try{
-
-    for(const item of sale.items||[]){
-
-      const p =
-        products.find(
-          x=>x.id===item.productId
-        );
-
-
-      if(p){
-
-        p.stock+=item.qty;
-
-
-        await saveDocument(
-          "products",
-          p
-        );
-
-      }
-
-    }
-
-
-    await deleteCollectionDocument(
-      "sales",
-      id
-    );
-
-
-    sales =
-      sales.filter(
-        s=>s.id!==id
-      );
-
-
-    renderAll();
-
-  }catch(error){
-
-    showFirebaseError(error);
-
-  }
-
+if(!p){
+alert("Product পাওয়া যায়নি: "+input.value);
+return;
 }
 
+if(qty<=0){
+alert("Quantity সঠিক দিন।");
+return;
+}
+
+if(p.stock<qty){
+alert(p.name+" এর stock পর্যাপ্ত নেই। Current stock: "+p.stock);
+return;
+}
+
+items.push({
+productId:p.id,
+name:p.name,
+code:p.code,
+qty,
+price:p.sellingPrice,
+purchasePrice:p.purchasePrice,
+subtotal:qty*p.sellingPrice
+});
+}
+
+let total=items.reduce((sum,i)=>sum+i.subtotal,0);
+let paid=Number(document.getElementById("salePaid").value)||0;
+
+if(paid>total){
+alert("Paid amount total-এর চেয়ে বেশি হতে পারবে না।");
+return;
+}
+
+let sale={
+id:uid(),
+invoice:"INV-"+Date.now(),
+date:document.getElementById("saleDate").value||today(),
+customer:document.getElementById("saleCustomer").value.trim()||"Walk-in Customer",
+payment:document.getElementById("salePayment").value.trim()||"Cash",
+items,
+total,
+paid,
+due:total-paid
+};
+
+items.forEach(item=>{
+
+let p=products.find(x=>x.id===item.productId);
+
+if(p)p.stock-=item.qty;
+});
+
+sales.push(sale);
+
+saveData();
+
+printInvoiceForSale(sale);
+
+document.getElementById("saleRows").innerHTML="";
+document.getElementById("salePaid").value="";
+document.getElementById("saleCustomer").value="";
+document.getElementById("saleTotal").value="0";
+document.getElementById("saleDue").value="0";
+
+addSaleRow();
+renderAll();
+}
+
+function deleteSale(id){
+
+let sale=sales.find(s=>s.id===id);
+
+if(!sale)return;
+
+if(!confirm("Sale delete করবেন? Stock আবার যোগ হবে."))return;
+
+sale.items.forEach(item=>{
+
+let p=products.find(x=>x.id===item.productId);
+
+if(p)p.stock+=item.qty;
+});
+
+sales=sales.filter(s=>s.id!==id);
+
+saveData();
+renderAll();
+}
 
 function renderSales(){
 
-  document.getElementById(
-    "salesTable"
-  ).innerHTML=
+document.getElementById("salesTable").innerHTML=
+sales.slice().reverse().map(s=>`
 
-    sales.slice().reverse()
-      .map(s=>`
+<tr>
+<td>${s.migrated?"🔄 ":""}${escapeHtml(s.date)}</td>
+<td>${escapeHtml(s.customer)}</td>
+<td>${money(s.total)}</td>
+<td>${money(s.paid)}</td>
+<td class="${s.due>0?'lowStock':'goodStock'}">${money(s.due)}</td>
+<td>
+<button onclick="printInvoiceForSaleById('${s.id}')">🖨️</button>
+<button class="btnRed" onclick="deleteSale('${s.id}')">🗑️</button>
+</td>
+</tr>
 
-        <tr>
-
-          <td>
-            ${s.migrated?"🔄 ":""}
-            ${escapeHtml(s.date)}
-          </td>
-
-          <td>
-            ${escapeHtml(s.customer)}
-          </td>
-
-          <td>
-            ${money(s.total)}
-          </td>
-
-          <td>
-            ${money(s.paid)}
-          </td>
-
-          <td class="${s.due>0?'lowStock':'goodStock'}">
-            ${money(s.due)}
-          </td>
-
-          <td>
-
-            <button
-              onclick="printInvoiceForSaleById('${s.id}')">
-              🖨️
-            </button>
-
-            <button
-              class="btnRed"
-              onclick="deleteSale('${s.id}')">
-              🗑️
-            </button>
-
-          </td>
-
-        </tr>
-
-      `).join("");
-
+`).join("");
 }
 
 
-/* =========================================================
+/* =========================
    PURCHASE
-========================================================= */
+========================= */
 
 function renderPurchaseProducts(){
 
-  const list =
-    document.getElementById(
-      "purchaseProductList"
-    );
+let list=document.getElementById("purchaseProductList");
 
+list.innerHTML="";
 
-  list.innerHTML="";
+products.forEach(p=>{
 
+let o=document.createElement("option");
 
-  products.forEach(p=>{
+o.value=p.name;
+o.label=p.code+" | "+p.name;
 
-    const o =
-      document.createElement(
-        "option"
-      );
-
-
-    o.value=p.name;
-
-    o.label=
-      p.code+" | "+p.name;
-
-
-    list.appendChild(o);
-
-  });
-
+list.appendChild(o);
+});
 }
-
 
 function purchaseProductChanged(){
 
-  const p =
-    findProduct(
-      document.getElementById(
-        "purchaseProduct"
-      ).value
-    );
+let p=findProduct(
+document.getElementById("purchaseProduct").value
+);
 
-
-  if(p){
-
-    document.getElementById(
-      "purchasePrice2"
-    ).value=
-      p.purchasePrice;
-
-  }
-
+if(p){
+document.getElementById("purchasePrice2").value=p.purchasePrice;
+}
 }
 
+function addPurchase(){
 
-async function addPurchase(){
+let productInput=document.getElementById("purchaseProduct").value;
+let p=findProduct(productInput);
 
-  const productInput =
-    document.getElementById(
-      "purchaseProduct"
-    ).value;
-
-
-  const p =
-    findProduct(productInput);
-
-
-  if(!p){
-
-    alert(
-      "Product পাওয়া যায়নি।"
-    );
-
-    return;
-
-  }
-
-
-  const qty =
-    Number(
-      document.getElementById(
-        "purchaseQty"
-      ).value
-    )||0;
-
-
-  const price =
-    Number(
-      document.getElementById(
-        "purchasePrice2"
-      ).value
-    )||0;
-
-
-  if(qty<=0){
-
-    alert(
-      "Quantity দিন।"
-    );
-
-    return;
-
-  }
-
-
-  const purchase={
-
-    id:uid(),
-
-    date:
-      document.getElementById(
-        "purchaseDate"
-      ).value||today(),
-
-    productId:p.id,
-
-    product:p.name,
-
-    code:p.code,
-
-    qty,
-
-    price,
-
-    supplier:
-      document.getElementById(
-        "supplier"
-      ).value.trim(),
-
-    total:qty*price
-
-  };
-
-
-  try{
-
-    p.stock+=qty;
-
-    p.purchasePrice=price;
-
-
-    await saveDocument(
-      "products",
-      p
-    );
-
-
-    await saveDocument(
-      "purchases",
-      purchase
-    );
-
-
-    purchases.push(purchase);
-
-
-    document.getElementById(
-      "purchaseProduct"
-    ).value="";
-
-
-    document.getElementById(
-      "purchaseQty"
-    ).value="";
-
-
-    document.getElementById(
-      "purchasePrice2"
-    ).value="";
-
-
-    document.getElementById(
-      "supplier"
-    ).value="";
-
-
-    renderAll();
-
-  }catch(error){
-
-    showFirebaseError(error);
-
-  }
-
+if(!p){
+alert("Product পাওয়া যায়নি।");
+return;
 }
 
+let qty=Number(document.getElementById("purchaseQty").value)||0;
+let price=Number(document.getElementById("purchasePrice2").value)||0;
 
-async function deletePurchase(id){
-
-  const pur =
-    purchases.find(
-      x=>x.id===id
-    );
-
-
-  if(!pur)return;
-
-
-  if(!confirm(
-    "Purchase delete করবেন? Stock কমে যাবে."
-  ))return;
-
-
-  try{
-
-    const p =
-      products.find(
-        x=>x.id===pur.productId
-      );
-
-
-    if(p){
-
-      p.stock=
-        Math.max(
-          0,
-          p.stock-pur.qty
-        );
-
-
-      await saveDocument(
-        "products",
-        p
-      );
-
-    }
-
-
-    await deleteCollectionDocument(
-      "purchases",
-      id
-    );
-
-
-    purchases =
-      purchases.filter(
-        x=>x.id!==id
-      );
-
-
-    renderAll();
-
-  }catch(error){
-
-    showFirebaseError(error);
-
-  }
-
+if(qty<=0){
+alert("Quantity দিন।");
+return;
 }
 
+let purchase={
+id:uid(),
+date:document.getElementById("purchaseDate").value||today(),
+productId:p.id,
+product:p.name,
+code:p.code,
+qty,
+price,
+supplier:document.getElementById("supplier").value.trim(),
+total:qty*price
+};
+
+p.stock+=qty;
+p.purchasePrice=price;
+
+purchases.push(purchase);
+
+saveData();
+
+document.getElementById("purchaseProduct").value="";
+document.getElementById("purchaseQty").value="";
+document.getElementById("purchasePrice2").value="";
+document.getElementById("supplier").value="";
+
+renderAll();
+}
+
+function deletePurchase(id){
+
+let pur=purchases.find(x=>x.id===id);
+
+if(!pur)return;
+
+if(!confirm("Purchase delete করবেন? Stock কমে যাবে."))return;
+
+let p=products.find(x=>x.id===pur.productId);
+
+if(p)p.stock=Math.max(0,p.stock-pur.qty);
+
+purchases=purchases.filter(x=>x.id!==id);
+
+saveData();
+renderAll();
+}
 
 function renderPurchases(){
 
-  document.getElementById(
-    "purchaseTable"
-  ).innerHTML=
+document.getElementById("purchaseTable").innerHTML=
+purchases.slice().reverse().map(p=>`
 
-    purchases.slice().reverse()
-      .map(p=>`
+<tr>
+<td>${p.migrated?"🔄 ":""}${escapeHtml(p.date)}</td>
+<td>${escapeHtml(p.product)}</td>
+<td>${p.qty}</td>
+<td>${money(p.price)}</td>
+<td>${escapeHtml(p.supplier)}</td>
+<td>${money(p.total)}</td>
+<td>
+<button class="btnRed" onclick="deletePurchase('${p.id}')">🗑️</button>
+</td>
+</tr>
 
-        <tr>
-
-          <td>
-            ${p.migrated?"🔄 ":""}
-            ${escapeHtml(p.date)}
-          </td>
-
-          <td>
-            ${escapeHtml(p.product)}
-          </td>
-
-          <td>
-            ${p.qty}
-          </td>
-
-          <td>
-            ${money(p.price)}
-          </td>
-
-          <td>
-            ${escapeHtml(p.supplier)}
-          </td>
-
-          <td>
-            ${money(p.total)}
-          </td>
-
-          <td>
-
-            <button
-              class="btnRed"
-              onclick="deletePurchase('${p.id}')">
-              🗑️
-            </button>
-
-          </td>
-
-        </tr>
-
-      `).join("");
-
+`).join("");
 }
 
 
-/* =========================================================
-   CUSTOMERS
-========================================================= */
+/* =========================
+   CUSTOMERS / DUE
+========================= */
 
 function getCustomerData(){
 
-  const map={};
+let map={};
 
+sales.forEach(s=>{
 
-  sales.forEach(s=>{
+let name=s.customer||"Walk-in Customer";
 
-    const name =
-      s.customer ||
-      "Walk-in Customer";
-
-
-    if(!map[name]){
-
-      map[name]={
-
-        name,
-
-        total:0,
-
-        paid:0,
-
-        originalDue:0
-
-      };
-
-    }
-
-
-    map[name].total +=
-      Number(s.total)||0;
-
-
-    map[name].paid +=
-      Number(s.paid)||0;
-
-
-    map[name].originalDue +=
-      Number(s.due)||0;
-
-  });
-
-
-  duePayments.forEach(p=>{
-
-    const name=p.customer;
-
-
-    if(!map[name]){
-
-      map[name]={
-
-        name,
-
-        total:0,
-
-        paid:0,
-
-        originalDue:0
-
-      };
-
-    }
-
-
-    map[name].paid +=
-      Number(p.amount)||0;
-
-  });
-
-
-  Object.values(map).forEach(c=>{
-
-    c.due=
-      Math.max(
-        0,
-        c.total-c.paid
-      );
-
-  });
-
-
-  return Object.values(map);
-
+if(!map[name]){
+map[name]={
+name,
+total:0,
+paid:0,
+originalDue:0
+};
 }
 
+map[name].total+=Number(s.total)||0;
+map[name].paid+=Number(s.paid)||0;
+map[name].originalDue+=Number(s.due)||0;
+});
+
+duePayments.forEach(p=>{
+
+let name=p.customer;
+
+if(!map[name]){
+map[name]={
+name,
+total:0,
+paid:0,
+originalDue:0
+};
+}
+
+map[name].paid+=Number(p.amount)||0;
+});
+
+Object.values(map).forEach(c=>{
+c.due=Math.max(0,c.total-c.paid);
+});
+
+return Object.values(map);
+}
 
 function renderCustomers(){
 
-  const data =
-    getCustomerData();
+let data=getCustomerData();
 
+document.getElementById("customerTable").innerHTML=
+data.map(c=>`
 
-  document.getElementById(
-    "customerTable"
-  ).innerHTML=
+<tr>
+<td>${escapeHtml(c.name)}</td>
+<td>${money(c.total)}</td>
+<td>${money(c.paid)}</td>
+<td class="${c.due>0?'lowStock':'goodStock'}">${money(c.due)}</td>
+<td>
+${
+c.due>0
+?
+`<button class="btnGreen" onclick="openDue('${encodeURIComponent(c.name)}')">💰 Pay Due</button>`
+:
+`<span class="badge badgeGreen">Paid</span>`
+}
+</td>
+</tr>
 
-    data.map(c=>`
-
-      <tr>
-
-        <td>
-          ${escapeHtml(c.name)}
-        </td>
-
-        <td>
-          ${money(c.total)}
-        </td>
-
-        <td>
-          ${money(c.paid)}
-        </td>
-
-        <td class="${c.due>0?'lowStock':'goodStock'}">
-          ${money(c.due)}
-        </td>
-
-        <td>
-
-          ${
-            c.due>0
-
-            ?
-
-            `<button
-              class="btnGreen"
-              onclick="openDue('${encodeURIComponent(c.name)}')">
-              💰 Pay Due
-            </button>`
-
-            :
-
-            `<span class="badge badgeGreen">
-              Paid
-            </span>`
-          }
-
-        </td>
-
-      </tr>
-
-    `).join("");
-
+`).join("");
 }
 
+let selectedDueCustomer="";
 
 function openDue(encoded){
 
-  selectedDueCustomer =
-    decodeURIComponent(encoded);
+selectedDueCustomer=decodeURIComponent(encoded);
 
+document.getElementById("dueCustomerName").textContent=
+"Customer: "+selectedDueCustomer;
 
-  document.getElementById(
-    "dueCustomerName"
-  ).textContent=
-    "Customer: "+
-    selectedDueCustomer;
+document.getElementById("dueAmount").value="";
+document.getElementById("dueNote").value="";
 
+document.getElementById("dueModal").style.display="flex";
+}
 
-  document.getElementById(
-    "dueAmount"
-  ).value="";
+function receiveDue(){
 
+let amount=Number(document.getElementById("dueAmount").value)||0;
 
-  document.getElementById(
-    "dueNote"
-  ).value="";
+if(amount<=0){
+alert("Payment amount দিন।");
+return;
+}
 
+let customerData=getCustomerData().find(
+c=>c.name===selectedDueCustomer
+);
 
-  document.getElementById(
-    "dueModal"
-  ).style.display="flex";
+if(!customerData){
+alert("Customer পাওয়া যায়নি।");
+return;
+}
 
+if(amount>customerData.due){
+alert("Due-এর চেয়ে বেশি payment দেওয়া যাবে না.");
+return;
+}
+
+duePayments.push({
+id:uid(),
+customer:selectedDueCustomer,
+amount,
+date:today(),
+note:document.getElementById("dueNote").value.trim()
+});
+
+saveData();
+closeModal("dueModal");
+renderAll();
+
+alert("Due payment received successfully!");
 }
 
 
-async function receiveDue(){
-
-  const amount =
-    Number(
-      document.getElementById(
-        "dueAmount"
-      ).value
-    )||0;
-
-
-  if(amount<=0){
-
-    alert(
-      "Payment amount দিন।"
-    );
-
-    return;
-
-  }
-
-
-  const customerData =
-    getCustomerData().find(
-      c=>c.name===selectedDueCustomer
-    );
-
-
-  if(!customerData){
-
-    alert(
-      "Customer পাওয়া যায়নি।"
-    );
-
-    return;
-
-  }
-
-
-  if(amount>customerData.due){
-
-    alert(
-      "Due-এর চেয়ে বেশি payment দেওয়া যাবে না।"
-    );
-
-    return;
-
-  }
-
-
-  const payment={
-
-    id:uid(),
-
-    customer:selectedDueCustomer,
-
-    amount,
-
-    date:today(),
-
-    note:
-      document.getElementById(
-        "dueNote"
-      ).value.trim()
-
-  };
-
-
-  try{
-
-    await saveDocument(
-      "duePayments",
-      payment
-    );
-
-
-    duePayments.push(payment);
-
-
-    closeModal("dueModal");
-
-    renderAll();
-
-
-    alert(
-      "Due payment received successfully!"
-    );
-
-  }catch(error){
-
-    showFirebaseError(error);
-
-  }
-
-}
-
-
-/* =========================================================
+/* =========================
    EXPENSE
-========================================================= */
+========================= */
 
-async function addExpense(){
+function addExpense(){
 
-  const name =
-    document.getElementById(
-      "expenseName"
-    ).value.trim();
+let name=document.getElementById("expenseName").value.trim();
+let amount=Number(document.getElementById("expenseAmount").value)||0;
 
-
-  const amount =
-    Number(
-      document.getElementById(
-        "expenseAmount"
-      ).value
-    )||0;
-
-
-  if(!name || amount<=0){
-
-    alert(
-      "Expense name ও amount দিন।"
-    );
-
-    return;
-
-  }
-
-
-  const expense={
-
-    id:uid(),
-
-    date:
-      document.getElementById(
-        "expenseDate"
-      ).value||today(),
-
-    name,
-
-    amount,
-
-    note:
-      document.getElementById(
-        "expenseNote"
-      ).value.trim()
-
-  };
-
-
-  try{
-
-    await saveDocument(
-      "expenses",
-      expense
-    );
-
-
-    expenses.push(expense);
-
-
-    document.getElementById(
-      "expenseName"
-    ).value="";
-
-
-    document.getElementById(
-      "expenseAmount"
-    ).value="";
-
-
-    document.getElementById(
-      "expenseNote"
-    ).value="";
-
-
-    renderAll();
-
-  }catch(error){
-
-    showFirebaseError(error);
-
-  }
-
+if(!name||amount<=0){
+alert("Expense name ও amount দিন।");
+return;
 }
 
+expenses.push({
+id:uid(),
+date:document.getElementById("expenseDate").value||today(),
+name,
+amount,
+note:document.getElementById("expenseNote").value.trim()
+});
 
-async function deleteExpense(id){
+saveData();
 
-  if(!confirm(
-    "Expense delete করবেন?"
-  ))return;
+document.getElementById("expenseName").value="";
+document.getElementById("expenseAmount").value="";
+document.getElementById("expenseNote").value="";
 
-
-  try{
-
-    await deleteCollectionDocument(
-      "expenses",
-      id
-    );
-
-
-    expenses =
-      expenses.filter(
-        e=>e.id!==id
-      );
-
-
-    renderAll();
-
-  }catch(error){
-
-    showFirebaseError(error);
-
-  }
-
+renderAll();
 }
 
+function deleteExpense(id){
+
+if(!confirm("Expense delete করবেন?"))return;
+
+expenses=expenses.filter(e=>e.id!==id);
+
+saveData();
+renderAll();
+}
 
 function renderExpenses(){
 
-  document.getElementById(
-    "expenseTable"
-  ).innerHTML=
+document.getElementById("expenseTable").innerHTML=
+expenses.slice().reverse().map(e=>`
 
-    expenses.slice().reverse()
-      .map(e=>`
+<tr>
+<td>${e.migrated?"🔄 ":""}${escapeHtml(e.date)}</td>
+<td>${e.migrated?"🔄 ":""}${escapeHtml(e.name)}</td>
+<td>${money(e.amount)}</td>
+<td>${escapeHtml(e.note)}</td>
+<td>
+<button class="btnRed" onclick="deleteExpense('${e.id}')">🗑️</button>
+</td>
+</tr>
 
-        <tr>
-
-          <td>
-            ${e.migrated?"🔄 ":""}
-            ${escapeHtml(e.date)}
-          </td>
-
-          <td>
-            ${e.migrated?"🔄 ":""}
-            ${escapeHtml(e.name)}
-          </td>
-
-          <td>
-            ${money(e.amount)}
-          </td>
-
-          <td>
-            ${escapeHtml(e.note)}
-          </td>
-
-          <td>
-
-            <button
-              class="btnRed"
-              onclick="deleteExpense('${e.id}')">
-              🗑️
-            </button>
-
-          </td>
-
-        </tr>
-
-      `).join("");
-
+`).join("");
 }
 
 
-/* =========================================================
+/* =========================
    TOTALS
-========================================================= */
+========================= */
 
 function getTotals(){
 
-  const totalSales =
-    sales.reduce(
-      (sum,s)=>
-        sum+
-        (Number(s.total)||0),
-      0
-    );
+let totalSales=sales.reduce(
+(sum,s)=>sum+(Number(s.total)||0),0
+);
 
+let totalPurchase=purchases.reduce(
+(sum,p)=>sum+(Number(p.total)||0),0
+);
 
-  const totalPurchase =
-    purchases.reduce(
-      (sum,p)=>
-        sum+
-        (Number(p.total)||0),
-      0
-    );
+let totalExpense=expenses.reduce(
+(sum,e)=>sum+(Number(e.amount)||0),0
+);
 
+let grossProfit=sales.reduce((sum,s)=>{
 
-  const totalExpense =
-    expenses.reduce(
-      (sum,e)=>
-        sum+
-        (Number(e.amount)||0),
-      0
-    );
+let profit=(s.items||[]).reduce(
+(a,i)=>
+a+
+(
+(Number(i.price)||0)-
+(Number(i.purchasePrice)||0)
+)*
+(Number(i.qty)||0),
+0
+);
 
+return sum+profit;
 
-  const grossProfit =
-    sales.reduce(
-      (sum,s)=>{
+},0);
 
-        const profit =
-          (s.items||[]).reduce(
-            (a,i)=>
-              a+
-              (
-                (Number(i.price)||0)-
-                (Number(i.purchasePrice)||0)
-              )*
-              (Number(i.qty)||0),
-            0
-          );
+let due=getCustomerData().reduce(
+(sum,c)=>sum+c.due,0
+);
 
+let stockValue=products.reduce(
+(sum,p)=>
+sum+
+(Number(p.stock)||0)*
+(Number(p.purchasePrice)||0),
+0
+);
 
-        return sum+profit;
-
-      },
-      0
-    );
-
-
-  const due =
-    getCustomerData().reduce(
-      (sum,c)=>
-        sum+c.due,
-      0
-    );
-
-
-  const stockValue =
-    products.reduce(
-      (sum,p)=>
-        sum+
-        (Number(p.stock)||0)*
-        (Number(p.purchasePrice)||0),
-      0
-    );
-
-
-  return{
-
-    totalSales,
-
-    totalPurchase,
-
-    totalExpense,
-
-    grossProfit,
-
-    due,
-
-    stockValue,
-
-    netProfit:
-      grossProfit-totalExpense
-
-  };
-
+return{
+totalSales,
+totalPurchase,
+totalExpense,
+grossProfit,
+due,
+stockValue,
+netProfit:grossProfit-totalExpense
+};
 }
-
-
-/* =========================================================
-   DASHBOARD
-========================================================= */
 
 function updateDashboard(){
 
-  const t=getTotals();
+let t=getTotals();
 
+let todaySale=sales
+.filter(s=>s.date===today())
+.reduce((sum,s)=>sum+(Number(s.total)||0),0);
 
-  const todaySale =
-    sales
-      .filter(
-        s=>s.date===today()
-      )
-      .reduce(
-        (sum,s)=>
-          sum+
-          (Number(s.total)||0),
-        0
-      );
+let low=products.filter(
+p=>Number(p.stock)<=Number(p.minStock)
+);
 
+document.getElementById("todaySales").textContent=money(todaySale);
+document.getElementById("totalProducts").textContent=products.length;
+document.getElementById("totalProfit").textContent=money(t.grossProfit);
+document.getElementById("totalExpense").textContent=money(t.totalExpense);
+document.getElementById("customerDue").textContent=money(t.due);
+document.getElementById("stockValue").textContent=money(t.stockValue);
+document.getElementById("lowStockCount").textContent=low.length;
+document.getElementById("netProfit").textContent=money(t.netProfit);
 
-  const low =
-    products.filter(
-      p=>
-        Number(p.stock)<=
-        Number(p.minStock)
-    );
+document.getElementById("lowStockTable").innerHTML=
+low.map(p=>`
 
+<tr>
+<td>${escapeHtml(p.name)}</td>
+<td>${escapeHtml(p.code)}</td>
+<td class="lowStock">${p.stock}</td>
+<td>${p.minStock}</td>
+</tr>
 
-  document.getElementById(
-    "todaySales"
-  ).textContent=
-    money(todaySale);
-
-
-  document.getElementById(
-    "totalProducts"
-  ).textContent=
-    products.length;
-
-
-  document.getElementById(
-    "totalProfit"
-  ).textContent=
-    money(t.grossProfit);
-
-
-  document.getElementById(
-    "totalExpense"
-  ).textContent=
-    money(t.totalExpense);
-
-
-  document.getElementById(
-    "customerDue"
-  ).textContent=
-    money(t.due);
-
-
-  document.getElementById(
-    "stockValue"
-  ).textContent=
-    money(t.stockValue);
-
-
-  document.getElementById(
-    "lowStockCount"
-  ).textContent=
-    low.length;
-
-
-  document.getElementById(
-    "netProfit"
-  ).textContent=
-    money(t.netProfit);
-
-
-  document.getElementById(
-    "lowStockTable"
-  ).innerHTML=
-
-    low.map(p=>`
-
-      <tr>
-
-        <td>
-          ${escapeHtml(p.name)}
-        </td>
-
-        <td>
-          ${escapeHtml(p.code)}
-        </td>
-
-        <td class="lowStock">
-          ${p.stock}
-        </td>
-
-        <td>
-          ${p.minStock}
-        </td>
-
-      </tr>
-
-    `).join("");
-
+`).join("");
 }
 
 
-/* =========================================================
+/* =========================
    REPORTS
-========================================================= */
+========================= */
 
 function updateReport(){
 
-  const t=getTotals();
+let t=getTotals();
 
-
-  document.getElementById(
-    "reportSales"
-  ).textContent=
-    money(t.totalSales);
-
-
-  document.getElementById(
-    "reportPurchase"
-  ).textContent=
-    money(t.totalPurchase);
-
-
-  document.getElementById(
-    "reportGross"
-  ).textContent=
-    money(t.grossProfit);
-
-
-  document.getElementById(
-    "reportExpense"
-  ).textContent=
-    money(t.totalExpense);
-
-
-  document.getElementById(
-    "reportNet"
-  ).textContent=
-    money(t.netProfit);
-
-
-  document.getElementById(
-    "reportDue"
-  ).textContent=
-    money(t.due);
-
-
-  document.getElementById(
-    "reportStock"
-  ).textContent=
-    money(t.stockValue);
-
+document.getElementById("reportSales").textContent=money(t.totalSales);
+document.getElementById("reportPurchase").textContent=money(t.totalPurchase);
+document.getElementById("reportGross").textContent=money(t.grossProfit);
+document.getElementById("reportExpense").textContent=money(t.totalExpense);
+document.getElementById("reportNet").textContent=money(t.netProfit);
+document.getElementById("reportDue").textContent=money(t.due);
+document.getElementById("reportStock").textContent=money(t.stockValue);
 }
 
 
-/* =========================================================
+/* =========================
    SETTINGS
-========================================================= */
+========================= */
 
 function loadSettings(){
 
-  document.getElementById(
-    "storeName"
-  ).value=
-    settings.name||"";
+document.getElementById("storeName").value=settings.name||"";
+document.getElementById("storeOwner").value=settings.owner||"";
+document.getElementById("storePhone").value=settings.phone||"";
+document.getElementById("storeAddress").value=settings.address||"";
+}
 
+function saveSettings(){
 
-  document.getElementById(
-    "storeOwner"
-  ).value=
-    settings.owner||"";
+settings.name=
+document.getElementById("storeName").value.trim()||"Smart Store";
 
+settings.owner=
+document.getElementById("storeOwner").value.trim();
 
-  document.getElementById(
-    "storePhone"
-  ).value=
-    settings.phone||"";
+settings.phone=
+document.getElementById("storePhone").value.trim();
 
+settings.address=
+document.getElementById("storeAddress").value.trim();
 
-  document.getElementById(
-    "storeAddress"
-  ).value=
-    settings.address||"";
+saveData();
 
+alert("Settings saved!");
+
+updateAccountUI();
 }
 
 
-async function saveSettings(){
-
-  settings.name=
-    document.getElementById(
-      "storeName"
-    ).value.trim()
-    ||"Smart Store";
-
-
-  settings.owner=
-    document.getElementById(
-      "storeOwner"
-    ).value.trim();
-
-
-  settings.phone=
-    document.getElementById(
-      "storePhone"
-    ).value.trim();
-
-
-  settings.address=
-    document.getElementById(
-      "storeAddress"
-    ).value.trim();
-
-
-  try{
-
-    await setDoc(
-      doc(
-        db,
-        "users",
-        auth.currentUser.uid,
-        "settings",
-        "main"
-      ),
-      settings
-    );
-
-
-    if(auth.currentUser.displayName
-      !==settings.owner){
-
-      await updateProfile(
-        auth.currentUser,
-        {
-          displayName:
-            settings.owner
-        }
-      );
-
-    }
-
-
-    updateAccountUI();
-
-
-    alert(
-      "Settings saved!"
-    );
-
-  }catch(error){
-
-    showFirebaseError(error);
-
-  }
-
-}
-
-
-/* =========================================================
+/* =========================
    INVOICE
-========================================================= */
+========================= */
 
 function printInvoiceForSaleById(id){
 
-  const sale =
-    sales.find(
-      s=>s.id===id
-    );
+let sale=sales.find(s=>s.id===id);
 
-
-  if(sale)
-    printInvoiceForSale(sale);
-
+if(sale)printInvoiceForSale(sale);
 }
-
 
 function printInvoiceForSale(sale){
 
-  document.getElementById(
-    "invoiceStoreName"
-  ).textContent=
-    settings.name||"Smart Store";
+document.getElementById("invoiceStoreName").textContent=
+settings.name||"Smart Store";
 
+document.getElementById("invoiceAddress").textContent=
+settings.address||"";
 
-  document.getElementById(
-    "invoiceAddress"
-  ).textContent=
-    settings.address||"";
+document.getElementById("invoicePhone").textContent=
+settings.phone||"";
 
+document.getElementById("invoiceNumber").textContent=sale.invoice;
+document.getElementById("invoiceDate").textContent=sale.date;
+document.getElementById("invoiceCustomer").textContent=sale.customer;
 
-  document.getElementById(
-    "invoicePhone"
-  ).textContent=
-    settings.phone||"";
+document.getElementById("invoiceItems").innerHTML=
+(sale.items||[]).map(i=>`
 
+<tr>
+<td style="border:1px solid #000;padding:8px">${escapeHtml(i.name)}</td>
+<td style="border:1px solid #000;padding:8px">${i.qty}</td>
+<td style="border:1px solid #000;padding:8px">৳${Number(i.price).toFixed(2)}</td>
+<td style="border:1px solid #000;padding:8px">৳${Number(i.subtotal).toFixed(2)}</td>
+</tr>
 
-  document.getElementById(
-    "invoiceNumber"
-  ).textContent=
-    sale.invoice;
+`).join("");
 
+document.getElementById("invoiceTotal").textContent=
+Number(sale.total).toFixed(2);
 
-  document.getElementById(
-    "invoiceDate"
-  ).textContent=
-    sale.date;
+document.getElementById("invoicePaid").textContent=
+Number(sale.paid).toFixed(2);
 
+document.getElementById("invoiceDue").textContent=
+Number(sale.due).toFixed(2);
 
-  document.getElementById(
-    "invoiceCustomer"
-  ).textContent=
-    sale.customer;
+document.getElementById("invoiceOwner").textContent=
+settings.owner||"";
 
-
-  document.getElementById(
-    "invoiceItems"
-  ).innerHTML=
-
-    (sale.items||[])
-      .map(i=>`
-
-        <tr>
-
-          <td style="border:1px solid #000;padding:8px">
-            ${escapeHtml(i.name)}
-          </td>
-
-          <td style="border:1px solid #000;padding:8px">
-            ${i.qty}
-          </td>
-
-          <td style="border:1px solid #000;padding:8px">
-            ৳${Number(i.price).toFixed(2)}
-          </td>
-
-          <td style="border:1px solid #000;padding:8px">
-            ৳${Number(i.subtotal).toFixed(2)}
-          </td>
-
-        </tr>
-
-      `).join("");
-
-
-  document.getElementById(
-    "invoiceTotal"
-  ).textContent=
-    Number(sale.total).toFixed(2);
-
-
-  document.getElementById(
-    "invoicePaid"
-  ).textContent=
-    Number(sale.paid).toFixed(2);
-
-
-  document.getElementById(
-    "invoiceDue"
-  ).textContent=
-    Number(sale.due).toFixed(2);
-
-
-  document.getElementById(
-    "invoiceOwner"
-  ).textContent=
-    settings.owner||"";
-
-
-  setTimeout(
-    ()=>window.print(),
-    300
-  );
-
+setTimeout(()=>{
+window.print();
+},300);
 }
 
 
-/* =========================================================
+/* =========================
    BACKUP
-========================================================= */
+========================= */
 
 function backupData(){
 
-  if(!auth.currentUser){
+let account=currentAccount();
 
-    alert("Login করুন।");
+if(!account){
+alert("Login করুন।");
+return;
+}
 
-    return;
+let backup={
+app:"Smart Store",
+version:2,
+date:new Date().toISOString(),
+data:{
+products,
+sales,
+purchases,
+expenses,
+duePayments,
+settings
+}
+};
 
-  }
+let blob=new Blob(
+[JSON.stringify(backup,null,2)],
+{type:"application/json"}
+);
 
+let url=URL.createObjectURL(blob);
 
-  const backup={
+let a=document.createElement("a");
 
-    app:"Smart Store",
+a.href=url;
+a.download="smart-store-backup-"+today()+".json";
 
-    version:3,
+a.click();
 
-    date:
-      new Date().toISOString(),
+URL.revokeObjectURL(url);
+}
 
-    data:{
+function restoreData(event){
 
-      products,
+let file=event.target.files[0];
 
-      sales,
+if(!file)return;
 
-      purchases,
+let reader=new FileReader();
 
-      expenses,
+reader.onload=function(e){
 
-      duePayments,
+try{
 
-      settings
+let backup=JSON.parse(e.target.result);
+let data=backup.data||backup;
 
-    }
+if(!data)throw new Error();
 
-  };
+if(!confirm("বর্তমান data replace করে backup restore করবেন?"))
+return;
 
+products=data.products||[];
+sales=data.sales||[];
+purchases=data.purchases||[];
+expenses=data.expenses||[];
+duePayments=data.duePayments||[];
 
-  const blob=
-    new Blob(
-      [
-        JSON.stringify(
-          backup,
-          null,
-          2
-        )
-      ],
-      {
-        type:"application/json"
-      }
-    );
+settings=data.settings||settings;
 
+saveData();
+loadSettings();
+renderAll();
 
-  const url=
-    URL.createObjectURL(blob);
+alert("Backup successfully restored!");
 
+}catch(err){
 
-  const a=
-    document.createElement("a");
+alert("Backup file সঠিক নয়।");
+}
+};
 
+reader.readAsText(file);
 
-  a.href=url;
-
-
-  a.download=
-    "smart-store-backup-"+
-    today()+
-    ".json";
-
-
-  a.click();
-
-
-  URL.revokeObjectURL(url);
-
+event.target.value="";
 }
 
 
-/* =========================================================
-   RESTORE
-========================================================= */
+/* =========================
+   DELETE ACCOUNT
+========================= */
 
-async function restoreData(event){
+function deleteCurrentAccount(){
 
-  const file =
-    event.target.files[0];
+let account=currentAccount();
 
+if(!account)return;
 
-  if(!file)return;
+let ok=confirm(
+"আপনার Account এবং এই account-এর সব data delete হয়ে যাবে। নিশ্চিত?"
+);
 
+if(!ok)return;
 
-  const reader =
-    new FileReader();
+accounts=accounts.filter(a=>a.id!==currentAccountId);
 
+localStorage.setItem(
+"smartStoreAccounts",
+JSON.stringify(accounts)
+);
 
-  reader.onload=
-    async function(e){
+currentAccountId=null;
 
-      try{
+localStorage.removeItem("smartStoreCurrentAccount");
 
-        const backup =
-          JSON.parse(
-            e.target.result
-          );
-
-
-        const data =
-          backup.data ||
-          backup;
-
-
-        if(!data)
-          throw new Error();
-
-
-        if(!confirm(
-          "বর্তমান data replace করে backup restore করবেন?"
-        ))return;
-
-
-        products =
-          data.products||[];
-
-
-        sales =
-          data.sales||[];
-
-
-        purchases =
-          data.purchases||[];
-
-
-        expenses =
-          data.expenses||[];
-
-
-        duePayments =
-          data.duePayments||[];
-
-
-        settings =
-          data.settings||settings;
-
-
-        /*
-          Restore-এর জন্য পুরোনো Firestore
-          collection delete করে নতুন data save
-        */
-
-        await replaceCollection(
-          "products",
-          products
-        );
-
-
-        await replaceCollection(
-          "sales",
-          sales
-        );
-
-
-        await replaceCollection(
-          "purchases",
-          purchases
-        );
-
-
-        await replaceCollection(
-          "expenses",
-          expenses
-        );
-
-
-        await replaceCollection(
-          "duePayments",
-          duePayments
-        );
-
-
-        await setDoc(
-          doc(
-            db,
-            "users",
-            auth.currentUser.uid,
-            "settings",
-            "main"
-          ),
-          settings
-        );
-
-
-        loadSettings();
-
-        renderAll();
-
-
-        alert(
-          "Backup successfully restored!"
-        );
-
-
-      }catch(err){
-
-        console.error(err);
-
-        alert(
-          "Backup file সঠিক নয়।"
-        );
-
-      }
-
-    };
-
-
-  reader.readAsText(file);
-
-
-  event.target.value="";
-
+location.reload();
 }
 
 
-/* =========================================================
-   REPLACE COLLECTION
-========================================================= */
-
-async function replaceCollection(
-  name,
-  data
-){
-
-  const snap =
-    await getDocs(
-      collectionRef(name)
-    );
-
-
-  /*
-    Delete old documents
-  */
-
-  for(const d of snap.docs){
-
-    await deleteDoc(d.ref);
-
-  }
-
-
-  /*
-    Add backup documents
-  */
-
-  for(const item of data){
-
-    const id =
-      item.id || uid();
-
-
-    item.id=id;
-
-
-    await setDoc(
-      documentRef(
-        name,
-        id
-      ),
-      item
-    );
-
-  }
-
-}
-
-
-/* =========================================================
-   DELETE FIREBASE ACCOUNT + ALL DATA
-========================================================= */
-
-async function deleteCurrentAccount(){
-
-  const user =
-    auth.currentUser;
-
-
-  if(!user)return;
-
-
-  const ok =
-    confirm(
-      "আপনার Account এবং এই account-এর সব data delete হয়ে যাবে। নিশ্চিত?"
-    );
-
-
-  if(!ok)return;
-
-
-  const confirmText =
-    prompt(
-      'নিশ্চিত করতে "DELETE" লিখুন'
-    );
-
-
-  if(confirmText!=="DELETE"){
-
-    alert(
-      "Account delete বাতিল করা হয়েছে।"
-    );
-
-    return;
-
-  }
-
-
-  try{
-
-    const collections=[
-      "products",
-      "sales",
-      "purchases",
-      "expenses",
-      "duePayments"
-    ];
-
-
-    /*
-      সব data delete
-    */
-
-    for(const name of collections){
-
-      const snap =
-        await getDocs(
-          collectionRef(name)
-        );
-
-
-      for(const d of snap.docs){
-
-        await deleteDoc(d.ref);
-
-      }
-
-    }
-
-
-    /*
-      Settings delete
-    */
-
-    await deleteDoc(
-      doc(
-        db,
-        "users",
-        user.uid,
-        "settings",
-        "main"
-      )
-    );
-
-
-    /*
-      User profile delete
-    */
-
-    await deleteDoc(
-      doc(
-        db,
-        "users",
-        user.uid
-      )
-    );
-
-
-    /*
-      Firebase Authentication account delete
-    */
-
-    await deleteUser(user);
-
-
-    alert(
-      "Account successfully deleted."
-    );
-
-
-    location.reload();
-
-
-  }catch(error){
-
-    console.error(error);
-
-
-    if(
-      error.code ===
-      "auth/requires-recent-login"
-    ){
-
-      alert(
-        "Security কারণে আবার Login করে Account Delete করুন।"
-      );
-
-    }else{
-
-      showFirebaseError(error);
-
-    }
-
-  }
-
-}
-
-
-/* =========================================================
+/* =========================
    RENDER ALL
-========================================================= */
+========================= */
 
 function renderAll(){
 
-  renderProducts();
+renderProducts();
+renderSales();
+renderPurchases();
+renderCustomers();
+renderExpenses();
 
-  renderSales();
+renderSaleProductList();
+renderPurchaseProducts();
 
-  renderPurchases();
-
-  renderCustomers();
-
-  renderExpenses();
-
-  renderSaleProductList();
-
-  renderPurchaseProducts();
-
-  updateDashboard();
-
-  updateReport();
-
+updateDashboard();
+updateReport();
 }
 
 
-/* =========================================================
-   FIREBASE AUTH STATE
-========================================================= */
-
-onAuthStateChanged(
-  auth,
-  async user=>{
-
-    if(user){
-
-      try{
-
-        await loadAccountData();
-
-
-        document.getElementById(
-          "loginScreen"
-        ).style.display="none";
-
-
-        document.getElementById(
-          "app"
-        ).style.display="block";
-
-
-        updateAccountUI();
-
-        loadSettings();
-
-        renderAll();
-
-
-      }catch(error){
-
-        console.error(error);
-
-      }
-
-    }else{
-
-      document.getElementById(
-        "app"
-      ).style.display="none";
-
-
-      document.getElementById(
-        "loginScreen"
-      ).style.display="flex";
-
-
-      showLogin();
-
-    }
-
-  }
-);
-
-
-/* =========================================================
-   MAKE FUNCTIONS AVAILABLE TO HTML onclick
-========================================================= */
-
-window.showCreateAccount=showCreateAccount;
-window.showLogin=showLogin;
-window.showForgotPassword=showForgotPassword;
-
-window.createAccount=createAccount;
-window.loginAccount=loginAccount;
-window.logoutAccount=logoutAccount;
-
-window.sendResetCode=sendResetCode;
-window.resetPassword=resetPassword;
-window.sendVerificationEmail=
-  sendVerificationEmail;
-
-window.migrateOldData=migrateOldData;
-window.showMigratedExpenses=
-  showMigratedExpenses;
-window.deleteMigratedExpenses=
-  deleteMigratedExpenses;
-
-window.showSection=showSection;
-
-window.addProduct=addProduct;
-window.clearProductForm=
-  clearProductForm;
-window.renderProducts=renderProducts;
-window.editProduct=editProduct;
-window.deleteProduct=deleteProduct;
-
-window.showBarcode=showBarcode;
-window.closeModal=closeModal;
-
-window.addSaleRow=addSaleRow;
-window.removeSaleRow=removeSaleRow;
-window.saleProductChanged=
-  saleProductChanged;
-window.calculateSale=calculateSale;
-window.completeSale=completeSale;
-window.deleteSale=deleteSale;
-window.printInvoiceForSaleById=
-  printInvoiceForSaleById;
-
-window.purchaseProductChanged=
-  purchaseProductChanged;
-window.addPurchase=addPurchase;
-window.deletePurchase=deletePurchase;
-
-window.openDue=openDue;
-window.receiveDue=receiveDue;
-
-window.addExpense=addExpense;
-window.deleteExpense=deleteExpense;
-
-window.saveSettings=saveSettings;
-
-window.backupData=backupData;
-window.restoreData=restoreData;
-
-window.deleteCurrentAccount=
-  deleteCurrentAccount;
-
-
-/* =========================================================
+/* =========================
    STARTUP
-========================================================= */
+========================= */
 
-document.getElementById(
-  "saleDate"
-).value=today();
-
-
-document.getElementById(
-  "purchaseDate"
-).value=today();
-
-
-document.getElementById(
-  "expenseDate"
-).value=today();
-
+document.getElementById("saleDate").value=today();
+document.getElementById("purchaseDate").value=today();
+document.getElementById("expenseDate").value=today();
 
 addSaleRow();
 
+/*
+পুরোনো কোডের একটি সমস্যা এখানে ঠিক করা হয়েছে:
+Account না থাকা অবস্থায় migrate করা হবে না।
+নতুন account তৈরি করার পর migration check হবে।
+*/
+
+if(currentAccountId &&
+accounts.some(a=>a.id===currentAccountId)){
+
+loadAccountData();
+openApp();
+}
+
 </script>
+
+</body>
+</html>
