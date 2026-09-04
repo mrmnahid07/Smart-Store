@@ -1,0 +1,185 @@
+from pathlib import Path
+
+html = r'''<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Store - Business Management</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f4f6f9;color:#222}
+header{background:#172554;color:white;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:5}
+header h1{margin:0;font-size:22px}.menu{display:none;background:#fff;color:#172554;border:0;border-radius:6px;padding:8px 12px}
+.layout{display:flex;min-height:calc(100vh - 60px)}aside{width:230px;background:#0f172a;color:#fff;padding:15px}
+aside button{width:100%;border:0;background:transparent;color:#fff;text-align:left;padding:12px;border-radius:7px;margin:3px 0;cursor:pointer;font-size:15px}
+aside button:hover,aside button.active{background:#2563eb}
+main{flex:1;padding:22px;max-width:1400px;margin:auto;width:100%}
+.page{display:none}.page.active{display:block}.title{margin-top:0}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px}
+.card{background:#fff;border-radius:10px;padding:18px;box-shadow:0 2px 8px #00000012;border-left:5px solid #2563eb}
+.card h3{margin:0 0 8px;font-size:14px;color:#64748b}.money{font-size:24px;font-weight:bold}
+.panel{background:#fff;border-radius:10px;padding:18px;margin-top:18px;box-shadow:0 2px 8px #00000012}
+form{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+label{font-size:13px;font-weight:bold;color:#475569}input,select,textarea{width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;margin-top:5px;font-size:14px}
+textarea{min-height:70px}.full{grid-column:1/-1}
+.btn{border:0;border-radius:6px;padding:10px 15px;background:#2563eb;color:#fff;cursor:pointer;font-weight:bold}.btn.red{background:#dc2626}.btn.green{background:#16a34a}.btn.gray{background:#64748b}
+.table-wrap{overflow:auto;margin-top:15px}table{width:100%;border-collapse:collapse;min-width:700px}th,td{padding:10px;border-bottom:1px solid #e2e8f0;text-align:left}th{background:#f1f5f9}
+.actions button{margin-right:5px;padding:6px 9px;border:0;border-radius:5px;cursor:pointer}.edit{background:#f59e0b;color:white}.del{background:#dc2626;color:white}
+.search{max-width:350px;margin-bottom:10px}
+.notice{padding:10px;background:#eff6ff;border-radius:7px;color:#1e40af;margin-bottom:12px}
+@media(max-width:750px){aside{position:fixed;left:-240px;top:60px;bottom:0;z-index:10;transition:.2s}aside.open{left:0}.menu{display:block}main{padding:12px}}
+</style>
+</head>
+<body>
+<header><h1>🛒 Smart Store</h1><button class="menu" onclick="toggleMenu()">☰ Menu</button></header>
+<div class="layout">
+<aside id="sidebar">
+<button class="active" onclick="showPage('dashboard',this)">🏠 Dashboard</button>
+<button onclick="showPage('products',this)">📦 Products</button>
+<button onclick="showPage('sales',this)">🛒 Sales / POS</button>
+<button onclick="showPage('purchases',this)">📥 Purchase</button>
+<button onclick="showPage('customers',this)">👥 Customers</button>
+<button onclick="showPage('expenses',this)">💸 Expenses</button>
+<button onclick="showPage('reports',this)">📊 Business Report</button>
+<button onclick="showPage('backup',this)">💾 Backup / Restore</button>
+</aside>
+
+<main>
+<section id="dashboard" class="page active">
+<h2 class="title">Dashboard</h2>
+<div class="cards">
+<div class="card"><h3>Today's Sales</h3><div class="money" id="todaySales">৳0.00</div></div>
+<div class="card"><h3>Total Due</h3><div class="money" id="dashDue">৳0.00</div></div>
+<div class="card"><h3>Total Products</h3><div class="money" id="productCount">0</div></div>
+<div class="card"><h3>Stock Value</h3><div class="money" id="dashStock">৳0.00</div></div>
+</div>
+<div class="panel"><h3>Quick Entry</h3><p>Products, sales, purchases, customers and expenses can all be entered manually from the menu.</p></div>
+</section>
+
+<section id="products" class="page">
+<h2>📦 Product Entry</h2>
+div class="panel"><form id="productForm">
+<input type="hidden" id="productId">
+<div><label>Product Name</label><input id="pName" required></div>
+<div><label>Product Code</label><input id="pCode"></div>
+<div><label>Purchase Price</label><input id="pBuy" type="number" min="0" step="0.01" required></div>
+<div><label>Sale Price</label><input id="pSell" type="number" min="0" step="0.01" required></div>
+<div><label>Stock Quantity</label><input id="pStock" type="number" min="0" step="1" required></div>
+<div><label>Unit</label><input id="pUnit" placeholder="pcs/kg/etc"></div>
+<div class="full"><button class="btn" type="submit">Save Product</button> <button class="btn gray" type="button" onclick="clearProduct()">Clear</button></div>
+</form></div>
+<div class="panel"><input class="search" placeholder="Search product..." oninput="renderProducts(this.value)"><div class="table-wrap"><table><thead><tr><th>Name</th><th>Code</th><th>Buy</th><th>Sell</th><th>Stock</th><th>Value</th><th>Action</th></tr></thead><tbody id="productTable"></tbody></table></div></div>
+</section>
+
+<section id="sales" class="page">
+<h2>🛒 Sales / POS</h2>
+<div class="panel"><form id="saleForm">
+<div><label>Product</label><select id="saleProduct" required></select></div>
+<div><label>Quantity</label><input id="saleQty" type="number" min="1" step="1" value="1" required></div>
+<div><label>Sale Price (editable)</label><input id="salePrice" type="number" min="0" step="0.01" required></div>
+<div><label>Customer</label><input id="saleCustomer" placeholder="Customer name"></div>
+<div><label>Paid Amount</label><input id="salePaid" type="number" min="0" step="0.01" value="0"></div>
+<div class="full"><button class="btn green" type="submit">Complete Sale</button></div>
+</form><div id="saleHint" class="notice">Select a product to load its price.</div></div>
+<div class="panel"><h3>Sales History</h3><div class="table-wrap"><table><thead><tr><th>Date</th><th>Product</th><th>Customer</th><th>Qty</th><th>Total</th><th>Paid</th><th>Due</th><th>Action</th></tr></thead><tbody id="salesTable"></tbody></table></div></div>
+</section>
+
+<section id="purchases" class="page">
+<h2>📥 Purchase Entry</h2>
+<div class="panel"><form id="purchaseForm">
+<div><label>Product</label><select id="purchaseProduct" required></select></div>
+<div><label>Quantity</label><input id="purchaseQty" type="number" min="1" required></div>
+<div><label>Purchase Price</label><input id="purchasePrice" type="number" min="0" step="0.01" required></div>
+<div><label>Supplier</label><input id="supplier"></div>
+<div class="full"><button class="btn" type="submit">Save Purchase</button></div>
+</form></div>
+<div class="panel"><h3>Purchase History</h3><div class="table-wrap"><table><thead><tr><th>Date</th><th>Product</th><th>Supplier</th><th>Qty</th><th>Total</th><th>Action</th></tr></thead><tbody id="purchaseTable"></tbody></table></div></div>
+</section>
+
+<section id="customers" class="page">
+<h2>👥 Customer & Due Entry</h2>
+<div class="panel"><form id="customerForm">
+<div><label>Customer Name</label><input id="cName" required></div>
+<div><label>Mobile</label><input id="cPhone"></div>
+<div><label>Address</label><input id="cAddress"></div>
+<div><label>Opening Due</label><input id="cDue" type="number" min="0" step="0.01" value="0"></div>
+<div class="full"><button class="btn" type="submit">Save Customer</button></div>
+</form></div>
+<div class="panel"><div class="table-wrap"><table><thead><tr><th>Name</th><th>Mobile</th><th>Address</th><th>Due</th><th>Action</th></tr></thead><tbody id="customerTable"></tbody></table></div></div>
+</section>
+
+<section id="expenses" class="page">
+<h2>💸 Expense Entry</h2>
+<div class="panel"><form id="expenseForm">
+<div><label>Expense Title</label><input id="eTitle" required></div>
+<div><label>Amount</label><input id="eAmount" type="number" min="0" step="0.01" required></div>
+<div><label>Date</label><input id="eDate" type="date" required></div>
+<div class="full"><label>Note</label><textarea id="eNote"></textarea></div>
+<div><button class="btn" type="submit">Save Expense</button></div>
+</form></div>
+<div class="panel"><h3>Expense History</h3><div class="table-wrap"><table><thead><tr><th>Date</th><th>Title</th><th>Note</th><th>Amount</th><th>Action</th></tr></thead><tbody id="expenseTable"></tbody></table></div></div>
+</section>
+
+<section id="reports" class="page">
+<h2>📊 Business Report</h2>
+<div class="cards">
+<div class="card"><h3>Total Sales</h3><div class="money" id="rSales">৳0.00</div></div>
+<div class="card"><h3>Total Purchase</h3><div class="money" id="rPurchase">৳0.00</div></div>
+<div class="card"><h3>Gross Profit</h3><div class="money" id="rGross">৳0.00</div></div>
+<div class="card"><h3>Expenses</h3><div class="money" id="rExpenses">৳0.00</div></div>
+<div class="card"><h3>Net Profit</h3><div class="money" id="rNet">৳0.00</div></div>
+<div class="card"><h3>Total Due</h3><div class="money" id="rDue">৳0.00</div></div>
+<div class="card"><h3>Stock Value</h3><div class="money" id="rStock">৳0.00</div></div>
+</div>
+<div class="panel"><button class="btn" onclick="window.print()">🖨️ Print Report</button></div>
+</section>
+
+<section id="backup" class="page">
+<h2>💾 Backup / Restore</h2>
+div class="panel"><p>সব ডাটা এই ব্রাউজারেই সংরক্ষিত থাকে। Backup নিয়ে অন্য কম্পিউটারে Restore করা যাবে।</p>
+<button class="btn" onclick="backup()">⬇️ Download Backup</button>
+<input type="file" id="restoreFile" accept=".json" style="margin-top:12px">
+<button class="btn green" onclick="restore()">⬆️ Restore Backup</button>
+<button class="btn red" onclick="clearAll()">⚠️ Delete All Data</button>
+</div>
+</section>
+</main>
+</div>
+
+<script>
+const KEY="smartStoreDataV1";
+let db=JSON.parse(localStorage.getItem(KEY)||'{"products":[],"sales":[],"purchases":[],"customers":[],"expenses":[]}');
+const money=n=>"৳"+Number(n||0).toFixed(2);
+const save=()=>{localStorage.setItem(KEY,JSON.stringify(db));renderAll()};
+const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+function showPage(id,btn){document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));document.getElementById(id).classList.add("active");document.querySelectorAll("aside button").forEach(x=>x.classList.remove("active"));if(btn)btn.classList.add("active");document.getElementById("sidebar").classList.remove("open");renderAll()}
+function toggleMenu(){document.getElementById("sidebar").classList.toggle("open")}
+function renderProducts(search=""){let a=db.products.filter(p=>(p.name+" "+p.code).toLowerCase().includes(search.toLowerCase()));productTable.innerHTML=a.map(p=>`<tr><td>${esc(p.name)}</td><td>${esc(p.code)}</td><td>${money(p.buy)}</td><td>${money(p.sell)}</td><td>${p.stock} ${esc(p.unit)}</td><td>${money(p.stock*p.buy)}</td><td class="actions"><button class="edit" onclick="editProduct('${p.id}')">Edit</button><button class="del" onclick="delItem('products','${p.id}')">Delete</button></td></tr>`).join("")||'<tr><td colspan="7">No products yet.</td></tr>'}
+function clearProduct(){productId.value="";productForm.reset()}
+productForm.onsubmit=e=>{e.preventDefault();let id=productId.value||Date.now().toString();let old=db.products.find(x=>x.id===id);let p={id,name:pName.value.trim(),code:pCode.value.trim(),buy:+pBuy.value,sell:+pSell.value,stock:+pStock.value,unit:pUnit.value.trim()};if(old)Object.assign(old,p);else db.products.push(p);clearProduct();save()}
+function editProduct(id){let p=db.products.find(x=>x.id===id);productId.value=p.id;pName.value=p.name;pCode.value=p.code;pBuy.value=p.buy;pSell.value=p.sell;pStock.value=p.stock;pUnit.value=p.unit;showPage("products",document.querySelectorAll("aside button")[1])}
+function delItem(type,id){if(confirm("Delete this entry?")){db[type]=db[type].filter(x=>x.id!==id);save()}}
+function fillSelects(){let opts='<option value="">Select product</option>'+db.products.map(p=>`<option value="${p.id}">${esc(p.name)} — Stock: ${p.stock}</option>`).join("");saleProduct.innerHTML=opts;purchaseProduct.innerHTML=opts}
+saleProduct.onchange=()=>{let p=db.products.find(x=>x.id===saleProduct.value);if(p){salePrice.value=p.sell;saleHint.textContent=`Available stock: ${p.stock} ${p.unit||"pcs"}`}}
+saleForm.onsubmit=e=>{e.preventDefault();let p=db.products.find(x=>x.id===saleProduct.value),q=+saleQty.value,price=+salePrice.value,paid=+salePaid.value;if(!p)return alert("Select a product.");if(q>p.stock)return alert("Not enough stock.");let total=q*price;if(paid>total)return alert("Paid amount cannot be greater than total.");p.stock-=q;db.sales.push({id:Date.now().toString(),date:new Date().toISOString(),product:p.name,productId:p.id,qty:q,price,total,paid,customer:saleCustomer.value.trim(),cost:q*p.buy});saleForm.reset();saleQty.value=1;salePaid.value=0;save()}
+purchaseForm.onsubmit=e=>{e.preventDefault();let p=db.products.find(x=>x.id===purchaseProduct.value),q=+purchaseQty.value,price=+purchasePrice.value;if(!p)return alert("Select a product.");p.stock+=q;db.purchases.push({id:Date.now().toString(),date:new Date().toISOString(),product:p.name,productId:p.id,qty:q,price,total:q*price,supplier:supplier.value.trim()});purchaseForm.reset();save()}
+customerForm.onsubmit=e=>{e.preventDefault();db.customers.push({id:Date.now().toString(),name:cName.value.trim(),phone:cPhone.value.trim(),address:cAddress.value.trim(),due:+cDue.value});customerForm.reset();save()}
+expenseForm.onsubmit=e=>{e.preventDefault();db.expenses.push({id:Date.now().toString(),title:eTitle.value.trim(),amount:+eAmount.value,date:eDate.value,note:eNote.value.trim()});expenseForm.reset();eDate.value=new Date().toISOString().slice(0,10);save()}
+function renderSales(){salesTable.innerHTML=db.sales.slice().reverse().map(s=>`<tr><td>${new Date(s.date).toLocaleString()}</td><td>${esc(s.product)}</td><td>${esc(s.customer)}</td><td>${s.qty}</td><td>${money(s.total)}</td><td>${money(s.paid)}</td><td>${money(s.total-s.paid)}</td><td><button class="del" onclick="delItem('sales','${s.id}')">Delete</button></td></tr>`).join("")||'<tr><td colspan="8">No sales yet.</td></tr>'}
+function renderPurchases(){purchaseTable.innerHTML=db.purchases.slice().reverse().map(p=>`<tr><td>${new Date(p.date).toLocaleString()}</td><td>${esc(p.product)}</td><td>${esc(p.supplier)}</td><td>${p.qty}</td><td>${money(p.total)}</td><td><button class="del" onclick="delItem('purchases','${p.id}')">Delete</button></td></tr>`).join("")||'<tr><td colspan="6">No purchases yet.</td></tr>'}
+function renderCustomers(){customerTable.innerHTML=db.customers.map(c=>`<tr><td>${esc(c.name)}</td><td>${esc(c.phone)}</td><td>${esc(c.address)}</td><td>${money(c.due)}</td><td><button class="del" onclick="delItem('customers','${c.id}')">Delete</button></td></tr>`).join("")||'<tr><td colspan="5">No customers yet.</td></tr>'}
+function renderExpenses(){expenseTable.innerHTML=db.expenses.slice().reverse().map(x=>`<tr><td>${x.date}</td><td>${esc(x.title)}</td><td>${esc(x.note)}</td><td>${money(x.amount)}</td><td><button class="del" onclick="delItem('expenses','${x.id}')">Delete</button></td></tr>`).join("")||'<tr><td colspan="5">No expenses yet.</td></tr>'}
+function report(){let sales=db.sales.reduce((a,x)=>a+x.total,0),purchase=db.purchases.reduce((a,x)=>a+x.total,0),cost=db.sales.reduce((a,x)=>a+x.cost,0),exp=db.expenses.reduce((a,x)=>a+x.amount,0),due=db.sales.reduce((a,x)=>a+x.total-x.paid,0)+db.customers.reduce((a,x)=>a+x.due,0),stock=db.products.reduce((a,x)=>a+x.stock*x.buy,0);rSales.textContent=money(sales);rPurchase.textContent=money(purchase);rGross.textContent=money(sales-cost);rExpenses.textContent=money(exp);rNet.textContent=money(sales-cost-exp);rDue.textContent=money(due);rStock.textContent=money(stock);let today=new Date().toISOString().slice(0,10);todaySales.textContent=money(db.sales.filter(x=>x.date.slice(0,10)===today).reduce((a,x)=>a+x.total,0));dashDue.textContent=money(due);dashStock.textContent=money(stock);productCount.textContent=db.products.length}
+function renderAll(){fillSelects();renderProducts(document.querySelector("#products .search")?.value||"");renderSales();renderPurchases();renderCustomers();renderExpenses();report()}
+function backup(){let blob=new Blob([JSON.stringify(db,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="smart-store-backup.json";a.click()}
+function restore(){let f=restoreFile.files[0];if(!f)return alert("Choose a backup JSON file.");let r=new FileReader();r.onload=()=>{try{db=JSON.parse(r.result);save();alert("Backup restored successfully.")}catch(e){alert("Invalid backup file.")}};r.readAsText(f)}
+function clearAll(){if(confirm("This will permanently delete all Smart Store data. Continue?")){db={products:[],sales:[],purchases:[],customers:[],expenses:[]};save()}}
+eDate.value=new Date().toISOString().slice(0,10);renderAll();
+</script>
+</body>
+</html>'''
+# Fix accidental unescaped div opening strings from raw construction
+html = html.replace("\ndiv class=\"panel\"", "\n<div class=\"panel\"")
+path = Path("/mnt/data/index.html")
+path.write_text(html, encoding="utf-8")
+print(f"Created: {path}")
