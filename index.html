@@ -1554,10 +1554,18 @@ th{
    FIREBASE CONFIG
 ===================================================== */
 
+/* ===================================================== 
+   FIREBASE CONFIG 
+===================================================== */
+
 const firebaseConfig = {
-    apiKey: "AIzaSyDjgt2oKenX2VokbpurU8DfSYKGLq7Wfuc",
+    apiKey: "AIzaSyA6wENDf6gDkJomt0VznpK5I8cUKoFrKd0",
     authDomain: "smart-store-775e9.firebaseapp.com",
-    projectId: "smart-store-775e9"
+    projectId: "smart-store-775e9",
+    storageBucket: "smart-store-775e9.firebasestorage.app",
+    messagingSenderId: "585970463024",
+    appId: "1:585970463024:web:b3051a97f3f49ca52158f5",
+    measurementId: "G-720GEV11BB"
 };
 
 let auth = null;
@@ -1568,7 +1576,6 @@ try {
 
     auth = firebase.auth();
 
-    // Browser language অনুযায়ী Firebase email পাঠাবে
     auth.useDeviceLanguage();
 
     console.log("Firebase initialized successfully");
@@ -1578,28 +1585,7 @@ catch(error){
 
     console.error("Firebase Initialization Error:", error);
 
-    const authScreen = document.getElementById("authScreen");
-
-    if(authScreen){
-
-        authScreen.innerHTML = `
-            <div class="auth-box">
-                <h1>🏪 Smart Store</h1>
-
-                <div class="auth-error">
-                    ❌ Firebase চালু করা যাচ্ছে না।
-                    <br><br>
-                    <b>Error:</b>
-                    ${escapeHTML(error.message)}
-                </div>
-            </div>
-        `;
-
-    }
-
 }
-
-
 /* =====================================================
    SHORTCUT
 ===================================================== */
