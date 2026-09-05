@@ -12,12 +12,237 @@
     padding:0;
     font-family:Arial, sans-serif;
 }
+/* ================= LOGIN SYSTEM ================= */
 
+.auth-screen{
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:#f1f5f9;
+    padding:20px;
+}
+
+.auth-box{
+    width:100%;
+    max-width:420px;
+    background:white;
+    padding:30px;
+    border-radius:15px;
+    box-shadow:0 5px 25px rgba(0,0,0,.12);
+}
+
+.auth-box h1{
+    text-align:center;
+    color:#2563eb;
+    margin-bottom:8px;
+}
+
+.auth-box p{
+    text-align:center;
+    color:#64748b;
+    margin-bottom:20px;
+}
+
+.auth-box input{
+    margin-bottom:12px;
+}
+
+.auth-btn{
+    width:100%;
+    margin-top:5px;
+}
+
+.auth-links{
+    text-align:center;
+    margin-top:18px;
+}
+
+.auth-links button{
+    border:none;
+    background:none;
+    color:#2563eb;
+    cursor:pointer;
+    font-weight:bold;
+    margin:5px;
+}
+
+.auth-error{
+    color:#dc2626;
+    text-align:center;
+    margin:10px 0;
+    font-size:14px;
+}
+
+.auth-success{
+    color:#16a34a;
+    text-align:center;
+    margin:10px 0;
+    font-size:14px;
+}
+
+#registerBox,
+#forgotBox{
+    display:none;
+}
+
+.user-area{
+    margin-top:20px;
+    padding-top:15px;
+    border-top:1px solid #334155;
+}
+
+.user-email{
+    color:#94a3b8;
+    font-size:12px;
+    word-break:break-all;
+    margin-bottom:10px;
+}
+
+.logout-btn{
+    width:100%;
+    border:none;
+    background:#dc2626;
+    color:white;
+    padding:10px;
+    border-radius:7px;
+    cursor:pointer;
+    font-weight:bold;
+}
 body{
     background:#f1f5f9;
     color:#1e293b;
 }
+<!-- ================= AUTH SCREEN ================= -->
 
+<div id="authScreen" class="auth-screen">
+
+    <!-- LOGIN -->
+    <div class="auth-box" id="loginBox">
+
+        <h1>🏪 Smart Store</h1>
+        <p>Login to continue</p>
+
+        <input
+            type="email"
+            id="loginEmail"
+            placeholder="Email"
+            autocomplete="email"
+        >
+
+        <input
+            type="password"
+            id="loginPassword"
+            placeholder="Password"
+            autocomplete="current-password"
+        >
+
+        <div id="loginMessage"></div>
+
+        <button
+            class="btn btn-primary auth-btn"
+            onclick="loginUser()"
+        >
+            🔐 Login
+        </button>
+
+        <div class="auth-links">
+
+            <button onclick="showForgot()">
+                Forgot Account / Password?
+            </button>
+
+            <br>
+
+            <button onclick="showRegister()">
+                ➕ Create Account
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- REGISTER -->
+    <div class="auth-box" id="registerBox">
+
+        <h1>📝 Create Account</h1>
+        <p>New Smart Store account</p>
+
+        <input
+            type="email"
+            id="registerEmail"
+            placeholder="Email"
+            autocomplete="email"
+        >
+
+        <input
+            type="password"
+            id="registerPassword"
+            placeholder="Password (minimum 6 characters)"
+            autocomplete="new-password"
+        >
+
+        <input
+            type="password"
+            id="registerConfirm"
+            placeholder="Confirm Password"
+            autocomplete="new-password"
+        >
+
+        <div id="registerMessage"></div>
+
+        <button
+            class="btn btn-success auth-btn"
+            onclick="createAccount()"
+        >
+            ✅ Create Account
+        </button>
+
+        <div class="auth-links">
+
+            <button onclick="showLogin()">
+                🔐 Back to Login
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- FORGOT PASSWORD -->
+    <div class="auth-box" id="forgotBox">
+
+        <h1>🔑 Forgot Password</h1>
+        <p>Enter your account email</p>
+
+        <input
+            type="email"
+            id="forgotEmail"
+            placeholder="Email"
+            autocomplete="email"
+        >
+
+        <div id="forgotMessage"></div>
+
+        <button
+            class="btn btn-warning auth-btn"
+            onclick="resetPassword()"
+        >
+            📧 Send Reset Email
+        </button>
+
+        <div class="auth-links">
+
+            <button onclick="showLogin()">
+                🔐 Back to Login
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
 .sidebar{
     position:fixed;
     left:0;
