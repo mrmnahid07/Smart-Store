@@ -1555,21 +1555,49 @@ th{
 ===================================================== */
 
 const firebaseConfig = {
-
-    apiKey:
-        "AIzaSyDjgt2oKenX2VokbpurU8DfSYKGLq7Wfuc",
-
-    authDomain:
-        "smart-store-775e9.firebaseapp.com",
-
-    projectId:
-        "smart-store-775e9"
-
+    apiKey: "AIzaSyDjgt2oKenX2VokbpurU8DfSYKGLq7Wfuc",
+    authDomain: "smart-store-775e9.firebaseapp.com",
+    projectId: "smart-store-775e9"
 };
 
-firebase.initializeApp(firebaseConfig);
+let auth = null;
 
-const auth = firebase.auth();
+try {
+
+    firebase.initializeApp(firebaseConfig);
+
+    auth = firebase.auth();
+
+    // Browser language অনুযায়ী Firebase email পাঠাবে
+    auth.useDeviceLanguage();
+
+    console.log("Firebase initialized successfully");
+
+}
+catch(error){
+
+    console.error("Firebase Initialization Error:", error);
+
+    const authScreen = document.getElementById("authScreen");
+
+    if(authScreen){
+
+        authScreen.innerHTML = `
+            <div class="auth-box">
+                <h1>🏪 Smart Store</h1>
+
+                <div class="auth-error">
+                    ❌ Firebase চালু করা যাচ্ছে না।
+                    <br><br>
+                    <b>Error:</b>
+                    ${escapeHTML(error.message)}
+                </div>
+            </div>
+        `;
+
+    }
+
+}
 
 
 /* =====================================================
@@ -1730,10 +1758,88 @@ function clearAuthMessages(){
 
 
 /* =====================================================
+   FIREBASE ERROR MESSAGE
+===================================================== */
+
+function firebaseErrorMessage(error){
+
+    console.error(
+        "Firebase Error:",
+        error.code,
+        error.message,
+        error
+    );
+
+    switch(error.code){
+
+        case "auth/email-already-in-use":
+            return "এই Email দিয়ে আগে থেকেই একটি Account আছে।";
+
+        case "auth/invalid-email":
+            return "Email address সঠিক নয়।";
+
+        case "auth/weak-password":
+            return "Password কমপক্ষে ৬ অক্ষরের হতে হবে।";
+
+        case "auth/operation-not-allowed":
+            return "Firebase-এ Email/Password Login চালু করা নেই। Firebase Console → Authentication → Sign-in method থেকে Email/Password Enable করুন।";
+
+        case "auth/unauthorized-domain":
+            return "এই Website Domain Firebase-এ Authorized করা নেই। Firebase Console → Authentication → Settings → Authorized domains-এ আপনার Website Domain যোগ করুন।";
+
+        case "auth/network-request-failed":
+            return "Internet connection সমস্যা হয়েছে। Internet connection পরীক্ষা করুন।";
+
+        case "auth/api-key-not-valid":
+            return "Firebase API Key সঠিক নয়। Firebase Project Settings থেকে Web App Configuration পরীক্ষা করুন।";
+
+        case "auth/invalid-api-key":
+            return "Firebase API Key সঠিক নয়।";
+
+        case "auth/configuration-not-found":
+            return "Firebase Authentication configuration পাওয়া যাচ্ছে না। Firebase Console-এর Authentication সেটিংস পরীক্ষা করুন।";
+
+        case "auth/user-not-found":
+            return "এই Email দিয়ে কোনো Account পাওয়া যায়নি।";
+
+        case "auth/wrong-password":
+            return "Password ভুল।";
+
+        case "auth/invalid-credential":
+            return "Email অথবা Password ভুল।";
+
+        case "auth/too-many-requests":
+            return "অনেকবার চেষ্টা করা হয়েছে। কিছুক্ষণ পরে আবার চেষ্টা করুন।";
+
+        case "auth/internal-error":
+            return "Firebase-এর internal error হয়েছে। কিছুক্ষণ পরে আবার চেষ্টা করুন।";
+
+        default:
+            return (
+                "Firebase Error: " +
+                (error.code || "unknown-error")
+            );
+
+    }
+
+}
+
+
+/* =====================================================
    LOGIN
 ===================================================== */
 
 function loginUser(){
+
+    if(!auth){
+
+        $("loginMessage").innerHTML =
+            '<div class="auth-error">❌ Firebase চালু হয়নি।</div>';
+
+        return;
+
+    }
+
 
     const email =
         $("loginEmail").value.trim();
@@ -1775,7 +1881,12 @@ function loginUser(){
             password
         )
 
-        .then(function(){
+        .then(function(userCredential){
+
+            console.log(
+                "Login successful:",
+                userCredential.user.email
+            );
 
             message.innerHTML =
                 '<div class="auth-success">' +
@@ -1786,65 +1897,15 @@ function loginUser(){
 
         .catch(function(error){
 
-            let msg =
-                "Login করা যায়নি।";
-
-
-            if(
-                error.code ===
-                "auth/user-not-found"
-            ){
-
-                msg =
-                    "এই Email দিয়ে কোনো account পাওয়া যায়নি।";
-
-            }
-
-            else if(
-                error.code ===
-                "auth/wrong-password"
-            ){
-
-                msg =
-                    "Password ভুল।";
-
-            }
-
-            else if(
-                error.code ===
-                "auth/invalid-email"
-            ){
-
-                msg =
-                    "সঠিক Email দিন।";
-
-            }
-
-            else if(
-                error.code ===
-                "auth/invalid-credential"
-            ){
-
-                msg =
-                    "Email অথবা Password ভুল।";
-
-            }
-
-            else if(
-                error.code ===
-                "auth/too-many-requests"
-            ){
-
-                msg =
-                    "অনেকবার চেষ্টা করা হয়েছে। কিছুক্ষণ পরে আবার চেষ্টা করুন।";
-
-            }
-
+            const msg =
+                firebaseErrorMessage(error);
 
             message.innerHTML =
                 '<div class="auth-error">❌ ' +
                 escapeHTML(msg) +
-                '</div>';
+                '<br><small>Code: ' +
+                escapeHTML(error.code || "") +
+                '</small></div>';
 
         });
 
@@ -1856,6 +1917,16 @@ function loginUser(){
 ===================================================== */
 
 function createAccount(){
+
+    if(!auth){
+
+        $("registerMessage").innerHTML =
+            '<div class="auth-error">❌ Firebase চালু হয়নি।</div>';
+
+        return;
+
+    }
+
 
     const email =
         $("registerEmail").value.trim();
@@ -1914,56 +1985,38 @@ function createAccount(){
             password
         )
 
-        .then(function(){
+        .then(function(userCredential){
+
+            console.log(
+                "Account created:",
+                userCredential.user.email,
+                userCredential.user.uid
+            );
 
             message.innerHTML =
                 '<div class="auth-success">' +
-                '✅ Account তৈরি হয়েছে।' +
+                '✅ Account সফলভাবে তৈরি হয়েছে।' +
+                '<br>⏳ Login হচ্ছে...' +
                 '</div>';
+
+            /*
+             * Firebase নতুন user-কে automatically login করে।
+             * তাই আলাদা করে login করার দরকার নেই।
+             */
 
         })
 
         .catch(function(error){
 
-            let msg =
-                "Account তৈরি করা যায়নি।";
-
-
-            if(
-                error.code ===
-                "auth/email-already-in-use"
-            ){
-
-                msg =
-                    "এই Email দিয়ে আগে থেকেই account আছে।";
-
-            }
-
-            else if(
-                error.code ===
-                "auth/invalid-email"
-            ){
-
-                msg =
-                    "সঠিক Email দিন।";
-
-            }
-
-            else if(
-                error.code ===
-                "auth/weak-password"
-            ){
-
-                msg =
-                    "Password আরও শক্তিশালী দিন।";
-
-            }
-
+            const msg =
+                firebaseErrorMessage(error);
 
             message.innerHTML =
                 '<div class="auth-error">❌ ' +
                 escapeHTML(msg) +
-                '</div>';
+                '<br><small>Code: ' +
+                escapeHTML(error.code || "") +
+                '</small></div>';
 
         });
 
@@ -1975,6 +2028,16 @@ function createAccount(){
 ===================================================== */
 
 function resetPassword(){
+
+    if(!auth){
+
+        $("forgotMessage").innerHTML =
+            '<div class="auth-error">❌ Firebase চালু হয়নি।</div>';
+
+        return;
+
+    }
+
 
     const email =
         $("forgotEmail").value.trim();
@@ -2002,45 +2065,31 @@ function resetPassword(){
 
         .then(function(){
 
+            console.log(
+                "Password reset email sent to:",
+                email
+            );
+
             message.innerHTML =
                 '<div class="auth-success">' +
-                '✅ Password reset email পাঠানো হয়েছে। ' +
-                'আপনার Email inbox দেখুন।' +
+                '✅ Password reset email পাঠানো হয়েছে।' +
+                '<br><br>' +
+                'Gmail Inbox, Spam/Junk এবং Promotions folder দেখুন।' +
                 '</div>';
 
         })
 
         .catch(function(error){
 
-            let msg =
-                "Reset email পাঠানো যায়নি।";
-
-
-            if(
-                error.code ===
-                "auth/user-not-found"
-            ){
-
-                msg =
-                    "এই Email দিয়ে কোনো account পাওয়া যায়নি।";
-
-            }
-
-            else if(
-                error.code ===
-                "auth/invalid-email"
-            ){
-
-                msg =
-                    "সঠিক Email দিন।";
-
-            }
-
+            const msg =
+                firebaseErrorMessage(error);
 
             message.innerHTML =
                 '<div class="auth-error">❌ ' +
                 escapeHTML(msg) +
-                '</div>';
+                '<br><small>Code: ' +
+                escapeHTML(error.code || "") +
+                '</small></div>';
 
         });
 
@@ -2052,6 +2101,13 @@ function resetPassword(){
 ===================================================== */
 
 function logoutUser(){
+
+    if(!auth){
+
+        return;
+
+    }
+
 
     if(
         !confirm(
@@ -2069,17 +2125,23 @@ function logoutUser(){
 
         .then(function(){
 
-            showLogin();
+            console.log(
+                "Logout successful"
+            );
 
         })
 
         .catch(function(error){
 
-            alert(
-                "Logout করা যায়নি।"
+            console.error(
+                "Logout Error:",
+                error
             );
 
-            console.error(error);
+            alert(
+                "Logout করা যায়নি।\n\n" +
+                error.code
+            );
 
         });
 
@@ -2090,74 +2152,85 @@ function logoutUser(){
    AUTH STATE
 ===================================================== */
 
-auth.onAuthStateChanged(function(user){
+if(auth){
 
-    const authScreen =
-        $("authScreen");
+    auth.onAuthStateChanged(function(user){
 
-    const sidebar =
-        document.querySelector(".sidebar");
+        const authScreen =
+            $("authScreen");
 
-    const main =
-        document.querySelector(".main");
+        const sidebar =
+            document.querySelector(".sidebar");
 
-    const userEmail =
-        $("loggedUserEmail");
+        const main =
+            document.querySelector(".main");
 
-
-    if(user){
-
-        /* =========================
-           LOGGED IN
-        ========================= */
-
-        authScreen.style.display =
-            "none";
-
-        sidebar.style.display =
-            "block";
-
-        main.style.display =
-            "block";
+        const userEmail =
+            $("loggedUserEmail");
 
 
-        if(userEmail){
+        if(user){
 
-            userEmail.innerText =
-                "👤 " + user.email;
+            /* =========================
+               LOGGED IN
+            ========================= */
+
+            console.log(
+                "AUTH USER:",
+                user.email,
+                user.uid
+            );
+
+
+            authScreen.style.display =
+                "none";
+
+            sidebar.style.display =
+                "block";
+
+            main.style.display =
+                "block";
+
+
+            if(userEmail){
+
+                userEmail.innerText =
+                    "👤 " + user.email;
+
+            }
+
+
+            renderAll();
 
         }
 
+        else{
 
-        renderAll();
+            /* =========================
+               LOGGED OUT
+            ========================= */
 
-    }
-
-    else{
-
-        /* =========================
-           LOGGED OUT
-        ========================= */
-
-        authScreen.style.display =
-            "flex";
-
-        sidebar.style.display =
-            "none";
-
-        main.style.display =
-            "none";
-
-        showLogin();
-
-    }
-
-});
+            console.log(
+                "No authenticated user"
+            );
 
 
-/* =====================================================
-   PAGE NAVIGATION
-===================================================== */
+            authScreen.style.display =
+                "flex";
+
+            sidebar.style.display =
+                "none";
+
+            main.style.display =
+                "none";
+
+            showLogin();
+
+        }
+
+    });
+
+}
 
 function showPage(page,button){
 
