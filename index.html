@@ -1230,7 +1230,400 @@ th{
 
 
 <script>
+<!-- ================= FIREBASE ================= -->
 
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+
+<script>
+
+const firebaseConfig = {
+
+    apiKey: "AIzaSyDjgt2oKenX2VokbpurU8DfSYKGLq7Wfuc",
+
+    authDomain: "smart-store-775e9.firebaseapp.com",
+
+    projectId: "smart-store-775e9"
+
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const auth = firebase.auth();
+
+
+/* =====================================================
+   AUTH SCREEN
+===================================================== */
+
+function showLogin(){
+
+    document.getElementById("loginBox").style.display="block";
+    document.getElementById("registerBox").style.display="none";
+    document.getElementById("forgotBox").style.display="none";
+
+    clearAuthMessages();
+
+}
+
+
+function showRegister(){
+
+    document.getElementById("loginBox").style.display="none";
+    document.getElementById("registerBox").style.display="block";
+    document.getElementById("forgotBox").style.display="none";
+
+    clearAuthMessages();
+
+}
+
+
+function showForgot(){
+
+    document.getElementById("loginBox").style.display="none";
+    document.getElementById("registerBox").style.display="none";
+    document.getElementById("forgotBox").style.display="block";
+
+    clearAuthMessages();
+
+}
+
+
+function clearAuthMessages(){
+
+    document.getElementById("loginMessage").innerHTML="";
+    document.getElementById("registerMessage").innerHTML="";
+    document.getElementById("forgotMessage").innerHTML="";
+
+}
+
+
+/* =====================================================
+   LOGIN
+===================================================== */
+
+function loginUser(){
+
+    const email =
+        document.getElementById("loginEmail").value.trim();
+
+    const password =
+        document.getElementById("loginPassword").value;
+
+    const message =
+        document.getElementById("loginMessage");
+
+
+    if(!email){
+
+        message.innerHTML =
+            '<div class="auth-error">Email দিন</div>';
+
+        return;
+    }
+
+
+    if(!password){
+
+        message.innerHTML =
+            '<div class="auth-error">Password দিন</div>';
+
+        return;
+    }
+
+
+    message.innerHTML =
+        '<div>⏳ Login হচ্ছে...</div>';
+
+
+    auth.signInWithEmailAndPassword(email,password)
+
+    .then(function(){
+
+        message.innerHTML =
+            '<div class="auth-success">✅ Login successful</div>';
+
+    })
+
+    .catch(function(error){
+
+        let msg="Login করা যায়নি।";
+
+        if(error.code==="auth/user-not-found"){
+            msg="এই Email দিয়ে কোনো account পাওয়া যায়নি।";
+        }
+
+        else if(error.code==="auth/wrong-password"){
+            msg="Password ভুল।";
+        }
+
+        else if(error.code==="auth/invalid-email"){
+            msg="সঠিক Email দিন।";
+        }
+
+        else if(error.code==="auth/invalid-credential"){
+            msg="Email অথবা Password ভুল।";
+        }
+
+        message.innerHTML =
+            '<div class="auth-error">❌ '+msg+'</div>';
+
+    });
+
+}
+
+
+/* =====================================================
+   CREATE ACCOUNT
+===================================================== */
+
+function createAccount(){
+
+    const email =
+        document.getElementById("registerEmail").value.trim();
+
+    const password =
+        document.getElementById("registerPassword").value;
+
+    const confirm =
+        document.getElementById("registerConfirm").value;
+
+    const message =
+        document.getElementById("registerMessage");
+
+
+    if(!email){
+
+        message.innerHTML =
+            '<div class="auth-error">Email দিন</div>';
+
+        return;
+    }
+
+
+    if(password.length < 6){
+
+        message.innerHTML =
+            '<div class="auth-error">Password কমপক্ষে ৬ অক্ষরের হতে হবে।</div>';
+
+        return;
+    }
+
+
+    if(password !== confirm){
+
+        message.innerHTML =
+            '<div class="auth-error">Password মিলছে না।</div>';
+
+        return;
+    }
+
+
+    message.innerHTML =
+        '<div>⏳ Account তৈরি হচ্ছে...</div>';
+
+
+    auth.createUserWithEmailAndPassword(
+        email,
+        password
+    )
+
+    .then(function(){
+
+        message.innerHTML =
+            '<div class="auth-success">✅ Account তৈরি হয়েছে।</div>';
+
+    })
+
+    .catch(function(error){
+
+        let msg="Account তৈরি করা যায়নি।";
+
+
+        if(error.code==="auth/email-already-in-use"){
+
+            msg="এই Email দিয়ে আগে থেকেই account আছে।";
+
+        }
+
+        else if(error.code==="auth/invalid-email"){
+
+            msg="সঠিক Email দিন।";
+
+        }
+
+        else if(error.code==="auth/weak-password"){
+
+            msg="Password আরও শক্তিশালী দিন।";
+
+        }
+
+
+        message.innerHTML =
+            '<div class="auth-error">❌ '+msg+'</div>';
+
+    });
+
+}
+
+
+/* =====================================================
+   FORGOT PASSWORD
+===================================================== */
+
+function resetPassword(){
+
+    const email =
+        document.getElementById("forgotEmail").value.trim();
+
+    const message =
+        document.getElementById("forgotMessage");
+
+
+    if(!email){
+
+        message.innerHTML =
+            '<div class="auth-error">Email দিন</div>';
+
+        return;
+    }
+
+
+    message.innerHTML =
+        '<div>⏳ Reset email পাঠানো হচ্ছে...</div>';
+
+
+    auth.sendPasswordResetEmail(email)
+
+    .then(function(){
+
+        message.innerHTML =
+            '<div class="auth-success">' +
+            '✅ Password reset email পাঠানো হয়েছে। আপনার Email inbox দেখুন।' +
+            '</div>';
+
+    })
+
+    .catch(function(error){
+
+        let msg="Reset email পাঠানো যায়নি।";
+
+
+        if(error.code==="auth/user-not-found"){
+
+            msg="এই Email দিয়ে কোনো account পাওয়া যায়নি।";
+
+        }
+
+        else if(error.code==="auth/invalid-email"){
+
+            msg="সঠিক Email দিন।";
+
+        }
+
+
+        message.innerHTML =
+            '<div class="auth-error">❌ '+msg+'</div>';
+
+    });
+
+}
+
+
+/* =====================================================
+   LOGOUT
+===================================================== */
+
+function logoutUser(){
+
+    if(!confirm("আপনি কি Logout করতে চান?")){
+
+        return;
+
+    }
+
+
+    auth.signOut()
+
+    .then(function(){
+
+        showLogin();
+
+    })
+
+    .catch(function(error){
+
+        alert("Logout করা যায়নি।");
+
+        console.error(error);
+
+    });
+
+}
+
+
+/* =====================================================
+   AUTH STATE
+===================================================== */
+
+auth.onAuthStateChanged(function(user){
+
+    const authScreen =
+        document.getElementById("authScreen");
+
+    const sidebar =
+        document.querySelector(".sidebar");
+
+    const main =
+        document.querySelector(".main");
+
+    const userEmail =
+        document.getElementById("loggedUserEmail");
+
+
+    if(user){
+
+        /* LOGGED IN */
+
+        authScreen.style.display="none";
+
+        sidebar.style.display="block";
+
+        main.style.display="block";
+
+
+        if(userEmail){
+
+            userEmail.innerText =
+                "👤 " + user.email;
+
+        }
+
+
+        /* Store data load */
+
+        renderAll();
+
+    }
+
+    else{
+
+        /* LOGGED OUT */
+
+        authScreen.style.display="flex";
+
+        sidebar.style.display="none";
+
+        main.style.display="none";
+
+
+        showLogin();
+
+    }
+
+});
+
+</script>
 /* =====================================================
    DATABASE
 ===================================================== */
