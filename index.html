@@ -6113,5 +6113,33 @@ firebase.auth().onAuthStateChanged(function(user) {
 
 });
 </script>
+    <script>
+/* ==========================================
+   SMART STORE - DASHBOARD SMART EFFECT
+========================================== */
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const menuButtons = document.querySelectorAll(".menu button");
+
+    menuButtons.forEach(function(button, index) {
+
+        button.style.opacity = "0";
+        button.style.transform = "translateY(15px)";
+
+        setTimeout(function() {
+
+            button.style.transition =
+                "opacity .35s ease, transform .35s ease";
+
+            button.style.opacity = "1";
+            button.style.transform = "translateY(0)";
+
+        }, index * 60);
+
+    });
+
+});
+</script>
 </body>
 </html>
