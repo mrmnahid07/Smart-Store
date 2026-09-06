@@ -198,19 +198,22 @@ body{
 
 .card{
     background:white;
-    padding:20px;
+    padding:16px;
     border-radius:12px;
     box-shadow:0 2px 8px rgba(0,0,0,.06);
 }
 
 .card h3{
     color:#64748b;
-    font-size:14px;
-    margin-bottom:10px;
+    font-size:12px;
+    margin-bottom:7px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
 }
 
 .card .number{
-    font-size:25px;
+    font-size:21px;
     font-weight:bold;
 }
 
@@ -240,16 +243,19 @@ label{
 }
 
 input,
-textarea{
+textarea,
+select{
     width:100%;
     padding:11px;
     border:1px solid #cbd5e1;
     border-radius:7px;
     outline:none;
+    background:white;
 }
 
 input:focus,
-textarea:focus{
+textarea:focus,
+select:focus{
     border-color:#2563eb;
 }
 
@@ -294,6 +300,28 @@ textarea{
     display:flex;
     gap:6px;
     flex-wrap:wrap;
+}
+
+.qty-unit{
+    display:flex;
+    gap:6px;
+    align-items:stretch;
+}
+
+.qty-unit input{
+    flex:1;
+    min-width:0;
+}
+
+.qty-unit select{
+    width:105px;
+    flex-shrink:0;
+}
+
+.small-note{
+    color:#64748b;
+    font-size:11px;
+    margin-top:4px;
 }
 
 table{
@@ -367,6 +395,27 @@ th{
 
     .logo{
         padding-bottom:10px;
+    }
+
+    .cards{
+        grid-template-columns:repeat(2,1fr);
+        gap:10px;
+    }
+
+    .card{
+        padding:12px;
+    }
+
+    .card h3{
+        font-size:11px;
+    }
+
+    .card .number{
+        font-size:18px;
+    }
+
+    .qty-unit select{
+        width:90px;
     }
 }
 </style>
@@ -568,6 +617,7 @@ th{
 
 
     <!-- USER AREA -->
+
     <div class="user-area">
 
         <div
@@ -610,47 +660,47 @@ th{
         <div class="cards">
 
             <div class="card">
-                <h3>Total Sales</h3>
+                <h3>💰 Total Sales</h3>
                 <div class="number" id="dashSales">৳0</div>
             </div>
 
             <div class="card">
-                <h3>Total Purchase</h3>
+                <h3>🛍️ Total Purchase</h3>
                 <div class="number" id="dashPurchase">৳0</div>
             </div>
 
             <div class="card">
-                <h3>Gross Profit</h3>
+                <h3>📈 Total Profit</h3>
                 <div class="number" id="dashGross">৳0</div>
             </div>
 
             <div class="card">
-                <h3>Expenses</h3>
+                <h3>💸 Expenses</h3>
                 <div class="number" id="dashExpense">৳0</div>
             </div>
 
             <div class="card">
-                <h3>Net Profit</h3>
+                <h3>💵 Net Profit</h3>
                 <div class="number" id="dashNet">৳0</div>
             </div>
 
             <div class="card">
-                <h3>Total Due</h3>
+                <h3>⚠️ Total Due</h3>
                 <div class="number" id="dashDue">৳0</div>
             </div>
 
             <div class="card">
-                <h3>Stock Value</h3>
+                <h3>📦 Stock Value</h3>
                 <div class="number" id="dashStock">৳0</div>
             </div>
 
             <div class="card">
-                <h3>Cash / Balance</h3>
+                <h3>💳 Cash / Balance</h3>
                 <div class="number" id="dashCash">৳0</div>
             </div>
 
             <div class="card">
-                <h3>Total Products</h3>
+                <h3>📦 Total Products</h3>
                 <div class="number" id="dashProducts">0</div>
             </div>
 
@@ -697,7 +747,7 @@ th{
 
         <div class="panel">
 
-            <h2>📦 Add Product</h2>
+            <h2>📦 Add Product / Raw Material</h2>
 
             <form id="productForm">
 
@@ -714,7 +764,7 @@ th{
                         <input
                             id="productName"
                             type="text"
-                            placeholder="Product Name লিখুন"
+                            placeholder="Product / কাঁচামাল নাম"
                             required
                         >
                     </div>
@@ -736,6 +786,7 @@ th{
                             id="productBuy"
                             type="number"
                             step="0.01"
+                            min="0"
                             placeholder="ক্রয় মূল্য"
                             required
                         >
@@ -748,20 +799,59 @@ th{
                             id="productSell"
                             type="number"
                             step="0.01"
+                            min="0"
                             placeholder="বিক্রয় মূল্য"
                             required
                         >
                     </div>
 
+                    <!-- নতুন Profit -->
                     <div>
-                        <label>Stock</label>
+                        <label>Profit Per Unit</label>
 
                         <input
-                            id="productStock"
+                            id="productProfit"
                             type="number"
-                            step="1"
-                            placeholder="Stock"
+                            step="0.01"
+                            min="0"
+                            placeholder="যেমন: 20"
                         >
+
+                        <div class="small-note">
+                            খালি রাখলে Sell - Buy হবে
+                        </div>
+                    </div>
+
+                    <!-- Quantity + Unit -->
+                    <div>
+                        <label>Quantity + Unit</label>
+
+                        <div class="qty-unit">
+
+                            <input
+                                id="productStock"
+                                type="number"
+                                min="0"
+                                step="0.001"
+                                placeholder="Quantity"
+                            >
+
+                            <select id="productUnit">
+                                <option value="পিস">পিস</option>
+                                <option value="কেজি">কেজি</option>
+                                <option value="গ্রাম">গ্রাম</option>
+                                <option value="লিটার">লিটার</option>
+                                <option value="মিটার">মিটার</option>
+                                <option value="বস্তা">বস্তা</option>
+                                <option value="কার্টন">কার্টন</option>
+                                <option value="প্যাকেট">প্যাকেট</option>
+                                <option value="বান্ডিল">বান্ডিল</option>
+                                <option value="জোড়া">জোড়া</option>
+                                <option value="কাঁচামাল">কাঁচামাল</option>
+                                <option value="অন্যান্য">অন্যান্য</option>
+                            </select>
+
+                        </div>
                     </div>
 
                 </div>
@@ -804,7 +894,9 @@ th{
                             <th>Code</th>
                             <th>Buy</th>
                             <th>Sell</th>
+                            <th>Profit/Unit</th>
                             <th>Stock</th>
+                            <th>Unit</th>
                             <th>Stock Value</th>
                             <th>Action</th>
                         </tr>
@@ -863,18 +955,38 @@ th{
                         >
                     </div>
 
+                    <!-- Quantity + Unit -->
                     <div>
-                        <label>Quantity</label>
+                        <label>Quantity + Unit</label>
 
-                        <input
-                            id="saleQty"
-                            type="number"
-                            min="1"
-                            step="1"
-                            placeholder="Quantity"
-                            required
-                            oninput="calculateSale()"
-                        >
+                        <div class="qty-unit">
+
+                            <input
+                                id="saleQty"
+                                type="number"
+                                min="0.001"
+                                step="0.001"
+                                placeholder="Quantity"
+                                required
+                                oninput="calculateSale()"
+                            >
+
+                            <select id="saleUnit">
+                                <option value="পিস">পিস</option>
+                                <option value="কেজি">কেজি</option>
+                                <option value="গ্রাম">গ্রাম</option>
+                                <option value="লিটার">লিটার</option>
+                                <option value="মিটার">মিটার</option>
+                                <option value="বস্তা">বস্তা</option>
+                                <option value="কার্টন">কার্টন</option>
+                                <option value="প্যাকেট">প্যাকেট</option>
+                                <option value="বান্ডিল">বান্ডিল</option>
+                                <option value="জোড়া">জোড়া</option>
+                                <option value="কাঁচামাল">কাঁচামাল</option>
+                                <option value="অন্যান্য">অন্যান্য</option>
+                            </select>
+
+                        </div>
                     </div>
 
                     <div>
@@ -935,10 +1047,20 @@ th{
                     </div>
 
                     <div>
-                        <label>Cost Price</label>
+                        <label>Cost Price / Unit</label>
 
                         <input
                             id="saleCost"
+                            type="number"
+                            readonly
+                        >
+                    </div>
+
+                    <div>
+                        <label>Profit / Unit</label>
+
+                        <input
+                            id="saleProfit"
                             type="number"
                             readonly
                         >
@@ -983,6 +1105,7 @@ th{
                             <th>Date</th>
                             <th>Product</th>
                             <th>Qty</th>
+                            <th>Unit</th>
                             <th>Price</th>
                             <th>Total</th>
                             <th>Customer</th>
@@ -1012,7 +1135,7 @@ th{
 
         <div class="panel">
 
-            <h2>🚚 Add Purchase</h2>
+            <h2>🚚 Add Purchase / Raw Material</h2>
 
             <form id="purchaseForm">
 
@@ -1039,23 +1162,43 @@ th{
                         <input
                             id="purchaseProduct"
                             type="text"
-                            placeholder="Product Name লিখুন"
+                            placeholder="Product / কাঁচামাল"
                             required
                             oninput="autoPurchasePrice()"
                         >
                     </div>
 
+                    <!-- Quantity + Unit -->
                     <div>
-                        <label>Quantity</label>
+                        <label>Quantity + Unit</label>
 
-                        <input
-                            id="purchaseQty"
-                            type="number"
-                            min="1"
-                            step="1"
-                            placeholder="Quantity"
-                            required
-                        >
+                        <div class="qty-unit">
+
+                            <input
+                                id="purchaseQty"
+                                type="number"
+                                min="0.001"
+                                step="0.001"
+                                placeholder="Quantity"
+                                required
+                            >
+
+                            <select id="purchaseUnit">
+                                <option value="পিস">পিস</option>
+                                <option value="কেজি">কেজি</option>
+                                <option value="গ্রাম">গ্রাম</option>
+                                <option value="লিটার">লিটার</option>
+                                <option value="মিটার">মিটার</option>
+                                <option value="বস্তা">বস্তা</option>
+                                <option value="কার্টন">কার্টন</option>
+                                <option value="প্যাকেট">প্যাকেট</option>
+                                <option value="বান্ডিল">বান্ডিল</option>
+                                <option value="জোড়া">জোড়া</option>
+                                <option value="কাঁচামাল">কাঁচামাল</option>
+                                <option value="অন্যান্য">অন্যান্য</option>
+                            </select>
+
+                        </div>
                     </div>
 
                     <div>
@@ -1080,6 +1223,18 @@ th{
                             min="0"
                             step="0.01"
                             placeholder="New Product Sale Price"
+                        >
+                    </div>
+
+                    <div>
+                        <label>Profit Per Unit</label>
+
+                        <input
+                            id="purchaseProfit"
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            placeholder="Profit"
                         >
                     </div>
 
@@ -1132,6 +1287,7 @@ th{
                             <th>Date</th>
                             <th>Product</th>
                             <th>Qty</th>
+                            <th>Unit</th>
                             <th>Price</th>
                             <th>Total</th>
                             <th>Supplier</th>
@@ -1491,47 +1647,47 @@ th{
         <div class="cards">
 
             <div class="card">
-                <h3>Total Sales</h3>
+                <h3>💰 Total Sales</h3>
                 <div class="number" id="reportSales">৳0</div>
             </div>
 
             <div class="card">
-                <h3>Total Purchase</h3>
+                <h3>🛍️ Total Purchase</h3>
                 <div class="number" id="reportPurchase">৳0</div>
             </div>
 
             <div class="card">
-                <h3>Gross Profit</h3>
+                <h3>📈 Total Profit</h3>
                 <div class="number" id="reportGross">৳0</div>
             </div>
 
             <div class="card">
-                <h3>Expenses</h3>
+                <h3>💸 Expenses</h3>
                 <div class="number" id="reportExpense">৳0</div>
             </div>
 
             <div class="card">
-                <h3>Net Profit</h3>
+                <h3>💵 Net Profit</h3>
                 <div class="number" id="reportNet">৳0</div>
             </div>
 
             <div class="card">
-                <h3>Total Due</h3>
+                <h3>⚠️ Total Due</h3>
                 <div class="number" id="reportDue">৳0</div>
             </div>
 
             <div class="card">
-                <h3>Stock Value</h3>
+                <h3>📦 Stock Value</h3>
                 <div class="number" id="reportStock">৳0</div>
             </div>
 
             <div class="card">
-                <h3>Cash / Balance</h3>
+                <h3>💳 Cash / Balance</h3>
                 <div class="number" id="reportCash">৳0</div>
             </div>
 
             <div class="card">
-                <h3>Total Products</h3>
+                <h3>📦 Total Products</h3>
                 <div class="number" id="reportProducts">0</div>
             </div>
 
@@ -1552,10 +1708,6 @@ th{
 
 /* =====================================================
    FIREBASE CONFIG
-===================================================== */
-
-/* ===================================================== 
-   FIREBASE CONFIG 
 ===================================================== */
 
 const firebaseConfig = {
@@ -1583,9 +1735,14 @@ try {
 }
 catch(error){
 
-    console.error("Firebase Initialization Error:", error);
+    console.error(
+        "Firebase Initialization Error:",
+        error
+    );
 
 }
+
+
 /* =====================================================
    SHORTCUT
 ===================================================== */
@@ -1610,6 +1767,31 @@ let db =
         expenses: []
 
     };
+
+
+/* =====================================================
+   DATABASE SAFETY
+===================================================== */
+
+db.products = Array.isArray(db.products)
+    ? db.products
+    : [];
+
+db.sales = Array.isArray(db.sales)
+    ? db.sales
+    : [];
+
+db.purchases = Array.isArray(db.purchases)
+    ? db.purchases
+    : [];
+
+db.customers = Array.isArray(db.customers)
+    ? db.customers
+    : [];
+
+db.expenses = Array.isArray(db.expenses)
+    ? db.expenses
+    : [];
 
 
 /* =====================================================
@@ -1687,6 +1869,98 @@ function escapeHTML(value){
         .replace(/'/g,"&#039;");
 
 }
+
+
+/* =====================================================
+   PRODUCT PROFIT
+===================================================== */
+
+function getProductProfit(product){
+
+    if(
+        product &&
+        product.profit !== undefined &&
+        product.profit !== null &&
+        product.profit !== ""
+    ){
+
+        const value =
+            Number(product.profit);
+
+        if(Number.isFinite(value)){
+            return Math.max(0,value);
+        }
+
+    }
+
+    return Math.max(
+        0,
+        Number(product?.sell || 0)
+        -
+        Number(product?.buy || 0)
+    );
+
+}
+
+
+/* =====================================================
+   SALE PROFIT
+===================================================== */
+
+function getSaleProfit(sale){
+
+    if(
+        sale &&
+        sale.profit !== undefined &&
+        sale.profit !== null
+    ){
+
+        const value =
+            Number(sale.profit);
+
+        if(Number.isFinite(value)){
+            return value;
+        }
+
+    }
+
+    /*
+     * পুরোনো Sale হলে Cost থেকে Profit হিসাব
+     */
+    if(sale){
+
+        return Math.max(
+            0,
+            Number(sale.total || 0)
+            -
+            Number(sale.cost || 0)
+        );
+
+    }
+
+    return 0;
+
+}
+
+
+/* =====================================================
+   UNIT OPTIONS
+===================================================== */
+
+const UNIT_OPTIONS = [
+    "পিস",
+    "কেজি",
+    "গ্রাম",
+    "লিটার",
+    "মিটার",
+    "বস্তা",
+    "কার্টন",
+    "প্যাকেট",
+    "বান্ডিল",
+    "জোড়া",
+    "কাঁচামাল",
+    "অন্যান্য"
+];
 
 
 /* =====================================================
@@ -1985,11 +2259,6 @@ function createAccount(){
                 '<br>⏳ Login হচ্ছে...' +
                 '</div>';
 
-            /*
-             * Firebase নতুন user-কে automatically login করে।
-             * তাই আলাদা করে login করার দরকার নেই।
-             */
-
         })
 
         .catch(function(error){
@@ -2051,11 +2320,6 @@ function resetPassword(){
 
         .then(function(){
 
-            console.log(
-                "Password reset email sent to:",
-                email
-            );
-
             message.innerHTML =
                 '<div class="auth-success">' +
                 '✅ Password reset email পাঠানো হয়েছে।' +
@@ -2089,9 +2353,7 @@ function resetPassword(){
 function logoutUser(){
 
     if(!auth){
-
         return;
-
     }
 
 
@@ -2100,9 +2362,7 @@ function logoutUser(){
             "আপনি কি Logout করতে চান?"
         )
     ){
-
         return;
-
     }
 
 
@@ -2125,7 +2385,7 @@ function logoutUser(){
             );
 
             alert(
-                "Logout করা যায়নি।\n\n" +
+                "Logout করা যায়নি.\n\n" +
                 error.code
             );
 
@@ -2157,17 +2417,6 @@ if(auth){
 
         if(user){
 
-            /* =========================
-               LOGGED IN
-            ========================= */
-
-            console.log(
-                "AUTH USER:",
-                user.email,
-                user.uid
-            );
-
-
             authScreen.style.display =
                 "none";
 
@@ -2192,15 +2441,6 @@ if(auth){
 
         else{
 
-            /* =========================
-               LOGGED OUT
-            ========================= */
-
-            console.log(
-                "No authenticated user"
-            );
-
-
             authScreen.style.display =
                 "flex";
 
@@ -2217,6 +2457,11 @@ if(auth){
     });
 
 }
+
+
+/* =====================================================
+   PAGE
+===================================================== */
 
 function showPage(page,button){
 
@@ -2288,7 +2533,7 @@ function showPage(page,button){
 
 
 /* =====================================================
-   PRODUCT
+   PRODUCT SAVE
 ===================================================== */
 
 $("productForm")
@@ -2303,39 +2548,37 @@ $("productForm")
                 $("productId").value;
 
 
-            const product = {
+            const name =
+                $("productName")
+                    .value.trim();
 
-                id:
-                    id ||
-                    Date.now().toString(),
+            const code =
+                $("productCode")
+                    .value.trim();
 
-                name:
-                    $("productName")
-                    .value.trim(),
+            const buy =
+                Number(
+                    $("productBuy").value || 0
+                );
 
-                code:
-                    $("productCode")
-                    .value.trim(),
+            const sell =
+                Number(
+                    $("productSell").value || 0
+                );
 
-                buy:
-                    Number(
-                        $("productBuy").value || 0
-                    ),
+            const profitText =
+                $("productProfit").value.trim();
 
-                sell:
-                    Number(
-                        $("productSell").value || 0
-                    ),
+            const stock =
+                Number(
+                    $("productStock").value || 0
+                );
 
-                stock:
-                    Number(
-                        $("productStock").value || 0
-                    )
-
-            };
+            const unit =
+                $("productUnit").value;
 
 
-            if(!product.name){
+            if(!name){
 
                 alert(
                     "Product Name লিখুন"
@@ -2346,18 +2589,123 @@ $("productForm")
             }
 
 
+            if(buy < 0 || sell < 0){
+
+                alert(
+                    "Price সঠিকভাবে লিখুন"
+                );
+
+                return;
+
+            }
+
+
+            if(stock < 0){
+
+                alert(
+                    "Stock সঠিকভাবে লিখুন"
+                );
+
+                return;
+
+            }
+
+
+            /*
+             * Profit manually দিলে সেটাই থাকবে।
+             * খালি রাখলে Sell - Buy automatic।
+             */
+
+            let profit;
+
+            if(profitText === ""){
+
+                profit =
+                    Math.max(
+                        0,
+                        sell - buy
+                    );
+
+            }
+
+            else{
+
+                profit =
+                    Number(profitText);
+
+            }
+
+
+            if(
+                !Number.isFinite(profit)
+                ||
+                profit < 0
+            ){
+
+                alert(
+                    "Profit সঠিকভাবে লিখুন"
+                );
+
+                return;
+
+            }
+
+
+            const product = {
+
+                id:
+                    id ||
+                    Date.now().toString(),
+
+                name:
+                    name,
+
+                code:
+                    code,
+
+                buy:
+                    buy,
+
+                sell:
+                    sell,
+
+                profit:
+                    profit,
+
+                stock:
+                    stock,
+
+                unit:
+                    unit
+
+            };
+
+
             if(id){
 
                 const index =
                     db.products.findIndex(
-                        p => p.id === id
+                        p =>
+                            String(p.id)
+                            ===
+                            String(id)
                     );
 
 
                 if(index !== -1){
 
-                    db.products[index] =
-                        product;
+                    /*
+                     * পুরোনো data-এর অতিরিক্ত field
+                     * নষ্ট না করে update
+                     */
+
+                    db.products[index] = {
+
+                        ...db.products[index],
+
+                        ...product
+
+                    };
 
                 }
 
@@ -2384,11 +2732,18 @@ $("productForm")
     );
 
 
+/* =====================================================
+   EDIT PRODUCT
+===================================================== */
+
 function editProduct(id){
 
     const p =
         db.products.find(
-            x => x.id === id
+            x =>
+                String(x.id)
+                ===
+                String(id)
         );
 
 
@@ -2399,19 +2754,27 @@ function editProduct(id){
         p.id;
 
     $("productName").value =
-        p.name;
+        p.name || "";
 
     $("productCode").value =
         p.code || "";
 
     $("productBuy").value =
-        p.buy;
+        Number(p.buy || 0);
 
     $("productSell").value =
-        p.sell;
+        Number(p.sell || 0);
+
+    $("productProfit").value =
+        getProductProfit(p);
 
     $("productStock").value =
-        p.stock;
+        Number(p.stock || 0);
+
+    $("productUnit").value =
+        UNIT_OPTIONS.includes(p.unit)
+        ? p.unit
+        : "পিস";
 
 
     $("productSubmit").innerText =
@@ -2428,6 +2791,10 @@ function editProduct(id){
 }
 
 
+/* =====================================================
+   DELETE PRODUCT
+===================================================== */
+
 function deleteProduct(id){
 
     if(
@@ -2443,7 +2810,10 @@ function deleteProduct(id){
 
     db.products =
         db.products.filter(
-            p => p.id !== id
+            p =>
+                String(p.id)
+                !==
+                String(id)
         );
 
 
@@ -2452,11 +2822,21 @@ function deleteProduct(id){
 }
 
 
+/* =====================================================
+   RESET PRODUCT
+===================================================== */
+
 function resetProductForm(){
 
     $("productForm").reset();
 
     $("productId").value =
+        "";
+
+    $("productProfit").value =
+        "";
+
+    $("productStock").value =
         "";
 
     $("productSubmit").innerText =
@@ -2473,11 +2853,11 @@ function findProduct(name){
 
     return db.products.find(
         p =>
-            p.name
+            String(p.name || "")
                 .trim()
                 .toLowerCase()
             ===
-            name
+            String(name || "")
                 .trim()
                 .toLowerCase()
     );
@@ -2500,10 +2880,18 @@ function autoSalePrice(){
     if(p){
 
         $("salePrice").value =
-            p.sell;
+            Number(p.sell || 0);
 
         $("saleCost").value =
-            p.buy;
+            Number(p.buy || 0);
+
+        $("saleProfit").value =
+            getProductProfit(p);
+
+        $("saleUnit").value =
+            UNIT_OPTIONS.includes(p.unit)
+            ? p.unit
+            : "পিস";
 
     }
 
@@ -2512,6 +2900,10 @@ function autoSalePrice(){
 
 }
 
+
+/* =====================================================
+   CALCULATE SALE
+===================================================== */
 
 function calculateSale(){
 
@@ -2558,7 +2950,10 @@ function calculateSale(){
     if(p){
 
         $("saleCost").value =
-            p.buy;
+            Number(p.buy || 0);
+
+        $("saleProfit").value =
+            getProductProfit(p);
 
     }
 
@@ -2566,7 +2961,7 @@ function calculateSale(){
 
 
 /* =====================================================
-   SALES
+   SALES SAVE
 ===================================================== */
 
 $("salesForm")
@@ -2604,6 +2999,10 @@ $("salesForm")
                 );
 
 
+            const unit =
+                $("saleUnit").value;
+
+
             if(!name){
 
                 alert(
@@ -2615,10 +3014,29 @@ $("salesForm")
             }
 
 
-            if(qty <= 0){
+            if(
+                !Number.isFinite(qty)
+                ||
+                qty <= 0
+            ){
 
                 alert(
                     "Quantity সঠিকভাবে লিখুন"
+                );
+
+                return;
+
+            }
+
+
+            if(
+                !Number.isFinite(price)
+                ||
+                price < 0
+            ){
+
+                alert(
+                    "Sale Price সঠিকভাবে লিখুন"
                 );
 
                 return;
@@ -2641,13 +3059,18 @@ $("salesForm")
             }
 
 
-            /* Restore old stock during edit */
+            /*
+             * Edit করলে আগের stock ফেরত দেওয়া
+             */
 
             if(id){
 
                 const old =
                     db.sales.find(
-                        s => s.id === id
+                        s =>
+                            String(s.id)
+                            ===
+                            String(id)
                     );
 
 
@@ -2661,8 +3084,10 @@ $("salesForm")
 
                     if(oldProduct){
 
-                        oldProduct.stock +=
-                            Number(old.qty);
+                        oldProduct.stock =
+                            Number(oldProduct.stock || 0)
+                            +
+                            Number(old.qty || 0);
 
                     }
 
@@ -2677,26 +3102,40 @@ $("salesForm")
 
             let cost = 0;
 
+            let unitProfit = 0;
+
 
             if(product){
 
                 if(
-                    product.stock < qty
+                    Number(product.stock || 0)
+                    <
+                    qty
                 ){
 
                     alert(
                         "Stock পর্যাপ্ত নেই। Current Stock: "
-                        + product.stock
+                        +
+                        Number(product.stock || 0)
+                        +
+                        " "
+                        +
+                        (product.unit || "")
                     );
 
 
-                    /* Restore edit rollback */
+                    /*
+                     * Edit rollback
+                     */
 
                     if(id){
 
                         const old =
                             db.sales.find(
-                                s => s.id === id
+                                s =>
+                                    String(s.id)
+                                    ===
+                                    String(id)
                             );
 
 
@@ -2710,8 +3149,10 @@ $("salesForm")
 
                             if(oldProduct){
 
-                                oldProduct.stock -=
-                                    Number(old.qty);
+                                oldProduct.stock =
+                                    Number(oldProduct.stock || 0)
+                                    -
+                                    Number(old.qty || 0);
 
                             }
 
@@ -2725,12 +3166,36 @@ $("salesForm")
                 }
 
 
-                product.stock -= qty;
+                product.stock =
+                    Number(product.stock || 0)
+                    -
+                    qty;
+
 
                 cost =
-                    qty * product.buy;
+                    qty *
+                    Number(product.buy || 0);
+
+
+                unitProfit =
+                    getProductProfit(product);
 
             }
+
+            else{
+
+                /*
+                 * Product না থাকলেও Sale allow থাকবে,
+                 * কিন্তু Profit হবে 0
+                 */
+
+                unitProfit = 0;
+
+            }
+
+
+            const totalProfit =
+                unitProfit * qty;
 
 
             const sale = {
@@ -2747,6 +3212,9 @@ $("salesForm")
 
                 qty:
                     qty,
+
+                unit:
+                    unit,
 
                 price:
                     price,
@@ -2768,7 +3236,10 @@ $("salesForm")
                         .value.trim(),
 
                 cost:
-                    cost
+                    cost,
+
+                profit:
+                    totalProfit
 
             };
 
@@ -2777,7 +3248,10 @@ $("salesForm")
 
                 const index =
                     db.sales.findIndex(
-                        s => s.id === id
+                        s =>
+                            String(s.id)
+                            ===
+                            String(id)
                     );
 
 
@@ -2811,11 +3285,18 @@ $("salesForm")
     );
 
 
+/* =====================================================
+   EDIT SALE
+===================================================== */
+
 function editSale(id){
 
     const s =
         db.sales.find(
-            x => x.id === id
+            x =>
+                String(x.id)
+                ===
+                String(id)
         );
 
 
@@ -2826,31 +3307,71 @@ function editSale(id){
         s.id;
 
     $("saleDate").value =
-        s.date;
+        s.date || today();
 
     $("saleProduct").value =
-        s.product;
+        s.product || "";
 
     $("saleQty").value =
-        s.qty;
+        Number(s.qty || 0);
 
     $("salePrice").value =
-        s.price;
+        Number(s.price || 0);
 
     $("saleCustomer").value =
         s.customer || "";
 
     $("salePaid").value =
-        s.paid;
+        Number(s.paid || 0);
 
     $("saleTotal").value =
-        s.total;
+        Number(s.total || 0).toFixed(2);
 
     $("saleDue").value =
-        s.due;
+        Number(s.due || 0).toFixed(2);
 
     $("saleCost").value =
-        s.cost;
+        Number(s.cost || 0);
+
+    const product =
+        findProduct(s.product);
+
+
+    if(
+        s.unit &&
+        UNIT_OPTIONS.includes(s.unit)
+    ){
+
+        $("saleUnit").value =
+            s.unit;
+
+    }
+
+    else if(product){
+
+        $("saleUnit").value =
+            UNIT_OPTIONS.includes(product.unit)
+            ? product.unit
+            : "পিস";
+
+    }
+
+    else{
+
+        $("saleUnit").value =
+            "পিস";
+
+    }
+
+
+    $("saleProfit").value =
+        product
+        ? getProductProfit(product)
+        : (
+            Number(s.profit || 0)
+            /
+            Math.max(Number(s.qty || 1),1)
+        );
 
 
     $("saleSubmit").innerText =
@@ -2867,6 +3388,10 @@ function editSale(id){
 }
 
 
+/* =====================================================
+   DELETE SALE
+===================================================== */
+
 function deleteSale(id){
 
     if(
@@ -2882,7 +3407,10 @@ function deleteSale(id){
 
     const sale =
         db.sales.find(
-            s => s.id === id
+            s =>
+                String(s.id)
+                ===
+                String(id)
         );
 
 
@@ -2896,8 +3424,10 @@ function deleteSale(id){
 
         if(product){
 
-            product.stock +=
-                Number(sale.qty);
+            product.stock =
+                Number(product.stock || 0)
+                +
+                Number(sale.qty || 0);
 
         }
 
@@ -2906,7 +3436,10 @@ function deleteSale(id){
 
     db.sales =
         db.sales.filter(
-            s => s.id !== id
+            s =>
+                String(s.id)
+                !==
+                String(id)
         );
 
 
@@ -2914,6 +3447,10 @@ function deleteSale(id){
 
 }
 
+
+/* =====================================================
+   RESET SALE
+===================================================== */
 
 function resetSaleForm(){
 
@@ -2937,6 +3474,12 @@ function resetSaleForm(){
     $("saleCost").value =
         0;
 
+    $("saleProfit").value =
+        0;
+
+    $("saleUnit").value =
+        "পিস";
+
     $("saleSubmit").innerText =
         "➕ Add Sale";
 
@@ -2944,7 +3487,7 @@ function resetSaleForm(){
 
 
 /* =====================================================
-   PURCHASE
+   PURCHASE AUTO PRICE
 ===================================================== */
 
 function autoPurchasePrice(){
@@ -2959,15 +3502,27 @@ function autoPurchasePrice(){
     if(p){
 
         $("purchasePrice").value =
-            p.buy;
+            Number(p.buy || 0);
 
         $("purchaseSell").value =
-            p.sell;
+            Number(p.sell || 0);
+
+        $("purchaseProfit").value =
+            getProductProfit(p);
+
+        $("purchaseUnit").value =
+            UNIT_OPTIONS.includes(p.unit)
+            ? p.unit
+            : "পিস";
 
     }
 
 }
 
+
+/* =====================================================
+   PURCHASE SAVE
+===================================================== */
 
 $("purchaseForm")
     .addEventListener(
@@ -3004,6 +3559,15 @@ $("purchaseForm")
                 );
 
 
+            const profitText =
+                $("purchaseProfit")
+                    .value.trim();
+
+
+            const unit =
+                $("purchaseUnit").value;
+
+
             if(!name){
 
                 alert(
@@ -3015,7 +3579,11 @@ $("purchaseForm")
             }
 
 
-            if(qty <= 0){
+            if(
+                !Number.isFinite(qty)
+                ||
+                qty <= 0
+            ){
 
                 alert(
                     "Quantity সঠিকভাবে লিখুন"
@@ -3026,13 +3594,33 @@ $("purchaseForm")
             }
 
 
-            /* Restore old purchase stock */
+            if(
+                !Number.isFinite(price)
+                ||
+                price < 0
+            ){
+
+                alert(
+                    "Purchase Price সঠিকভাবে লিখুন"
+                );
+
+                return;
+
+            }
+
+
+            /*
+             * Edit করলে আগের purchase stock বাদ
+             */
 
             if(id){
 
                 const old =
                     db.purchases.find(
-                        p => p.id === id
+                        p =>
+                            String(p.id)
+                            ===
+                            String(id)
                     );
 
 
@@ -3046,8 +3634,10 @@ $("purchaseForm")
 
                     if(oldProduct){
 
-                        oldProduct.stock -=
-                            Number(old.qty);
+                        oldProduct.stock =
+                            Number(oldProduct.stock || 0)
+                            -
+                            Number(old.qty || 0);
 
                     }
 
@@ -3060,13 +3650,62 @@ $("purchaseForm")
                 findProduct(name);
 
 
+            let finalProfit;
+
+
+            if(profitText === ""){
+
+                if(product){
+
+                    finalProfit =
+                        getProductProfit(product);
+
+                }
+
+                else{
+
+                    finalProfit =
+                        Math.max(
+                            0,
+                            sell - price
+                        );
+
+                }
+
+            }
+
+            else{
+
+                finalProfit =
+                    Number(profitText);
+
+            }
+
+
+            if(
+                !Number.isFinite(finalProfit)
+                ||
+                finalProfit < 0
+            ){
+
+                alert(
+                    "Profit সঠিকভাবে লিখুন"
+                );
+
+                return;
+
+            }
+
+
             if(product){
 
-                product.stock += qty;
+                product.stock =
+                    Number(product.stock || 0)
+                    +
+                    qty;
 
                 product.buy =
                     price;
-
 
                 if(sell > 0){
 
@@ -3074,6 +3713,12 @@ $("purchaseForm")
                         sell;
 
                 }
+
+                product.profit =
+                    finalProfit;
+
+                product.unit =
+                    unit;
 
             }
 
@@ -3096,8 +3741,14 @@ $("purchaseForm")
                     sell:
                         sell || price,
 
+                    profit:
+                        finalProfit,
+
                     stock:
-                        qty
+                        qty,
+
+                    unit:
+                        unit
 
                 };
 
@@ -3125,6 +3776,9 @@ $("purchaseForm")
                 qty:
                     qty,
 
+                unit:
+                    unit,
+
                 price:
                     price,
 
@@ -3142,7 +3796,10 @@ $("purchaseForm")
 
                 const index =
                     db.purchases.findIndex(
-                        p => p.id === id
+                        p =>
+                            String(p.id)
+                            ===
+                            String(id)
                     );
 
 
@@ -3176,11 +3833,18 @@ $("purchaseForm")
     );
 
 
+/* =====================================================
+   EDIT PURCHASE
+===================================================== */
+
 function editPurchase(id){
 
     const p =
         db.purchases.find(
-            x => x.id === id
+            x =>
+                String(x.id)
+                ===
+                String(id)
         );
 
 
@@ -3191,16 +3855,16 @@ function editPurchase(id){
         p.id;
 
     $("purchaseDate").value =
-        p.date;
+        p.date || today();
 
     $("purchaseProduct").value =
-        p.product;
+        p.product || "";
 
     $("purchaseQty").value =
-        p.qty;
+        Number(p.qty || 0);
 
     $("purchasePrice").value =
-        p.price;
+        Number(p.price || 0);
 
     $("purchaseSupplier").value =
         p.supplier || "";
@@ -3214,8 +3878,26 @@ function editPurchase(id){
 
     $("purchaseSell").value =
         product
-        ? product.sell
+        ? Number(product.sell || 0)
         : "";
+
+
+    $("purchaseProfit").value =
+        product
+        ? getProductProfit(product)
+        : "";
+
+
+    $("purchaseUnit").value =
+        product &&
+        UNIT_OPTIONS.includes(product.unit)
+        ? product.unit
+        : (
+            p.unit &&
+            UNIT_OPTIONS.includes(p.unit)
+            ? p.unit
+            : "পিস"
+        );
 
 
     $("purchaseSubmit").innerText =
@@ -3232,6 +3914,10 @@ function editPurchase(id){
 }
 
 
+/* =====================================================
+   DELETE PURCHASE
+===================================================== */
+
 function deletePurchase(id){
 
     if(
@@ -3247,7 +3933,10 @@ function deletePurchase(id){
 
     const purchase =
         db.purchases.find(
-            p => p.id === id
+            p =>
+                String(p.id)
+                ===
+                String(id)
         );
 
 
@@ -3261,10 +3950,17 @@ function deletePurchase(id){
 
         if(product){
 
-            product.stock -=
-                Number(
-                    purchase.qty
-                );
+            product.stock =
+                Number(product.stock || 0)
+                -
+                Number(purchase.qty || 0);
+
+
+            if(product.stock < 0){
+
+                product.stock = 0;
+
+            }
 
         }
 
@@ -3273,7 +3969,10 @@ function deletePurchase(id){
 
     db.purchases =
         db.purchases.filter(
-            p => p.id !== id
+            p =>
+                String(p.id)
+                !==
+                String(id)
         );
 
 
@@ -3281,6 +3980,10 @@ function deletePurchase(id){
 
 }
 
+
+/* =====================================================
+   RESET PURCHASE
+===================================================== */
 
 function resetPurchaseForm(){
 
@@ -3291,6 +3994,12 @@ function resetPurchaseForm(){
 
     $("purchaseDate").value =
         today();
+
+    $("purchaseUnit").value =
+        "পিস";
+
+    $("purchaseProfit").value =
+        "";
 
     $("purchaseSubmit").innerText =
         "➕ Add Purchase";
@@ -3448,7 +4157,10 @@ $("customerForm")
 
                 const index =
                     db.customers.findIndex(
-                        c => c.id === id
+                        c =>
+                            String(c.id)
+                            ===
+                            String(id)
                     );
 
 
@@ -3482,11 +4194,18 @@ $("customerForm")
     );
 
 
+/* =====================================================
+   EDIT CUSTOMER
+===================================================== */
+
 function editCustomer(id){
 
     const c =
         db.customers.find(
-            x => x.id === id
+            x =>
+                String(x.id)
+                ===
+                String(id)
         );
 
 
@@ -3528,6 +4247,10 @@ function editCustomer(id){
 }
 
 
+/* =====================================================
+   DELETE CUSTOMER
+===================================================== */
+
 function deleteCustomer(id){
 
     if(
@@ -3543,7 +4266,10 @@ function deleteCustomer(id){
 
     db.customers =
         db.customers.filter(
-            c => c.id !== id
+            c =>
+                String(c.id)
+                !==
+                String(id)
         );
 
 
@@ -3551,6 +4277,10 @@ function deleteCustomer(id){
 
 }
 
+
+/* =====================================================
+   RESET CUSTOMER
+===================================================== */
 
 function resetCustomerForm(){
 
@@ -3640,7 +4370,8 @@ $("expenseForm")
 
             if(
                 !Number.isFinite(amount)
-                || amount <= 0
+                ||
+                amount <= 0
             ){
 
                 alert(
@@ -3744,6 +4475,10 @@ $("expenseForm")
     );
 
 
+/* =====================================================
+   EDIT EXPENSE
+===================================================== */
+
 function editExpense(id){
 
     const expense =
@@ -3827,6 +4562,10 @@ function editExpense(id){
 }
 
 
+/* =====================================================
+   RESET EXPENSE
+===================================================== */
+
 function resetExpenseForm(){
 
     $("expenseForm").reset();
@@ -3858,6 +4597,10 @@ function resetExpenseForm(){
 
 }
 
+
+/* =====================================================
+   DELETE EXPENSE
+===================================================== */
 
 function deleteExpense(id){
 
@@ -3947,7 +4690,7 @@ function renderProducts(){
             `
             <tr>
                 <td
-                    colspan="7"
+                    colspan="9"
                     class="empty"
                 >
                     কোনো Product নেই
@@ -3962,6 +4705,13 @@ function renderProducts(){
         [...db.products]
             .reverse()
             .forEach(function(p){
+
+                const profit =
+                    getProductProfit(p);
+
+                const unit =
+                    p.unit || "পিস";
+
 
                 html +=
                     `
@@ -3986,9 +4736,17 @@ function renderProducts(){
                         </td>
 
                         <td>
+                            ${money(profit)}
+                        </td>
+
+                        <td>
                             ${Number(
                                 p.stock || 0
                             )}
+                        </td>
+
+                        <td>
+                            ${escapeHTML(unit)}
                         </td>
 
                         <td>
@@ -4008,7 +4766,7 @@ function renderProducts(){
                                 <button
                                     type="button"
                                     class="btn btn-warning"
-                                    onclick="editProduct('${String(p.id).replace(/'/g,"\\'")}')"
+                                    onclick="editProduct('${String(p.id).replace(/'/g,"\\'") }')"
                                 >
                                     ✏️ Edit
                                 </button>
@@ -4016,7 +4774,7 @@ function renderProducts(){
                                 <button
                                     type="button"
                                     class="btn btn-danger"
-                                    onclick="deleteProduct('${String(p.id).replace(/'/g,"\\'")}')"
+                                    onclick="deleteProduct('${String(p.id).replace(/'/g,"\\'") }')"
                                 >
                                     🗑️ Delete
                                 </button>
@@ -4056,7 +4814,7 @@ function renderSales(){
             `
             <tr>
                 <td
-                    colspan="9"
+                    colspan="10"
                     class="empty"
                 >
                     কোনো Sale নেই
@@ -4071,6 +4829,10 @@ function renderSales(){
         [...db.sales]
             .reverse()
             .forEach(function(s){
+
+                const unit =
+                    s.unit || "পিস";
+
 
                 html +=
                     `
@@ -4089,7 +4851,11 @@ function renderSales(){
                         </td>
 
                         <td>
-                            ${s.qty}
+                            ${Number(s.qty || 0)}
+                        </td>
+
+                        <td>
+                            ${escapeHTML(unit)}
                         </td>
 
                         <td>
@@ -4123,7 +4889,7 @@ function renderSales(){
                                 <button
                                     type="button"
                                     class="btn btn-warning"
-                                    onclick="editSale('${String(s.id).replace(/'/g,"\\'")}')"
+                                    onclick="editSale('${String(s.id).replace(/'/g,"\\'") }')"
                                 >
                                     ✏️ Edit
                                 </button>
@@ -4131,7 +4897,7 @@ function renderSales(){
                                 <button
                                     type="button"
                                     class="btn btn-danger"
-                                    onclick="deleteSale('${String(s.id).replace(/'/g,"\\'")}')"
+                                    onclick="deleteSale('${String(s.id).replace(/'/g,"\\'") }')"
                                 >
                                     🗑️ Delete
                                 </button>
@@ -4171,7 +4937,7 @@ function renderPurchases(){
             `
             <tr>
                 <td
-                    colspan="7"
+                    colspan="8"
                     class="empty"
                 >
                     কোনো Purchase নেই
@@ -4186,6 +4952,10 @@ function renderPurchases(){
         [...db.purchases]
             .reverse()
             .forEach(function(p){
+
+                const unit =
+                    p.unit || "পিস";
+
 
                 html +=
                     `
@@ -4204,7 +4974,11 @@ function renderPurchases(){
                         </td>
 
                         <td>
-                            ${p.qty}
+                            ${Number(p.qty || 0)}
+                        </td>
+
+                        <td>
+                            ${escapeHTML(unit)}
                         </td>
 
                         <td>
@@ -4230,7 +5004,7 @@ function renderPurchases(){
                                 <button
                                     type="button"
                                     class="btn btn-warning"
-                                    onclick="editPurchase('${String(p.id).replace(/'/g,"\\'")}')"
+                                    onclick="editPurchase('${String(p.id).replace(/'/g,"\\'") }')"
                                 >
                                     ✏️ Edit
                                 </button>
@@ -4238,7 +5012,7 @@ function renderPurchases(){
                                 <button
                                     type="button"
                                     class="btn btn-danger"
-                                    onclick="deletePurchase('${String(p.id).replace(/'/g,"\\'")}')"
+                                    onclick="deletePurchase('${String(p.id).replace(/'/g,"\\'") }')"
                                 >
                                     🗑️ Delete
                                 </button>
@@ -4386,7 +5160,7 @@ function renderCustomers(){
                                 <button
                                     type="button"
                                     class="btn btn-warning"
-                                    onclick="editCustomer('${String(c.id).replace(/'/g,"\\'")}')"
+                                    onclick="editCustomer('${String(c.id).replace(/'/g,"\\'") }')"
                                 >
                                     ✏️ Edit
                                 </button>
@@ -4394,7 +5168,7 @@ function renderCustomers(){
                                 <button
                                     type="button"
                                     class="btn btn-danger"
-                                    onclick="deleteCustomer('${String(c.id).replace(/'/g,"\\'")}')"
+                                    onclick="deleteCustomer('${String(c.id).replace(/'/g,"\\'") }')"
                                 >
                                     🗑️ Delete
                                 </button>
@@ -4410,6 +5184,10 @@ function renderCustomers(){
 
     }
 
+
+    /*
+     * এখানে Profit ইচ্ছা করেই নেই।
+     */
 
     $("customerTable")
         .innerHTML = html;
@@ -4487,7 +5265,7 @@ function renderExpenses(){
                                 <button
                                     type="button"
                                     class="btn btn-warning"
-                                    onclick="editExpense('${String(e.id).replace(/'/g,"\\'")}')"
+                                    onclick="editExpense('${String(e.id).replace(/'/g,"\\'") }')"
                                 >
                                     ✏️ Edit
                                 </button>
@@ -4495,7 +5273,7 @@ function renderExpenses(){
                                 <button
                                     type="button"
                                     class="btn btn-danger"
-                                    onclick="deleteExpense('${String(e.id).replace(/'/g,"\\'")}')"
+                                    onclick="deleteExpense('${String(e.id).replace(/'/g,"\\'") }')"
                                 >
                                     🗑️ Delete
                                 </button>
@@ -4542,13 +5320,16 @@ function calculateDashboard(){
         );
 
 
+    /*
+     * এখন Profit sale-এর সময়
+     * manually দেওয়া Profit অনুযায়ী।
+     */
+
     const gross =
         db.sales.reduce(
             (sum,s) =>
                 sum +
-                Number(s.total || 0)
-                -
-                Number(s.cost || 0),
+                getSaleProfit(s),
             0
         );
 
@@ -4690,7 +5471,10 @@ function calculateDashboard(){
                     </td>
 
                     <td>
-                        ${s.qty}
+                        ${Number(s.qty || 0)}
+                        ${escapeHTML(
+                            s.unit || "পিস"
+                        )}
                     </td>
 
                     <td>
@@ -4737,7 +5521,7 @@ function calculateDashboard(){
 
 
 /* =====================================================
-   REPORT
+   DATE RANGE
 ===================================================== */
 
 function dateInRange(
@@ -4770,6 +5554,10 @@ function dateInRange(
 
 }
 
+
+/* =====================================================
+   REPORT
+===================================================== */
 
 function generateReport(){
 
@@ -4832,13 +5620,15 @@ function generateReport(){
         );
 
 
+    /*
+     * Total Profit
+     */
+
     const gross =
         sales.reduce(
             (sum,s) =>
                 sum +
-                Number(s.total || 0)
-                -
-                Number(s.cost || 0),
+                getSaleProfit(s),
             0
         );
 
@@ -4855,6 +5645,10 @@ function generateReport(){
     const net =
         gross - totalExpense;
 
+
+    /*
+     * Due
+     */
 
     const salesDue =
         db.sales.reduce(
@@ -5060,6 +5854,20 @@ $("customerDate").value =
 
 $("expenseDate").value =
     today();
+
+
+/* =====================================================
+   DEFAULT UNIT
+===================================================== */
+
+$("productUnit").value =
+    "পিস";
+
+$("saleUnit").value =
+    "পিস";
+
+$("purchaseUnit").value =
+    "পিস";
 
 
 /* =====================================================
