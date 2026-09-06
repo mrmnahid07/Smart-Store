@@ -5892,6 +5892,99 @@ $("purchaseUnit").value =
 calculateCustomerDue();
 
 </script>
+<script>
+/* ==========================================
+   SMART STORE - 1 HOUR INACTIVITY AUTO LOGOUT
+========================================== */
 
+const INACTIVITY_LIMIT = 60 * 60 * 1000; // 1 hour
+let inactivityTimer = null;
+
+function resetInactivityTimer() {
+
+    // আগের timer বন্ধ
+    if (inactivityTimer) {
+        clearTimeout(inactivityTimer);
+    }
+
+    // User কোনো কাজ করলে নতুন করে ১ ঘণ্টা শুরু
+    inactivityTimer = setTimeout(function () {
+
+        const user = firebase.auth().currentUser;
+
+        if (user) {
+
+            firebase.auth().signOut()
+                .then(function () {
+
+                    alert(
+                        "আপনি ১ ঘণ্টা কোনো কাজ করেননি। নিরাপত্তার জন্য আপনাকে Logout করা হয়েছে।"
+                    );
+
+                    // Login page দেখাবে
+                    location.reload();
+
+                })
+                .catch(function (error) {
+
+                    console.error(
+                        "Auto Logout Error:",
+                        error
+                    );
+
+                });
+
+        }
+
+    }, INACTIVITY_LIMIT);
+}
+
+
+/* ==========================================
+   USER ACTIVITY DETECTION
+========================================== */
+
+[
+    "click",
+    "mousemove",
+    "mousedown",
+    "keydown",
+    "scroll",
+    "touchstart",
+    "input"
+].forEach(function(eventName) {
+
+    document.addEventListener(
+        eventName,
+        resetInactivityTimer,
+        true
+    );
+
+});
+
+
+/* ==========================================
+   FIREBASE LOGIN CHECK
+========================================== */
+
+firebase.auth().onAuthStateChanged(function(user) {
+
+    if (user) {
+
+        // Login থাকলে timer চালু
+        resetInactivityTimer();
+
+    } else {
+
+        // Logout হলে timer বন্ধ
+        if (inactivityTimer) {
+            clearTimeout(inactivityTimer);
+            inactivityTimer = null;
+        }
+
+    }
+
+});
+</script>
 </body>
 </html>
