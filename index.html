@@ -1,6 +1,207 @@
 <!DOCTYPE html>
 <html lang="bn">
 <head>
+    <style>
+/* =====================================================
+   SMART STORE - PREMIUM DASHBOARD ICON DESIGN
+===================================================== */
+
+/* Dashboard-এর ভিতরের menu/card */
+.menu {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(165px, 1fr));
+    gap: 20px !important;
+    padding: 20px !important;
+}
+
+/* Dashboard-এর প্রতিটি icon button */
+.menu button {
+    min-height: 145px !important;
+    padding: 20px 12px !important;
+
+    border: none !important;
+    border-radius: 22px !important;
+
+    color: #ffffff !important;
+
+    background:
+        linear-gradient(
+            135deg,
+            #0f172a 0%,
+            #2563eb 48%,
+            #7c3aed 100%
+        ) !important;
+
+    box-shadow:
+        0 10px 25px rgba(37, 99, 235, .25),
+        inset 0 1px 1px rgba(255,255,255,.25) !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    gap: 13px !important;
+
+    font-size: 17px !important;
+    font-weight: 800 !important;
+
+    cursor: pointer !important;
+    overflow: hidden !important;
+
+    transition:
+        transform .25s ease,
+        box-shadow .25s ease !important;
+}
+
+/* =====================================================
+   DASHBOARD ICON - বড়
+===================================================== */
+
+.menu button i,
+.menu button svg,
+.menu button .icon,
+.menu button .fa,
+.menu button .fas,
+.menu button .far,
+.menu button .fab {
+    font-size: 52px !important;
+
+    width: auto !important;
+    height: auto !important;
+
+    color: #ffffff !important;
+
+    line-height: 1 !important;
+
+    filter:
+        drop-shadow(0 5px 7px rgba(0,0,0,.35)) !important;
+
+    transition:
+        transform .25s ease,
+        filter .25s ease !important;
+
+    z-index: 2 !important;
+}
+
+/* Dashboard icon-এর text */
+.menu button span {
+    color: #ffffff !important;
+    font-weight: 800 !important;
+    z-index: 2 !important;
+}
+
+/* =====================================================
+   HOVER EFFECT
+===================================================== */
+
+.menu button:hover {
+    transform: translateY(-8px) scale(1.03) !important;
+
+    box-shadow:
+        0 18px 38px rgba(37, 99, 235, .35),
+        0 0 25px rgba(124, 58, 237, .20) !important;
+}
+
+.menu button:hover i,
+.menu button:hover svg,
+.menu button:hover .icon,
+.menu button:hover .fa,
+.menu button:hover .fas,
+.menu button:hover .far,
+.menu button:hover .fab {
+    transform: scale(1.18) rotate(-4deg) !important;
+
+    filter:
+        drop-shadow(0 7px 10px rgba(0,0,0,.45)) !important;
+}
+
+/* Click */
+.menu button:active {
+    transform: scale(.95) !important;
+}
+
+
+/* =====================================================
+   SIDEBAR / SIDE MENU
+   এখানে icon hide হবে, শুধু লেখা থাকবে
+===================================================== */
+
+/* Sidebar-এর সাধারণ icon */
+.sidebar i,
+.sidebar svg,
+.sidebar .icon,
+.sidebar .fa,
+.sidebar .fas,
+.sidebar .far,
+.sidebar .fab,
+.side-menu i,
+.side-menu svg,
+.side-menu .icon,
+.side-menu .fa,
+.side-menu .fas,
+.side-menu .far,
+.side-menu .fab {
+    display: none !important;
+}
+
+/* Sidebar button */
+.sidebar button,
+.side-menu button,
+.sidebar a,
+.side-menu a {
+    display: flex !important;
+
+    align-items: center !important;
+
+    gap: 0 !important;
+
+    padding: 13px 18px !important;
+
+    font-size: 16px !important;
+    font-weight: 700 !important;
+}
+
+/* =====================================================
+   যদি তোমার sidebar class অন্যরকম হয়,
+   menu-এর বাইরের button-এর icon hide
+===================================================== */
+
+.menu ~ button i,
+.menu ~ button svg {
+    display: none !important;
+}
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media (max-width: 600px) {
+
+    .menu {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 13px !important;
+        padding: 13px !important;
+    }
+
+    .menu button {
+        min-height: 120px !important;
+        border-radius: 18px !important;
+        font-size: 14px !important;
+    }
+
+    .menu button i,
+    .menu button svg,
+    .menu button .icon,
+    .menu button .fa,
+    .menu button .fas,
+    .menu button .far,
+    .menu button .fab {
+        font-size: 40px !important;
+    }
+}
+</style>
     <title>Smart Store - Smart Business Management System</title>
 
 <meta name="description" content="Smart Store - Products, Sales, Customers, Expenses and Profit Management System">
