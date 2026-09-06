@@ -2411,11 +2411,14 @@ function editProduct(id){
     $("productBuy").value =
         p.buy;
 
-    $("productSell").value =
-        p.sell;
+  $("productSell").value = 
+    p.sell;
 
-    $("productStock").value =
-        p.stock;
+$("productProfit").value =
+    Number(p.profit || 0);
+
+$("productStock").value = 
+    p.stock;
 
 
     $("productSubmit").innerText =
