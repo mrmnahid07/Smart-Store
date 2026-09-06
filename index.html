@@ -1,1406 +1,6 @@
-<!DOCTYPE html>
-<html lang="bn">
-<head>
-
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-
-<title>Smart Store - Smart Business Management System</title>
- 
-<meta name="description"
-content="Smart Store - Products, Sales, Customers, Expenses, Purchase and Profit Management System">
-
-<meta name="keywords"
-content="Smart Store, Store Management, Sales Management, Inventory Management, Business Management">
-
-<meta name="robots" content="index,follow">
-
-<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
- <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-
-<style>
-/* =====================================================
-   OWNER USER MANAGEMENT
-===================================================== */
-
-#ownerPanel{
-    margin:25px 0;
-    padding:22px;
-    background:#ffffff;
-    border-radius:15px;
-    box-shadow:0 5px 20px rgba(0,0,0,0.08);
-    border:1px solid #e5e7eb;
-}
-
-#ownerPanel h2{
-    margin-bottom:20px;
-    color:#222;
-    font-size:22px;
-}
-
-.user-item{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:15px;
-    padding:16px;
-    margin-bottom:12px;
-    background:#f7f8fa;
-    border-radius:12px;
-    border:1px solid #e5e7eb;
-}
-
-.user-item b{
-    color:#222;
-    font-size:15px;
-}
-
-.user-item strong{
-    color:#16a34a;
-}
-
-.user-item button{
-    border:none;
-    padding:9px 14px;
-    margin:3px;
-    border-radius:8px;
-    cursor:pointer;
-    font-weight:bold;
-}
-
-.user-item button:first-child{
-    background:#16a34a;
-    color:white;
-}
-
-.user-item button:last-child{
-    background:#dc2626;
-    color:white;
-}
-
-.user-item button:hover{
-    opacity:.85;
-}
-
-@media(max-width:600px){
-
-    .user-item{
-        flex-direction:column;
-        align-items:flex-start;
-    }
-
-    .user-item button{
-        width:100%;
-    }
-
-}
- <style>
-*{
-    box-sizing:border-box;
-    margin:0;
-    padding:0;
-    font-family:Arial,sans-serif;
-}
-
-body{
-    background:#f1f5f9;
-    color:#1e293b;
-}
-
-/* ================= AUTH ================= */
-
-.auth-screen{
-    min-height:100vh;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:20px;
-    background:
-        radial-gradient(circle at top left,#2563eb 0,#172554 35%,#020617 100%);
-}
-
-.auth-box{
-    width:100%;
-    max-width:430px;
-    background:rgba(255,255,255,.97);
-    padding:32px;
-    border-radius:24px;
-    box-shadow:0 25px 70px rgba(0,0,0,.35);
-}
-
-.auth-logo{
-    text-align:center;
-    margin-bottom:25px;
-}
-
-.auth-logo .logo-icon{
-    width:75px;
-    height:75px;
-    margin:auto;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    border-radius:22px;
-    font-size:42px;
-    background:linear-gradient(135deg,#2563eb,#7c3aed);
-    box-shadow:0 12px 30px rgba(37,99,235,.35);
-}
-
-.auth-logo h1{
-    margin-top:12px;
-    color:#0f172a;
-    font-size:27px;
-}
-
-.auth-logo p{
-    color:#64748b;
-    margin-top:5px;
-}
-
-.auth-box h2{
-    text-align:center;
-    margin-bottom:20px;
-    color:#0f172a;
-}
-
-.auth-box label{
-    display:block;
-    margin:12px 0 6px;
-    font-weight:bold;
-    font-size:14px;
-}
-
-.auth-box input{
-    width:100%;
-    padding:13px;
-    border:1px solid #cbd5e1;
-    border-radius:10px;
-    outline:none;
-    font-size:15px;
-}
-
-.auth-box input:focus{
-    border-color:#2563eb;
-    box-shadow:0 0 0 3px rgba(37,99,235,.12);
-}
-
-.auth-btn{
-    width:100%;
-    border:0;
-    margin-top:18px;
-    padding:14px;
-    border-radius:10px;
-    background:linear-gradient(135deg,#2563eb,#7c3aed);
-    color:white;
-    font-weight:bold;
-    font-size:16px;
-    cursor:pointer;
-}
-
-.auth-btn:hover{
-    opacity:.92;
-}
-
-.auth-links{
-    display:flex;
-    justify-content:space-between;
-    gap:10px;
-    margin-top:15px;
-}
-
-.auth-links button{
-    border:0;
-    background:none;
-    color:#2563eb;
-    cursor:pointer;
-    font-weight:bold;
-}
-
-.auth-message{
-    margin-top:12px;
-    text-align:center;
-    font-size:14px;
-    min-height:20px;
-}
-
-#registerBox,
-#forgotBox{
-    display:none;
-}
-
-/* ================= SIDEBAR ================= */
-
-.sidebar{
-    position:fixed;
-    left:0;
-    top:0;
-    width:230px;
-    height:100vh;
-    background:#0f172a;
-    color:white;
-    padding:18px 10px;
-    overflow-y:auto;
-    z-index:1000;
-}
-
-.logo{
-    text-align:center;
-    font-size:24px;
-    font-weight:bold;
-    padding:14px 5px 25px;
-    color:#38bdf8;
-}
-
-.sidebar .menu{
-    display:block;
-    padding:0;
-}
-
-.sidebar .menu button{
-    width:100%;
-    display:block;
-    border:0;
-    background:transparent;
-    color:#cbd5e1;
-    padding:13px 14px;
-    text-align:left;
-    cursor:pointer;
-    border-radius:9px;
-    margin-bottom:5px;
-    font-size:15px;
-    transition:.2s;
-}
-
-.sidebar .menu button:hover,
-.sidebar .menu button.active{
-    background:#1e293b;
-    color:white;
-}
-
-.user-area{
-    margin-top:25px;
-    border-top:1px solid #334155;
-    padding-top:18px;
-}
-
-.user-email{
-    color:#94a3b8;
-    font-size:13px;
-    word-break:break-word;
-    margin-bottom:10px;
-}
-
-.logout-btn{
-    width:100%;
-    border:0;
-    background:#dc2626;
-    color:white;
-    padding:11px;
-    border-radius:8px;
-    cursor:pointer;
-    font-weight:bold;
-}
-
-.logout-btn:hover{
-    background:#b91c1c;
-}
-
-/* ================= MAIN ================= */
-
-.main{
-    margin-left:230px;
-    padding:20px;
-}
-
-.topbar{
-    background:white;
-    padding:18px;
-    border-radius:14px;
-    margin-bottom:20px;
-    box-shadow:0 5px 20px rgba(15,23,42,.07);
-}
-
-.topbar h1{
-    font-size:25px;
-}
-
-.page{
-    display:none;
-}
-
-.page.active{
-    display:block;
-}
-
-/* ================= DASHBOARD ================= */
-
-#dashboard .cards{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-    gap:18px;
-    margin-bottom:20px;
-}
-
-#dashboard .card{
-    position:relative;
-    overflow:hidden;
-    min-height:150px;
-    padding:20px;
-    border-radius:20px;
-    color:white;
-    box-shadow:0 12px 30px rgba(15,23,42,.12);
-    transition:.25s;
-}
-
-#dashboard .card:hover{
-    transform:translateY(-4px);
-}
-
-#dashboard .card:nth-child(1){
-    background:linear-gradient(135deg,#2563eb,#06b6d4);
-}
-
-#dashboard .card:nth-child(2){
-    background:linear-gradient(135deg,#7c3aed,#a855f7);
-}
-
-#dashboard .card:nth-child(3){
-    background:linear-gradient(135deg,#059669,#22c55e);
-}
-
-#dashboard .card:nth-child(4){
-    background:linear-gradient(135deg,#ea580c,#f97316);
-}
-
-#dashboard .card:nth-child(5){
-    background:linear-gradient(135deg,#16a34a,#84cc16);
-}
-
-#dashboard .card:nth-child(6){
-    background:linear-gradient(135deg,#dc2626,#f43f5e);
-}
-
-#dashboard .card:nth-child(7){
-    background:linear-gradient(135deg,#0891b2,#2563eb);
-}
-
-#dashboard .card:nth-child(8){
-    background:linear-gradient(135deg,#ca8a04,#eab308);
-}
-
-#dashboard .card:nth-child(9){
-    background:linear-gradient(135deg,#475569,#64748b);
-}
-
-.dashboard-icon{
-    font-size:42px;
-    display:block;
-    margin-bottom:10px;
-}
-
-#dashboard .card h3{
-    font-size:14px;
-    opacity:.9;
-}
-
-#dashboard .card .number{
-    font-size:24px;
-    font-weight:bold;
-    margin-top:8px;
-}
-
-/* ================= COMMON ================= */
-
-.panel{
-    background:white;
-    padding:20px;
-    border-radius:14px;
-    margin-bottom:20px;
-    box-shadow:0 5px 20px rgba(15,23,42,.07);
-}
-
-.panel h2{
-    margin-bottom:15px;
-}
-
-.form-grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
-    gap:12px;
-}
-
-.form-group label{
-    display:block;
-    font-size:14px;
-    font-weight:bold;
-    margin-bottom:6px;
-}
-
-.form-group input,
-.form-group select,
-.form-group textarea{
-    width:100%;
-    padding:11px;
-    border:1px solid #cbd5e1;
-    border-radius:8px;
-    outline:none;
-    background:white;
-}
-
-.form-group textarea{
-    min-height:80px;
-    resize:vertical;
-}
-
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus{
-    border-color:#2563eb;
-}
-
-.form-actions{
-    margin-top:15px;
-    display:flex;
-    flex-wrap:wrap;
-    gap:8px;
-}
-
-.btn{
-    border:0;
-    padding:10px 14px;
-    border-radius:8px;
-    cursor:pointer;
-    font-weight:bold;
-}
-
-.btn-primary{
-    background:#2563eb;
-    color:white;
-}
-
-.btn-success{
-    background:#16a34a;
-    color:white;
-}
-
-.btn-danger{
-    background:#dc2626;
-    color:white;
-}
-
-.btn-warning{
-    background:#f59e0b;
-    color:white;
-}
-
-.btn-secondary{
-    background:#64748b;
-    color:white;
-}
-
-.table-wrap{
-    overflow-x:auto;
-}
-
-table{
-    width:100%;
-    border-collapse:collapse;
-    min-width:700px;
-}
-
-th,
-td{
-    padding:11px;
-    border-bottom:1px solid #e2e8f0;
-    text-align:left;
-    font-size:14px;
-}
-
-th{
-    background:#f8fafc;
-    color:#334155;
-}
-
-tr:hover td{
-    background:#f8fafc;
-}
-
-.action-buttons{
-    display:flex;
-    gap:5px;
-    flex-wrap:wrap;
-}
-
-.empty{
-    text-align:center;
-    padding:30px!important;
-    color:#64748b;
-}
-
-.badge{
-    display:inline-block;
-    padding:5px 9px;
-    border-radius:20px;
-    font-size:12px;
-    font-weight:bold;
-}
-
-.badge-red{
-    background:#fee2e2;
-    color:#b91c1c;
-}
-
-.badge-green{
-    background:#dcfce7;
-    color:#15803d;
-}
-
-.readonly{
-    background:#f8fafc!important;
-}
-
-/* ================= REPORT CARDS ================= */
-
-.report-cards{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
-    gap:15px;
-}
-
-.report-card{
-    background:white;
-    padding:18px;
-    border-radius:15px;
-    box-shadow:0 5px 18px rgba(15,23,42,.08);
-}
-
-.report-card h3{
-    font-size:14px;
-    color:#64748b;
-}
-
-.report-card .number{
-    font-size:21px;
-    font-weight:bold;
-    margin-top:8px;
-}
-
-/* ================= MOBILE ================= */
-
-@media(max-width:700px){
-
-    .sidebar{
-        position:relative;
-        width:100%;
-        height:auto;
-    }
-
-    .main{
-        margin-left:0;
-        padding:10px;
-    }
-
-    .logo{
-        padding-bottom:15px;
-    }
-
-    #dashboard .cards{
-        grid-template-columns:repeat(2,1fr);
-        gap:10px;
-    }
-
-    #dashboard .card{
-        min-height:135px;
-        padding:15px;
-    }
-
-    .dashboard-icon{
-        font-size:34px;
-    }
-
-    #dashboard .card .number{
-        font-size:18px;
-    }
-
-}
-
-@media(max-width:430px){
-
-    #dashboard .cards{
-        grid-template-columns:1fr;
-    }
-
-}
-
-/* ================= HIDE APP UNTIL LOGIN ================= */
-
-.sidebar,
-.main{
-    display:none;
-}
-
-</style>
-</head>
-
-<body>
-
-<!-- =====================================================
-     AUTH SCREEN
-===================================================== -->
-
-<div class="auth-screen" id="authScreen">
-
-    <div class="auth-box">
-
-        <div class="auth-logo">
-
-            <div class="logo-icon">🏪</div>
-
-            <h1>Smart Store</h1>
-
-            <p>Smart Business Management System</p>
-
-        </div>
-
-        <!-- LOGIN -->
-
-        <div id="loginBox">
-
-            <h2>Login</h2>
-
-            <div class="form-group">
-
-                <label>Email</label>
-
-                <input
-                    type="email"
-                    id="loginEmail"
-                    placeholder="Enter your email"
-                    autocomplete="email"
-                >
-
-            </div>
-
-            <div class="form-group">
-
-                <label>Password</label>
-
-                <input
-                    type="password"
-                    id="loginPassword"
-                    placeholder="Enter password"
-                    autocomplete="current-password"
-                >
-
-            </div>
-
-            <button
-                class="auth-btn"
-                type="button"
-                onclick="loginUser()"
-            >
-                Login
-            </button>
-
-            <div
-                id="loginMessage"
-                class="auth-message"
-            ></div>
-
-            <div class="auth-links">
-
-                <button onclick="showRegister()">
-                    Create Account
-                </button>
-
-                <button onclick="showForgot()">
-                    Forgot Password?
-                </button>
-
-            </div>
-
-        </div>
-
-        <!-- REGISTER -->
-
-        <div id="registerBox">
-
-            <h2>Create Account</h2>
-
-            <div class="form-group">
-
-                <label>Email</label>
-
-                <input
-                    type="email"
-                    id="registerEmail"
-                    placeholder="Enter email"
-                    autocomplete="email"
-                >
-
-            </div>
-
-            <div class="form-group">
-
-                <label>Password</label>
-
-                <input
-                    type="password"
-                    id="registerPassword"
-                    placeholder="Minimum 6 characters"
-                >
-
-            </div>
-
-            <div class="form-group">
-
-                <label>Confirm Password</label>
-
-                <input
-                    type="password"
-                    id="registerConfirm"
-                    placeholder="Confirm password"
-                >
-
-            </div>
-
-            <button
-                class="auth-btn"
-                type="button"
-                onclick="createAccount()"
-            >
-                Create Account
-            </button>
-
-            <div
-                id="registerMessage"
-                class="auth-message"
-            ></div>
-
-            <div class="auth-links">
-
-                <button onclick="showLogin()">
-                    Back to Login
-                </button>
-
-            </div>
-
-        </div>
-
-        <!-- FORGOT -->
-
-        <div id="forgotBox">
-
-            <h2>Reset Password</h2>
-
-            <div class="form-group">
-
-                <label>Email</label>
-
-                <input
-                    type="email"
-                    id="forgotEmail"
-                    placeholder="Enter your email"
-                >
-
-            </div>
-
-            <button
-                class="auth-btn"
-                type="button"
-                onclick="resetPassword()"
-            >
-                Send Reset Email
-            </button>
-
-            <div
-                id="forgotMessage"
-                class="auth-message"
-            ></div>
-
-            <div class="auth-links">
-
-                <button onclick="showLogin()">
-                    Back to Login
-                </button>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</div>
-
-
-<!-- =====================================================
-     SIDEBAR
-===================================================== -->
-
-<div class="sidebar">
-
-    <div class="logo">
-        🏪 Smart Store
-    </div>
-
-    <div class="menu">
-
-        <button
-            class="active"
-            onclick="showPage('dashboard',this)"
-        >
-            Dashboard
-        </button>
-
-        <button
-            onclick="showPage('products',this)"
-        >
-            Products
-        </button>
-
-        <button
-            onclick="showPage('sales',this)"
-        >
-            Sales
-        </button>
-
-        <button
-            onclick="showPage('purchase',this)"
-        >
-            Purchase
-        </button>
-
-        <button
-            onclick="showPage('customers',this)"
-        >
-            Customers
-        </button>
-
-        <button
-            onclick="showPage('expenses',this)"
-        >
-            Expenses
-        </button>
-
-        <button
-            onclick="showPage('reports',this)"
-        >
-            Reports
-        </button>
-
-    </div>
-
-    <div class="user-area">
-
-        <div
-            class="user-email"
-            id="loggedUserEmail"
-        >
-            Not logged in
-        </div>
-
-        <button
-            type="button"
-            class="logout-btn"
-            onclick="logoutUser()"
-        >
-            Logout
-        </button>
-
-    </div>
-
-</div>
-
-
-<!-- =====================================================
-     MAIN
-===================================================== -->
-
-<div class="main">
-
-    <div class="topbar">
-
-        <h1 id="pageTitle">
-            Dashboard
-        </h1>
-
-    </div>
-
-
-<!-- =====================================================
-     DASHBOARD
-===================================================== -->
-
-<section
-    id="dashboard"
-    class="page active"
->
-
-    <div class="cards">
-
-        <div class="card">
-            <span class="dashboard-icon">💰</span>
-            <h3>Total Sales</h3>
-            <div class="number" id="dashSales">৳0.00</div>
-        </div>
-
-        <div class="card">
-            <span class="dashboard-icon">🛍️</span>
-            <h3>Total Purchase</h3>
-            <div class="number" id="dashPurchase">৳0.00</div>
-        </div>
-
-        <div class="card">
-            <span class="dashboard-icon">📈</span>
-            <h3>Total Profit</h3>
-            <div class="number" id="dashGross">৳0.00</div>
-        </div>
-
-        <div class="card">
-            <span class="dashboard-icon">💸</span>
-            <h3>Expenses</h3>
-            <div class="number" id="dashExpense">৳0.00</div>
-        </div>
-
-        <div class="card">
-            <span class="dashboard-icon">💵</span>
-            <h3>Net Profit</h3>
-            <div class="number" id="dashNet">৳0.00</div>
-        </div>
-
-        <div class="card">
-            <span class="dashboard-icon">⚠️</span>
-            <h3>Total Due</h3>
-            <div class="number" id="dashDue">৳0.00</div>
-        </div>
-
-        <div class="card">
-            <span class="dashboard-icon">📦</span>
-            <h3>Stock Value</h3>
-            <div class="number" id="dashStock">৳0.00</div>
-        </div>
-
-        <div class="card">
-            <span class="dashboard-icon">💳</span>
-            <h3>Cash / Balance</h3>
-            <div class="number" id="dashCash">৳0.00</div>
-        </div>
-
-        <div class="card">
-            <span class="dashboard-icon">📦</span>
-            <h3>Total Products</h3>
-            <div class="number" id="dashProducts">0</div>
-        </div>
-
-    </div>
-<!-- =====================================================
-     OWNER USER MANAGEMENT
-===================================================== -->
-
-<div id="ownerPanel" style="display:none;">
-
-    <h2>👥 User Management</h2>
-
-    <div id="userList">
-        Loading...
-    </div>
-
-</div>
-
-    <div class="panel">
-
-        <h2>Recent Sales</h2>
-
-        <div class="table-wrap">
-
-            <table>
-
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Product</th>
-                        <th>Qty</th>
-                        <th>Total</th>
-                        <th>Paid</th>
-                        <th>Due</th>
-                    </tr>
-                </thead>
-
-                <tbody id="recentSales"></tbody>
-
-            </table>
-
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- =====================================================
-     PRODUCTS
-===================================================== -->
-
-<section
-    id="products"
-    class="page"
->
-
-    <div class="panel">
-
-        <h2>Product Management</h2>
-
-        <form id="productForm">
-
-            <input
-                type="hidden"
-                id="productId"
-            >
-
-            <div class="form-grid">
-
-                <div class="form-group">
-                    <label>Product Name</label>
-                    <input id="productName" required>
-                </div>
-
-                <div class="form-group">
-                    <label>Product Code</label>
-                    <input id="productCode">
-                </div>
-
-                <div class="form-group">
-                    <label>Buy Price</label>
-                    <input
-                        type="number"
-                        id="productBuy"
-                        min="0"
-                        step="0.01"
-                        required
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label>Sell Price</label>
-                    <input
-                        type="number"
-                        id="productSell"
-                        min="0"
-                        step="0.01"
-                        required
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label>Profit / Unit</label>
-                    <input
-                        type="number"
-                        id="productProfit"
-                        min="0"
-                        step="0.01"
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label>Stock</label>
-                    <input
-                        type="number"
-                        id="productStock"
-                        min="0"
-                        step="0.01"
-                        required
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label>Unit</label>
-
-                    <select id="productUnit">
-
-                        <option value="পিস">পিস</option>
-                        <option value="কেজি">কেজি</option>
-                        <option value="গ্রাম">গ্রাম</option>
-                        <option value="লিটার">লিটার</option>
-                        <option value="মিটার">মিটার</option>
-                        <option value="বস্তা">বস্তা</option>
-                        <option value="কার্টন">কার্টন</option>
-                        <option value="প্যাকেট">প্যাকেট</option>
-                        <option value="বান্ডিল">বান্ডিল</option>
-                        <option value="জোড়া">জোড়া</option>
-                        <option value="কাঁচামাল">কাঁচামাল</option>
-                        <option value="অন্যান্য">অন্যান্য</option>
-
-                    </select>
-
-                </div>
-
-            </div>
-
-            <div class="form-actions">
-
-                <button
-                    type="submit"
-                    id="productSubmit"
-                    class="btn btn-primary"
-                >
-                    Add Product
-                </button>
-
-                <button
-                    type="button"
-                    class="btn btn-secondary"
-                    onclick="resetProductForm()"
-                >
-                    Reset
-                </button>
-
-            </div>
-
-        </form>
-
-    </div>
-
-
-    <div class="panel">
-
-        <h2>Product List</h2>
-
-        <div class="table-wrap">
-
-            <table>
-
-                <thead>
-
-                    <tr>
-                        <th>Product</th>
-                        <th>Code</th>
-                        <th>Buy</th>
-                        <th>Sell</th>
-                        <th>Profit/Unit</th>
-                        <th>Stock</th>
-                        <th>Unit</th>
-                        <th>Stock Value</th>
-                        <th>Action</th>
-                    </tr>
-
-                </thead>
-
-                <tbody id="productTable"></tbody>
-
-            </table>
-
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- =====================================================
-     SALES
-===================================================== -->
-
-<section
-    id="sales"
-    class="page"
->
-
-    <div class="panel">
-
-        <h2>Sales Management</h2>
-
-        <form id="salesForm">
-
-            <input
-                type="hidden"
-                id="saleId"
-            >
-
-            <div class="form-grid">
-
-                <div class="form-group">
-                    <label>Date</label>
-                    <input
-                        type="date"
-                        id="saleDate"
-                        required
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label>Product</label>
-                    <input
-                        id="saleProduct"
-                        list="productList"
-                        oninput="autoSalePrice()"
-                        required
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label>Quantity</label>
-                    <input
-                        type="number"
-                        id="saleQty"
-                        min="0.01"
-                        step="0.01"
-                        oninput="calculateSale()"
-                        required
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label>Unit</label>
-
-                    <select id="saleUnit">
-                        <option value="পিস">পিস</option>
-                        <option value="কেজি">কেজি</option>
-                        <option value="গ্রাম">গ্রাম</option>
-                        <option value="লিটার">লিটার</option>
-                        <option value="মিটার">মিটার</option>
-                        <option value="বস্তা">বস্তা</option>
-                        <option value="কার্টন">কার্টন</option>
-                        <option value="প্যাকেট">প্যাকেট</option>
-                        <option value="বান্ডিল">বান্ডিল</option>
-                        <option value="জোড়া">জোড়া</option>
-                        <option value="কাঁচামাল">কাঁচামাল</option>
-                        <option value="অন্যান্য">অন্যান্য</option>
-                    </select>
-
-                </div>
-
-                <div class="form-group">
-                    <label>Sale Price</label>
-                    <input
-                        type="number"
-                        id="salePrice"
-                        min="0"
-                        step="0.01"
-                        oninput="calculateSale()"
-                        required
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label>Customer</label>
-                    <input id="saleCustomer">
-                </div>
-
-                <div class="form-group">
-                    <label>Paid</label>
-                    <input
-                        type="number"
-                        id="salePaid"
-                        min="0"
-                        step="0.01"
-                        oninput="calculateSale()"
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label>Total</label>
-                    <input
-                        id="saleTotal"
-                        class="readonly"
-                        readonly
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label>Due</label>
-                    <input
-                        id="saleDue"
-                        class="readonly"
-                        readonly
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label>Cost</label>
-                    <input
-                        id="saleCost"
-                        class="readonly"
-                        readonly
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label>Profit</label>
-                    <input
-                        id="saleProfit"
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        required
-                    >
-                </div>
-
-            </div>
-
-            <datalist id="productList"></datalist>
-
-            <div class="form-actions">
-
-                <button
-                    type="submit"
-                    id="saleSubmit"
-                    class="btn btn-success"
-                >
-                    Add Sale
-                </button>
-
-                <button
-                    type="button"
-                    class="btn btn-secondary"
-                    onclick="resetSaleForm()"
-                >
-                    Reset
-                </button>
-
-            </div>
-
-        </form>
-
-    </div>
-
-
-    <div class="panel">
-
-        <h2>Sales List</h2>
-
-        <div class="table-wrap">
-
-            <table>
-
-                <thead>
-
-                    <tr>
-                        <th>Date</th>
-                        <th>Product</th>
-                        <th>Qty</th>
-                        <th>Unit</th>
-                        <th>Price</th>
-                        <th>Total</th>
-                        <th>Customer</th>
-                        <th>Paid</th>
-                        <th>Due</th>
-                        <th>Action</th>
-                    </tr>
-
-                </thead>
-
-                <tbody id="salesTable"></tbody>
-
-            </table>
-
-        </div>
-
-    </div>
-
-</section>
-
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
 <script>
 
@@ -1411,24 +11,17 @@ tr:hover td{
 ===================================================== */
 
 const firebaseConfig = {
-
     apiKey:"AIzaSyA6wENDf6gDkJomt0VznpK5I8cUKoFrKd0",
-
     authDomain:"smart-store-775e9.firebaseapp.com",
-
     projectId:"smart-store-775e9",
-
     storageBucket:"smart-store-775e9.firebasestorage.app",
-
     messagingSenderId:"585970463024",
-
     appId:"1:585970463024:web:b3051a97f3f49ca52158f5",
-
     measurementId:"G-720GEV11BB"
-
 };
 
 let auth=null;
+let firestore=null;
 
 try{
 
@@ -1438,44 +31,48 @@ try{
 
     auth.useDeviceLanguage();
 
+    firestore=firebase.firestore();
+
 }catch(error){
 
     console.error("Firebase Error:",error);
 
 }
+
+
 /* =====================================================
    OWNER
 ===================================================== */
 
-const OWNER_UID = "tmHkBudx0JWsllhvf6Z9VGI9pwX2";
-const firestore = firebase.firestore();
+const OWNER_UID =
+    "tmHkBudx0JWsllhvf6Z9VGI9pwX2";
+
 
 /* =====================================================
-   HELPERS
+   DATABASE
 ===================================================== */
 
 const $=id=>document.getElementById(id);
 
 const DB_KEY="smartStoreDB";
 
-let db=JSON.parse(
-    localStorage.getItem(DB_KEY)
-)||{
+let db=
+    JSON.parse(
+        localStorage.getItem(DB_KEY)
+    ) || {
 
-    products:[],
-    sales:[],
-    purchases:[],
-    customers:[],
-    expenses:[]
+        products:[],
+        sales:[],
+        purchases:[],
+        customers:[],
+        expenses:[]
 
-};
+    };
 
-db.products=Array.isArray(db.products)?db.products:[];
-db.sales=Array.isArray(db.sales)?db.sales:[];
-db.purchases=Array.isArray(db.purchases)?db.purchases:[];
-db.customers=Array.isArray(db.customers)?db.customers:[];
-db.expenses=Array.isArray(db.expenses)?db.expenses:[];
 
+/* =====================================================
+   SAVE
+===================================================== */
 
 function save(){
 
@@ -1489,278 +86,32 @@ function save(){
 }
 
 
-function today(){
-
-    const d=new Date();
-
-    const y=d.getFullYear();
-
-    const m=String(
-        d.getMonth()+1
-    ).padStart(2,"0");
-
-    const day=String(
-        d.getDate()
-    ).padStart(2,"0");
-
-    return `${y}-${m}-${day}`;
-
-}
-
-
-function money(n){
-
-    return "৳"+Number(n||0).toLocaleString(
-        "en-BD",
-        {
-            minimumFractionDigits:2,
-            maximumFractionDigits:2
-        }
-    );
-
-}
-
-
-function escapeHTML(value){
-
-    return String(value??"")
-        .replace(/&/g,"&amp;")
-        .replace(/</g,"&lt;")
-        .replace(/>/g,"&gt;")
-        .replace(/"/g,"&quot;")
-        .replace(/'/g,"&#039;");
-
-}
-
-
-const UNIT_OPTIONS=[
-    "পিস",
-    "কেজি",
-    "গ্রাম",
-    "লিটার",
-    "মিটার",
-    "বস্তা",
-    "কার্টন",
-    "প্যাকেট",
-    "বান্ডিল",
-    "জোড়া",
-    "কাঁচামাল",
-    "অন্যান্য"
-];
-
-
-function getProductProfit(product){
-
-    const p=Number(product?.profit);
-
-    if(Number.isFinite(p) && p>=0){
-        return p;
-    }
-
-    return Math.max(
-        0,
-        Number(product?.sell||0)-
-        Number(product?.buy||0)
-    );
-
-}
-
-
-function getSaleProfit(sale){
-
-    const p=Number(sale?.profit);
-
-    if(Number.isFinite(p) && p>=0){
-        return p;
-    }
-
-    return Math.max(
-        0,
-        Number(sale?.total||0)-
-        Number(sale?.cost||0)
-    );
-
-}
-
-
-function findProduct(name){
-
-    const target=String(name||"")
-        .trim()
-        .toLowerCase();
-
-    return db.products.find(
-        p=>
-            String(p.name||"")
-            .trim()
-            .toLowerCase()
-            ===target
-    );
-
-}
-
-
 /* =====================================================
-   AUTH UI
+   REGISTER
 ===================================================== */
 
-function clearAuthMessages(){
+async function createAccount(){
 
-    [
-        "loginMessage",
-        "registerMessage",
-        "forgotMessage"
-    ].forEach(id=>{
+    if(!auth || !firestore){
 
-        if($(id)){
-            $(id).innerText="";
-        }
-
-    });
-
-}
-
-
-function showLogin(){
-
-    clearAuthMessages();
-
-    $("loginBox").style.display="block";
-    $("registerBox").style.display="none";
-    $("forgotBox").style.display="none";
-
-}
-
-
-function showRegister(){
-
-    clearAuthMessages();
-
-    $("loginBox").style.display="none";
-    $("registerBox").style.display="block";
-    $("forgotBox").style.display="none";
-
-}
-
-
-function showForgot(){
-
-    clearAuthMessages();
-
-    $("loginBox").style.display="none";
-    $("registerBox").style.display="none";
-    $("forgotBox").style.display="block";
-
-}
-
-
-function firebaseErrorMessage(error){
-
-    const code=error?.code||"";
-
-    const messages={
-
-        "auth/invalid-email":
-            "Email address সঠিক নয়।",
-
-        "auth/user-not-found":
-            "এই Email দিয়ে কোনো account পাওয়া যায়নি।",
-
-        "auth/wrong-password":
-            "Password ভুল।",
-
-        "auth/invalid-credential":
-            "Email অথবা Password সঠিক নয়।",
-
-        "auth/email-already-in-use":
-            "এই Email দিয়ে আগে থেকেই account আছে।",
-
-        "auth/weak-password":
-            "Password কমপক্ষে 6 characters দিন।",
-
-        "auth/operation-not-allowed":
-            "Firebase Authentication-এ Email/Password চালু নেই।",
-
-        "auth/too-many-requests":
-            "অনেকবার চেষ্টা হয়েছে। কিছুক্ষণ পরে আবার চেষ্টা করুন।"
-
-    };
-
-    return messages[code]||
-        error?.message||
-        "একটি সমস্যা হয়েছে। আবার চেষ্টা করুন।";
-
-}
-
-
-/* =====================================================
-   LOGIN
-===================================================== */
-
-function loginUser(){
-
-    if(!auth){
-
-        alert("Firebase connection পাওয়া যাচ্ছে না।");
+        alert(
+            "Firebase connection পাওয়া যাচ্ছে না।"
+        );
 
         return;
-
     }
 
-    const email=$("loginEmail").value.trim();
-    const password=$("loginPassword").value;
+    const email=
+        $("registerEmail").value.trim();
 
-    if(!email||!password){
+    const password=
+        $("registerPassword").value;
 
-        $("loginMessage").innerText=
-            "Email এবং Password দিন।";
-
-        return;
-
-    }
-
-    $("loginMessage").innerText="Login হচ্ছে...";
-
-    auth.signInWithEmailAndPassword(
-        email,
-        password
-    )
-    .then(()=>{
-
-        $("loginMessage").innerText="Login successful.";
-
-    })
-    .catch(error=>{
-
-        $("loginMessage").innerText=
-            firebaseErrorMessage(error);
-
-    });
-
-}
+    const confirm=
+        $("registerConfirm").value;
 
 
-/* =====================================================
-   CREATE ACCOUNT
-===================================================== */
-
-function createAccount(){
-
-    if(!auth){
-
-        alert("Firebase connection পাওয়া যাচ্ছে না।");
-
-        return;
-
-    }
-
-    const email=$("registerEmail").value.trim();
-
-    const password=$("registerPassword").value;
-
-    const confirm=$("registerConfirm").value;
-
-    if(!email||!password||!confirm){
+    if(!email || !password || !confirm){
 
         $("registerMessage").innerText=
             "সব তথ্য পূরণ করুন।";
@@ -1768,6 +119,7 @@ function createAccount(){
         return;
 
     }
+
 
     if(password!==confirm){
 
@@ -1778,6 +130,7 @@ function createAccount(){
 
     }
 
+
     if(password.length<6){
 
         $("registerMessage").innerText=
@@ -1787,63 +140,725 @@ function createAccount(){
 
     }
 
+
     $("registerMessage").innerText=
         "Account তৈরি হচ্ছে...";
 
-    auth.createUserWithEmailAndPassword(
-        email,
-        password
-    )
-    .then(()=>{
+
+    try{
+
+        const result=
+            await auth.createUserWithEmailAndPassword(
+                email,
+                password
+            );
+
+
+        const user=result.user;
+
+
+        /* ==========================================
+           USER FIRESTORE DOCUMENT
+        ========================================== */
+
+        await firestore
+            .collection("users")
+            .doc(user.uid)
+            .set({
+
+                email:user.email,
+
+                status:"disabled",
+
+                accessUntil:null,
+
+                createdAt:
+                    firebase.firestore.FieldValue
+                    .serverTimestamp()
+
+            });
+
+
+        await auth.signOut();
+
 
         $("registerMessage").innerText=
-            "Account সফলভাবে তৈরি হয়েছে।";
+            "Account তৈরি হয়েছে। Owner access দিলে ব্যবহার করতে পারবেন।";
 
-    })
-    .catch(error=>{
+
+        setTimeout(()=>{
+
+            showLogin();
+
+        },1500);
+
+
+    }catch(error){
+
+        console.error(error);
 
         $("registerMessage").innerText=
             firebaseErrorMessage(error);
 
-    });
+    }
 
 }
 
 
 /* =====================================================
-   RESET PASSWORD
+   LOGIN
 ===================================================== */
 
-function resetPassword(){
+async function loginUser(){
 
-    if(!auth)return;
+    if(!auth || !firestore){
 
-    const email=$("forgotEmail").value.trim();
-
-    if(!email){
-
-        $("forgotMessage").innerText=
-            "Email দিন।";
+        alert(
+            "Firebase connection পাওয়া যাচ্ছে না।"
+        );
 
         return;
 
     }
 
-    auth.sendPasswordResetEmail(email)
-        .then(()=>{
 
-            $("forgotMessage").innerText=
-                "Password reset email পাঠানো হয়েছে।";
+    const email=
+        $("loginEmail").value.trim();
 
-        })
-        .catch(error=>{
+    const password=
+        $("loginPassword").value;
 
-            $("forgotMessage").innerText=
-                firebaseErrorMessage(error);
+
+    if(!email || !password){
+
+        $("loginMessage").innerText=
+            "Email এবং Password দিন।";
+
+        return;
+
+    }
+
+
+    $("loginMessage").innerText=
+        "Login হচ্ছে...";
+
+
+    try{
+
+        await auth.signInWithEmailAndPassword(
+            email,
+            password
+        );
+
+    }catch(error){
+
+        console.error(error);
+
+        $("loginMessage").innerText=
+            firebaseErrorMessage(error);
+
+    }
+
+}
+
+
+/* =====================================================
+   CHECK USER ACCESS
+===================================================== */
+
+async function checkUserAccess(user){
+
+    /* OWNER */
+
+    if(user.uid===OWNER_UID){
+
+        return true;
+
+    }
+
+
+    try{
+
+        const doc=
+            await firestore
+                .collection("users")
+                .doc(user.uid)
+                .get();
+
+
+        if(!doc.exists){
+
+            await auth.signOut();
+
+            alert(
+                "আপনার account পাওয়া যায়নি। Owner-এর সাথে যোগাযোগ করুন।"
+            );
+
+            return false;
+
+        }
+
+
+        const data=doc.data();
+
+
+        /* DISABLED */
+
+        if(data.status!=="enabled"){
+
+            await auth.signOut();
+
+            alert(
+                "আপনার account বর্তমানে Disabled।\n\nOwner access দিলে Smart Store ব্যবহার করতে পারবেন।"
+            );
+
+            return false;
+
+        }
+
+
+        /* NO EXPIRY */
+
+        if(!data.accessUntil){
+
+            await auth.signOut();
+
+            alert(
+                "আপনার access এখনো দেওয়া হয়নি।"
+            );
+
+            return false;
+
+        }
+
+
+        const expiry=
+            data.accessUntil.toDate();
+
+
+        /* EXPIRED */
+
+        if(new Date()>=expiry){
+
+            await firestore
+                .collection("users")
+                .doc(user.uid)
+                .update({
+
+                    status:"disabled",
+
+                    accessUntil:null
+
+                });
+
+
+            await auth.signOut();
+
+
+            alert(
+                "আপনার 30 দিনের access শেষ হয়ে গেছে।"
+            );
+
+
+            return false;
+
+        }
+
+
+        return true;
+
+
+    }catch(error){
+
+        console.error(
+            "Access Check Error:",
+            error
+        );
+
+
+        await auth.signOut();
+
+
+        alert(
+            "Access যাচাই করা যাচ্ছে না। আবার চেষ্টা করুন।"
+        );
+
+
+        return false;
+
+    }
+
+}
+
+
+/* =====================================================
+   ENABLE USER — 30 DAYS
+===================================================== */
+
+async function enableUser(uid){
+
+    if(
+        !auth.currentUser ||
+        auth.currentUser.uid!==OWNER_UID
+    ){
+
+        alert(
+            "শুধু Owner user access দিতে পারবেন।"
+        );
+
+        return;
+
+    }
+
+
+    try{
+
+        const expiry=new Date();
+
+        expiry.setDate(
+            expiry.getDate()+30
+        );
+
+
+        await firestore
+            .collection("users")
+            .doc(uid)
+            .update({
+
+                status:"enabled",
+
+                accessUntil:
+                    firebase.firestore.Timestamp
+                    .fromDate(expiry)
+
+            });
+
+
+        alert(
+            "✅ User Enabled\n\n30 দিনের access দেওয়া হয়েছে।"
+        );
+
+
+        loadUsers();
+
+
+    }catch(error){
+
+        console.error(error);
+
+        alert(
+            "User enable করা যায়নি.\n\n"+
+            error.message
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   DISABLE USER
+===================================================== */
+
+async function disableUser(uid){
+
+    if(
+        !auth.currentUser ||
+        auth.currentUser.uid!==OWNER_UID
+    ){
+
+        alert(
+            "শুধু Owner user disable করতে পারবেন।"
+        );
+
+        return;
+
+    }
+
+
+    try{
+
+        await firestore
+            .collection("users")
+            .doc(uid)
+            .update({
+
+                status:"disabled",
+
+                accessUntil:null
+
+            });
+
+
+        alert(
+            "🚫 User Disabled"
+        );
+
+
+        loadUsers();
+
+
+    }catch(error){
+
+        console.error(error);
+
+        alert(
+            "User disable করা যায়নি.\n\n"+
+            error.message
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   OWNER USER LIST
+===================================================== */
+
+async function loadUsers(){
+
+    if(
+        !auth.currentUser ||
+        auth.currentUser.uid!==OWNER_UID
+    ){
+
+        return;
+
+    }
+
+
+    const box=
+        $("userList");
+
+
+    if(!box){
+
+        return;
+
+    }
+
+
+    box.innerHTML=
+        "Loading...";
+
+
+    try{
+
+        const snapshot=
+            await firestore
+                .collection("users")
+                .get();
+
+
+        let html="";
+
+
+        snapshot.forEach(doc=>{
+
+            const data=doc.data();
+
+
+            let status=
+                data.status==="enabled"
+                ? "Enabled"
+                : "Disabled";
+
+
+            let expiry="বন্ধ";
+
+
+            if(data.accessUntil){
+
+                expiry=
+                    data.accessUntil
+                        .toDate()
+                        .toLocaleDateString(
+                            "en-GB"
+                        );
+
+            }
+
+
+            html+=`
+
+                <div class="user-item">
+
+                    <div>
+
+                        <b>
+                            ${escapeHTML(
+                                data.email || "Unknown"
+                            )}
+                        </b>
+
+                        <br>
+
+                        Status:
+                        <strong>
+                            ${status}
+                        </strong>
+
+                        <br>
+
+                        Access Until:
+                        ${expiry}
+
+                    </div>
+
+
+                    <div>
+
+                        <button
+                            type="button"
+                            onclick="enableUser('${doc.id}')"
+                        >
+                            ✅ Enable 30 Days
+                        </button>
+
+
+                        <button
+                            type="button"
+                            onclick="disableUser('${doc.id}')"
+                        >
+                            🚫 Disable
+                        </button>
+
+                    </div>
+
+                </div>
+
+            `;
 
         });
 
+
+        box.innerHTML=
+            html ||
+            "কোনো registered user নেই.";
+
+
+    }catch(error){
+
+        console.error(error);
+
+        box.innerHTML=
+            "User list load করা যায়নি.";
+
+    }
+
 }
+
+
+/* =====================================================
+   AUTH STATE
+===================================================== */
+
+if(auth){
+
+    auth.onAuthStateChanged(
+        async user=>{
+
+            const authScreen=
+                $("authScreen");
+
+            const sidebar=
+                document.querySelector(
+                    ".sidebar"
+                );
+
+            const main=
+                document.querySelector(
+                    ".main"
+                );
+
+            const ownerPanel=
+                $("ownerPanel");
+
+
+            /* NOT LOGGED IN */
+
+            if(!user){
+
+                if(typeof stopInactivityTimer==="function"){
+                    stopInactivityTimer();
+                }
+
+
+                authScreen.style.display=
+                    "flex";
+
+
+                sidebar.style.display=
+                    "none";
+
+
+                main.style.display=
+                    "none";
+
+
+                if(ownerPanel){
+
+                    ownerPanel.style.display=
+                        "none";
+
+                }
+
+
+                if(typeof showLogin==="function"){
+
+                    showLogin();
+
+                }
+
+
+                return;
+
+            }
+
+
+            /* ACCESS CHECK */
+
+            const allowed=
+                await checkUserAccess(user);
+
+
+            if(!allowed){
+
+                authScreen.style.display=
+                    "flex";
+
+
+                sidebar.style.display=
+                    "none";
+
+
+                main.style.display=
+                    "none";
+
+
+                if(ownerPanel){
+
+                    ownerPanel.style.display=
+                        "none";
+
+                }
+
+
+                return;
+
+            }
+
+
+            /* ACCESS ALLOWED */
+
+            authScreen.style.display=
+                "none";
+
+
+            sidebar.style.display=
+                "block";
+
+
+            main.style.display=
+                "block";
+
+
+            if($("loggedUserEmail")){
+
+                $("loggedUserEmail").innerText=
+                    "👤 "+
+                    (user.email || "User");
+
+            }
+
+
+            if(
+                typeof resetInactivityTimer===
+                "function"
+            ){
+
+                resetInactivityTimer();
+
+            }
+
+
+            /* OWNER */
+
+            if(user.uid===OWNER_UID){
+
+                if(ownerPanel){
+
+                    ownerPanel.style.display=
+                        "block";
+
+                }
+
+
+                loadUsers();
+
+            }else{
+
+                if(ownerPanel){
+
+                    ownerPanel.style.display=
+                        "none";
+
+                }
+
+            }
+
+
+            renderAll();
+
+        }
+    );
+
+}
+
+
+/* =====================================================
+   AUTO CHECK EVERY 1 MINUTE
+===================================================== */
+
+setInterval(
+    async()=>{
+
+        if(
+            !auth ||
+            !auth.currentUser
+        ){
+
+            return;
+
+        }
+
+
+        if(
+            auth.currentUser.uid===
+            OWNER_UID
+        ){
+
+            return;
+
+        }
+
+
+        const allowed=
+            await checkUserAccess(
+                auth.currentUser
+            );
+
+
+        if(!allowed){
+
+            location.reload();
+
+        }
+
+    },
+    60000
+);
 
 
 /* =====================================================
@@ -1852,1883 +867,26 @@ function resetPassword(){
 
 function logoutUser(){
 
-    if(!auth)return;
-
-    if(!confirm("আপনি কি Logout করতে চান?")){
-        return;
-    }
-
-    auth.signOut();
-
-}
-
-
-/* =====================================================
-   AUTH STATE + AUTO LOGOUT
-===================================================== */
-
-const INACTIVITY_LIMIT=60*60*1000;
-
-let inactivityTimer=null;
-
-function stopInactivityTimer(){
-
-    if(inactivityTimer){
-
-        clearTimeout(inactivityTimer);
-
-        inactivityTimer=null;
-
-    }
-
-}
-
-
-function resetInactivityTimer(){
-
-    if(!auth || !auth.currentUser){
-
-        stopInactivityTimer();
+    if(!auth){
 
         return;
 
     }
 
-    stopInactivityTimer();
 
-    inactivityTimer=setTimeout(()=>{
+    auth.signOut()
+        .then(()=>{
 
-        if(auth.currentUser){
+            location.reload();
 
-            auth.signOut()
-                .then(()=>{
+        })
+        .catch(error=>{
 
-                    alert(
-                        "আপনি ১ ঘণ্টা কোনো কাজ করেননি। নিরাপত্তার জন্য আপনাকে Logout করা হয়েছে।"
-                    );
+            console.error(error);
 
-                    location.reload();
-
-                });
-
-        }
-
-    },INACTIVITY_LIMIT);
-
-}
-
-
-/* অতিরিক্ত mousemove বাদ দেওয়া হয়েছে */
-
-[
-    "click",
-    "keydown",
-    "mousedown",
-    "scroll",
-    "touchstart",
-    "input"
-].forEach(eventName=>{
-
-    document.addEventListener(
-        eventName,
-        ()=>{
-            if(auth?.currentUser){
-                resetInactivityTimer();
-            }
-        },
-        true
-    );
-
-});
-
-
-if(auth){
-
-    auth.onAuthStateChanged(user=>{
-
-        const authScreen=$("authScreen");
-
-        const sidebar=document.querySelector(".sidebar");
-
-        const main=document.querySelector(".main");
-
-        if(user){
-
-            authScreen.style.display="none";
-
-            sidebar.style.display="block";
-
-            main.style.display="block";
-
-            $("loggedUserEmail").innerText=
-                "👤 "+(user.email||"User");
-
-            resetInactivityTimer();
-
-            renderAll();
-
-        }else{
-
-            stopInactivityTimer();
-
-            authScreen.style.display="flex";
-
-            sidebar.style.display="none";
-
-            main.style.display="none";
-
-            showLogin();
-
-        }
-
-    });
-
-}
-
-
-/* =====================================================
-   PAGE NAVIGATION
-===================================================== */
-
-const PAGE_TITLES={
-
-    dashboard:"Dashboard",
-    products:"Products",
-    sales:"Sales",
-    purchase:"Purchase",
-    customers:"Customers",
-    expenses:"Expenses",
-    reports:"Reports"
-
-};
-
-
-function showPage(page,button){
-
-    document.querySelectorAll(".page")
-        .forEach(p=>{
-            p.classList.remove("active");
         });
 
-    const target=$(page);
-
-    if(target){
-        target.classList.add("active");
-    }
-
-    document.querySelectorAll(
-        ".sidebar .menu button"
-    ).forEach(b=>{
-        b.classList.remove("active");
-    });
-
-    if(button){
-        button.classList.add("active");
-    }
-
-    $("pageTitle").innerText=
-        PAGE_TITLES[page]||page;
-
 }
-
-
-/* =====================================================
-   PRODUCT AUTO PROFIT
-===================================================== */
-
-function calculateProductProfit(){
-
-    const buy=Number(
-        $("productBuy").value||0
-    );
-
-    const sell=Number(
-        $("productSell").value||0
-    );
-
-    $("productProfit").value=
-        Math.max(0,sell-buy).toFixed(2);
-
-}
-
-
-$("productBuy").addEventListener(
-    "input",
-    calculateProductProfit
-);
-
-$("productSell").addEventListener(
-    "input",
-    calculateProductProfit
-);
-
-
-/* =====================================================
-   PRODUCT SAVE
-===================================================== */
-
-$("productForm").addEventListener(
-    "submit",
-    e=>{
-
-        e.preventDefault();
-
-        const id=$("productId").value;
-
-        const name=$("productName")
-            .value.trim();
-
-        const code=$("productCode")
-            .value.trim();
-
-        const buy=Number(
-            $("productBuy").value||0
-        );
-
-        const sell=Number(
-            $("productSell").value||0
-        );
-
-        const stock=Number(
-            $("productStock").value||0
-        );
-
-        let profit=Number(
-            $("productProfit").value
-        );
-
-        const unit=$("productUnit").value;
-
-        if(!name){
-
-            alert("Product Name লিখুন");
-
-            return;
-
-        }
-
-        if(!Number.isFinite(buy)||buy<0){
-
-            alert("Buy Price সঠিকভাবে দিন");
-
-            return;
-
-        }
-
-        if(!Number.isFinite(sell)||sell<0){
-
-            alert("Sell Price সঠিকভাবে দিন");
-
-            return;
-
-        }
-
-        if(!Number.isFinite(stock)||stock<0){
-
-            alert("Stock সঠিকভাবে দিন");
-
-            return;
-
-        }
-
-        if(!Number.isFinite(profit)||profit<0){
-
-            profit=Math.max(0,sell-buy);
-
-        }
-
-        const product={
-
-            id:id||Date.now().toString(),
-
-            name:name,
-
-            code:code,
-
-            buy:buy,
-
-            sell:sell,
-
-            profit:profit,
-
-            stock:stock,
-
-            unit:unit
-
-        };
-
-        if(id){
-
-            const index=db.products.findIndex(
-                p=>String(p.id)===String(id)
-            );
-
-            if(index!==-1){
-
-                db.products[index]=product;
-
-            }
-
-        }else{
-
-            db.products.push(product);
-
-        }
-
-        resetProductForm();
-
-        save();
-
-        alert(
-            id
-            ?"Product Successfully Updated"
-            :"Product Successfully Saved"
-        );
-
-    }
-);
-
-
-/* =====================================================
-   EDIT PRODUCT
-===================================================== */
-
-function editProduct(id){
-
-    const p=db.products.find(
-        x=>String(x.id)===String(id)
-    );
-
-    if(!p)return;
-
-    $("productId").value=p.id;
-    $("productName").value=p.name||"";
-    $("productCode").value=p.code||"";
-    $("productBuy").value=Number(p.buy||0);
-    $("productSell").value=Number(p.sell||0);
-    $("productProfit").value=
-        getProductProfit(p);
-    $("productStock").value=
-        Number(p.stock||0);
-
-    $("productUnit").value=
-        UNIT_OPTIONS.includes(p.unit)
-        ?p.unit
-        :"পিস";
-
-    $("productSubmit").innerText=
-        "Update Product";
-
-    showPage(
-        "products",
-        document.querySelectorAll(
-            ".sidebar .menu button"
-        )[1]
-    );
-
-}
-
-
-/* =====================================================
-   DELETE PRODUCT
-===================================================== */
-
-function deleteProduct(id){
-
-    const p=db.products.find(
-        x=>String(x.id)===String(id)
-    );
-
-    if(!p)return;
-
-    if(!confirm(
-        "এই Product Delete করতে চান?\n\n"+
-        p.name
-    )){
-        return;
-    }
-
-    db.products=db.products.filter(
-        x=>String(x.id)!==String(id)
-    );
-
-    save();
-
-}
-
-
-/* =====================================================
-   RESET PRODUCT
-===================================================== */
-
-function resetProductForm(){
-
-    $("productForm").reset();
-
-    $("productId").value="";
-
-    $("productUnit").value="পিস";
-
-    $("productSubmit").innerText=
-        "Add Product";
-
-}
-
-
-/* =====================================================
-   SALES CALCULATION
-===================================================== */
-
-function autoSalePrice(){
-
-    const product=findProduct(
-        $("saleProduct").value
-    );
-
-    if(product){
-
-        $("salePrice").value=
-            Number(product.sell||0);
-
-        $("saleUnit").value=
-            UNIT_OPTIONS.includes(product.unit)
-            ?product.unit
-            :"পিস";
-
-        $("saleProfit").value=
-            getProductProfit(product);
-
-    }
-
-    calculateSale();
-
-}
-
-
-function calculateSale(){
-
-    const qty=Number(
-        $("saleQty").value||0
-    );
-
-    const price=Number(
-        $("salePrice").value||0
-    );
-
-    const paid=Number(
-        $("salePaid").value||0
-    );
-
-    const total=qty*price;
-
-    const due=Math.max(
-        0,
-        total-paid
-    );
-
-    const product=findProduct(
-        $("saleProduct").value
-    );
-
-    const cost=product
-        ?qty*Number(product.buy||0)
-        :0;
-
-    $("saleTotal").value=
-        total.toFixed(2);
-
-    $("saleDue").value=
-        due.toFixed(2);
-
-    $("saleCost").value=
-        cost.toFixed(2);
-
-    if(product &&
-       !$("saleProfit").value){
-
-        $("saleProfit").value=
-            (
-                qty*
-                getProductProfit(product)
-            ).toFixed(2);
-
-    }
-
-}
-
-
-/* =====================================================
-   SALES SAVE
-===================================================== */
-
-$("salesForm").addEventListener(
-    "submit",
-    e=>{
-
-        e.preventDefault();
-
-        const id=$("saleId").value;
-
-        const date=$("saleDate").value;
-
-        const name=$("saleProduct")
-            .value.trim();
-
-        const qty=Number(
-            $("saleQty").value||0
-        );
-
-        const unit=$("saleUnit").value;
-
-        const price=Number(
-            $("salePrice").value||0
-        );
-
-        const paid=Number(
-            $("salePaid").value||0
-        );
-
-        const customer=$("saleCustomer")
-            .value.trim();
-
-        const total=qty*price;
-
-        const due=Math.max(
-            0,
-            total-paid
-        );
-
-        const product=findProduct(name);
-
-        if(!date){
-
-            alert("Date দিন");
-
-            return;
-
-        }
-
-        if(!name){
-
-            alert("Product Name দিন");
-
-            return;
-
-        }
-
-        if(!Number.isFinite(qty)||qty<=0){
-
-            alert("Quantity সঠিকভাবে দিন");
-
-            return;
-
-        }
-
-        if(!Number.isFinite(price)||price<0){
-
-            alert("Sale Price সঠিকভাবে দিন");
-
-            return;
-
-        }
-
-        if(paid<0||paid>total){
-
-            alert("Paid amount সঠিক নয়");
-
-            return;
-
-        }
-
-        let profit=Number(
-            $("saleProfit").value
-        );
-
-        if(!Number.isFinite(profit)||profit<0){
-
-            profit=product
-                ?qty*getProductProfit(product)
-                :Math.max(
-                    0,
-                    total-
-                    (product
-                    ?qty*Number(product.buy||0)
-                    :0)
-                );
-
-        }
-
-        /* Edit হলে পুরোনো stock আগে ফেরত */
-
-        if(id){
-
-            const old=db.sales.find(
-                s=>String(s.id)===String(id)
-            );
-
-            if(old){
-
-                const oldProduct=findProduct(
-                    old.product
-                );
-
-                if(oldProduct){
-
-                    oldProduct.stock=
-                        Number(oldProduct.stock||0)+
-                        Number(old.qty||0);
-
-                }
-
-            }
-
-        }
-
-        if(!product){
-
-            db.products.push({
-
-                id:Date.now().toString(),
-
-                name:name,
-
-                code:"",
-
-                buy:0,
-
-                sell:price,
-
-                profit:profit/qty,
-
-                stock:0,
-
-                unit:unit
-
-            });
-
-        }
-
-        const currentProduct=findProduct(name);
-
-        if(!currentProduct){
-
-            alert("Product পাওয়া যায়নি");
-
-            return;
-
-        }
-
-        if(
-            Number(currentProduct.stock||0)
-            <qty
-        ){
-
-            alert(
-                "Stock পর্যাপ্ত নেই।\n\n"+
-                "Available Stock: "+
-                Number(currentProduct.stock||0)
-            );
-
-            return;
-
-        }
-
-        currentProduct.stock=
-            Number(currentProduct.stock||0)-qty;
-
-        const sale={
-
-            id:id||Date.now().toString(),
-
-            date:date,
-
-            product:name,
-
-            qty:qty,
-
-            unit:unit,
-
-            price:price,
-
-            total:total,
-
-            customer:customer,
-
-            paid:paid,
-
-            due:due,
-
-            cost:
-                qty*Number(
-                    currentProduct.buy||0
-                ),
-
-            profit:profit
-
-        };
-
-        if(id){
-
-            const index=db.sales.findIndex(
-                s=>String(s.id)===String(id)
-            );
-
-            if(index!==-1){
-
-                db.sales[index]=sale;
-
-            }
-
-        }else{
-
-            db.sales.push(sale);
-
-        }
-
-        resetSaleForm();
-
-        save();
-
-        alert(
-            id
-            ?"Sale Successfully Updated"
-            :"Sale Successfully Saved"
-        );
-
-    }
-);
-
-
-/* =====================================================
-   EDIT SALE
-===================================================== */
-
-function editSale(id){
-
-    const s=db.sales.find(
-        x=>String(x.id)===String(id)
-    );
-
-    if(!s)return;
-
-    $("saleId").value=s.id;
-
-    $("saleDate").value=
-        s.date||today();
-
-    $("saleProduct").value=
-        s.product||"";
-
-    $("saleQty").value=
-        Number(s.qty||0);
-
-    $("saleUnit").value=
-        UNIT_OPTIONS.includes(s.unit)
-        ?s.unit
-        :"পিস";
-
-    $("salePrice").value=
-        Number(s.price||0);
-
-    $("saleCustomer").value=
-        s.customer||"";
-
-    $("salePaid").value=
-        Number(s.paid||0);
-
-    $("saleProfit").value=
-        Number(s.profit||0);
-
-    calculateSale();
-
-    $("saleSubmit").innerText=
-        "Update Sale";
-
-    showPage(
-        "sales",
-        document.querySelectorAll(
-            ".sidebar .menu button"
-        )[2]
-    );
-
-}
-
-
-/* =====================================================
-   DELETE SALE
-===================================================== */
-
-function deleteSale(id){
-
-    const sale=db.sales.find(
-        s=>String(s.id)===String(id)
-    );
-
-    if(!sale)return;
-
-    if(!confirm(
-        "এই Sale Delete করতে চান?\n\n"+
-        sale.product+
-        " - "+
-        money(sale.total)
-    )){
-        return;
-    }
-
-    const product=findProduct(
-        sale.product
-    );
-
-    if(product){
-
-        product.stock=
-            Number(product.stock||0)+
-            Number(sale.qty||0);
-
-    }
-
-    db.sales=db.sales.filter(
-        s=>String(s.id)!==String(id)
-    );
-
-    save();
-
-}
-
-
-/* =====================================================
-   RESET SALE
-===================================================== */
-
-function resetSaleForm(){
-
-    $("salesForm").reset();
-
-    $("saleId").value="";
-
-    $("saleDate").value=today();
-
-    $("saleUnit").value="পিস";
-
-    $("saleSubmit").innerText=
-        "Add Sale";
-
-    $("saleTotal").value="";
-
-    $("saleDue").value="";
-
-    $("saleCost").value="";
-
-    $("saleProfit").value="";
-
-}
-
-</script>
-<!-- =====================================================
-     PURCHASE
-===================================================== -->
-
-<section
-    id="purchase"
-    class="page"
->
-
-    <div class="panel">
-
-        <h2>Purchase Management</h2>
-
-        <form id="purchaseForm">
-
-            <input
-                type="hidden"
-                id="purchaseId"
-            >
-
-            <div class="form-grid">
-
-                <div class="form-group">
-                    <label>Date</label>
-                    <input
-                        type="date"
-                        id="purchaseDate"
-                        required
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label>Product</label>
-                    <input
-                        id="purchaseProduct"
-                        list="purchaseProductList"
-                        oninput="autoPurchasePrice()"
-                        required
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label>Quantity</label>
-                    <input
-                        type="number"
-                        id="purchaseQty"
-                        min="0.01"
-                        step="0.01"
-                        oninput="calculatePurchase()"
-                        required
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label>Unit</label>
-
-                    <select id="purchaseUnit">
-
-                        <option value="পিস">পিস</option>
-                        <option value="কেজি">কেজি</option>
-                        <option value="গ্রাম">গ্রাম</option>
-                        <option value="লিটার">লিটার</option>
-                        <option value="মিটার">মিটার</option>
-                        <option value="বস্তা">বস্তা</option>
-                        <option value="কার্টন">কার্টন</option>
-                        <option value="প্যাকেট">প্যাকেট</option>
-                        <option value="বান্ডিল">বান্ডিল</option>
-                        <option value="জোড়া">জোড়া</option>
-                        <option value="কাঁচামাল">কাঁচামাল</option>
-                        <option value="অন্যান্য">অন্যান্য</option>
-
-                    </select>
-
-                </div>
-
-                <div class="form-group">
-                    <label>Buy Price</label>
-
-                    <input
-                        type="number"
-                        id="purchasePrice"
-                        min="0"
-                        step="0.01"
-                        oninput="calculatePurchase()"
-                        required
-                    >
-
-                </div>
-
-                <div class="form-group">
-                    <label>Sell Price</label>
-
-                    <input
-                        type="number"
-                        id="purchaseSell"
-                        min="0"
-                        step="0.01"
-                        oninput="calculatePurchase()"
-                    >
-
-                </div>
-
-                <div class="form-group">
-                    <label>Profit / Unit</label>
-
-                    <input
-                        type="number"
-                        id="purchaseProfit"
-                        min="0"
-                        step="0.01"
-                    >
-
-                </div>
-
-                <div class="form-group">
-                    <label>Supplier</label>
-
-                    <input
-                        id="purchaseSupplier"
-                    >
-
-                </div>
-
-            </div>
-
-            <datalist id="purchaseProductList"></datalist>
-
-            <div class="form-actions">
-
-                <button
-                    type="submit"
-                    id="purchaseSubmit"
-                    class="btn btn-primary"
-                >
-                    Add Purchase
-                </button>
-
-                <button
-                    type="button"
-                    class="btn btn-secondary"
-                    onclick="resetPurchaseForm()"
-                >
-                    Reset
-                </button>
-
-            </div>
-
-        </form>
-
-    </div>
-
-
-    <div class="panel">
-
-        <h2>Purchase List</h2>
-
-        <div class="table-wrap">
-
-            <table>
-
-                <thead>
-
-                    <tr>
-                        <th>Date</th>
-                        <th>Product</th>
-                        <th>Qty</th>
-                        <th>Unit</th>
-                        <th>Price</th>
-                        <th>Total</th>
-                        <th>Supplier</th>
-                        <th>Action</th>
-                    </tr>
-
-                </thead>
-
-                <tbody id="purchaseTable"></tbody>
-
-            </table>
-
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- =====================================================
-     CUSTOMERS
-===================================================== -->
-
-<section
-    id="customers"
-    class="page"
->
-
-    <div class="panel">
-
-        <h2>Customer Management</h2>
-
-        <form id="customerForm">
-
-            <input
-                type="hidden"
-                id="customerId"
-            >
-
-            <div class="form-grid">
-
-                <div class="form-group">
-
-                    <label>Date</label>
-
-                    <input
-                        type="date"
-                        id="customerDate"
-                        required
-                    >
-
-                </div>
-
-                <div class="form-group">
-
-                    <label>Customer Name</label>
-
-                    <input
-                        id="customerName"
-                        required
-                    >
-
-                </div>
-
-                <div class="form-group">
-
-                    <label>Mobile</label>
-
-                    <input
-                        id="customerMobile"
-                    >
-
-                </div>
-
-                <div class="form-group">
-
-                    <label>Address</label>
-
-                    <input
-                        id="customerAddress"
-                    >
-
-                </div>
-
-                <div class="form-group">
-
-                    <label>Opening Due</label>
-
-                    <input
-                        type="number"
-                        id="customerDue"
-                        min="0"
-                        step="0.01"
-                        value="0"
-                        oninput="calculateCustomerDue()"
-                    >
-
-                </div>
-
-                <div class="form-group">
-
-                    <label>Payment / Collection</label>
-
-                    <input
-                        type="number"
-                        id="customerPayment"
-                        min="0"
-                        step="0.01"
-                        value="0"
-                        oninput="calculateCustomerDue()"
-                    >
-
-                </div>
-
-                <div class="form-group">
-
-                    <label>Total Due</label>
-
-                    <input
-                        id="customerTotalDue"
-                        class="readonly"
-                        readonly
-                        value="0.00"
-                    >
-
-                </div>
-
-            </div>
-
-            <div class="form-actions">
-
-                <button
-                    type="submit"
-                    class="btn btn-primary"
-                    id="customerSubmit"
-                >
-                    Add Customer
-                </button>
-
-                <button
-                    type="button"
-                    class="btn btn-secondary"
-                    onclick="resetCustomerForm()"
-                >
-                    Reset
-                </button>
-
-            </div>
-
-        </form>
-
-    </div>
-
-
-    <div class="panel">
-
-        <h2>Customer List</h2>
-
-        <div class="table-wrap">
-
-            <table>
-
-                <thead>
-
-                    <tr>
-                        <th>Date</th>
-                        <th>Name</th>
-                        <th>Mobile</th>
-                        <th>Address</th>
-                        <th>Opening Due</th>
-                        <th>Payment</th>
-                        <th>Total Due</th>
-                        <th>Action</th>
-                    </tr>
-
-                </thead>
-
-                <tbody id="customerTable"></tbody>
-
-            </table>
-
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- =====================================================
-     EXPENSES
-===================================================== -->
-
-<section
-    id="expenses"
-    class="page"
->
-
-    <div class="panel">
-
-        <h2>Expense Management</h2>
-
-        <form id="expenseForm">
-
-            <input
-                type="hidden"
-                id="expenseId"
-            >
-
-            <div class="form-grid">
-
-                <div class="form-group">
-
-                    <label>Date</label>
-
-                    <input
-                        type="date"
-                        id="expenseDate"
-                        required
-                    >
-
-                </div>
-
-                <div class="form-group">
-
-                    <label>Expense Name</label>
-
-                    <input
-                        id="expenseName"
-                        required
-                    >
-
-                </div>
-
-                <div class="form-group">
-
-                    <label>Amount</label>
-
-                    <input
-                        type="number"
-                        id="expenseAmount"
-                        min="0.01"
-                        step="0.01"
-                        required
-                    >
-
-                </div>
-
-                <div class="form-group">
-
-                    <label>Note</label>
-
-                    <textarea
-                        id="expenseNote"
-                    ></textarea>
-
-                </div>
-
-            </div>
-
-            <div class="form-actions">
-
-                <button
-                    type="submit"
-                    id="expenseSubmit"
-                    class="btn btn-danger"
-                >
-                    Add Expense
-                </button>
-
-                <button
-                    type="button"
-                    class="btn btn-secondary"
-                    onclick="resetExpenseForm()"
-                >
-                    Reset
-                </button>
-
-            </div>
-
-        </form>
-
-    </div>
-
-
-    <div class="panel">
-
-        <h2>Expense List</h2>
-
-        <div class="table-wrap">
-
-            <table>
-
-                <thead>
-
-                    <tr>
-                        <th>Date</th>
-                        <th>Name</th>
-                        <th>Amount</th>
-                        <th>Note</th>
-                        <th>Action</th>
-                    </tr>
-
-                </thead>
-
-                <tbody id="expenseTable"></tbody>
-
-            </table>
-
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- =====================================================
-     REPORTS
-===================================================== -->
-
-<section
-    id="reports"
-    class="page"
->
-
-    <div class="panel">
-
-        <h2>Reports</h2>
-
-        <div class="form-grid">
-
-            <div class="form-group">
-
-                <label>From</label>
-
-                <input
-                    type="date"
-                    id="reportFrom"
-                >
-
-            </div>
-
-            <div class="form-group">
-
-                <label>To</label>
-
-                <input
-                    type="date"
-                    id="reportTo"
-                >
-
-            </div>
-
-        </div>
-
-        <div class="form-actions">
-
-            <button
-                class="btn btn-primary"
-                onclick="generateReport()"
-            >
-                Generate Report
-            </button>
-
-            <button
-                class="btn btn-success"
-                onclick="reportToday()"
-            >
-                Today
-            </button>
-
-            <button
-                class="btn btn-warning"
-                onclick="reportMonth()"
-            >
-                This Month
-            </button>
-
-            <button
-                class="btn btn-secondary"
-                onclick="reportAll()"
-            >
-                All
-            </button>
-
-        </div>
-
-    </div>
-
-
-    <div class="report-cards">
-
-        <div class="report-card">
-            <h3>Total Sales</h3>
-            <div class="number" id="reportSales">৳0.00</div>
-        </div>
-
-        <div class="report-card">
-            <h3>Total Purchase</h3>
-            <div class="number" id="reportPurchase">৳0.00</div>
-        </div>
-
-        <div class="report-card">
-            <h3>Total Profit</h3>
-            <div class="number" id="reportGross">৳0.00</div>
-        </div>
-
-        <div class="report-card">
-            <h3>Total Expense</h3>
-            <div class="number" id="reportExpense">৳0.00</div>
-        </div>
-
-        <div class="report-card">
-            <h3>Net Profit</h3>
-            <div class="number" id="reportNet">৳0.00</div>
-        </div>
-
-        <div class="report-card">
-            <h3>Total Due</h3>
-            <div class="number" id="reportDue">৳0.00</div>
-        </div>
-
-        <div class="report-card">
-            <h3>Stock Value</h3>
-            <div class="number" id="reportStock">৳0.00</div>
-        </div>
-
-        <div class="report-card">
-            <h3>Cash / Balance</h3>
-            <div class="number" id="reportCash">৳0.00</div>
-        </div>
-
-        <div class="report-card">
-            <h3>Total Products</h3>
-            <div class="number" id="reportProducts">0</div>
-        </div>
-
-    </div>
-
-</section>
-
-</div>
-
-
-<script>
-
-/* =====================================================
-   PURCHASE
-===================================================== */
-
-function autoPurchasePrice(){
-
-    const name=$("purchaseProduct")
-        .value.trim();
-
-    const product=findProduct(name);
-
-    if(product){
-
-        $("purchasePrice").value=
-            Number(product.buy||0);
-
-        $("purchaseSell").value=
-            Number(product.sell||0);
-
-        $("purchaseProfit").value=
-            getProductProfit(product);
-
-        $("purchaseUnit").value=
-            UNIT_OPTIONS.includes(product.unit)
-            ?product.unit
-            :"পিস";
-
-    }
-
-    calculatePurchase();
-
-}
-
-
-function calculatePurchase(){
-
-    const buy=Number(
-        $("purchasePrice").value||0
-    );
-
-    const sell=Number(
-        $("purchaseSell").value||0
-    );
-
-    $("purchaseProfit").value=
-        Math.max(0,sell-buy).toFixed(2);
-
-}
-
-
-$("purchaseForm").addEventListener(
-    "submit",
-    e=>{
-
-        e.preventDefault();
-
-        const id=$("purchaseId").value;
-
-        const date=$("purchaseDate").value;
-
-        const name=$("purchaseProduct")
-            .value.trim();
-
-        const qty=Number(
-            $("purchaseQty").value||0
-        );
-
-        const unit=$("purchaseUnit").value;
-
-        const price=Number(
-            $("purchasePrice").value||0
-        );
-
-        const sell=Number(
-            $("purchaseSell").value||0
-        );
-
-        const supplier=$("purchaseSupplier")
-            .value.trim();
-
-        let profit=Number(
-            $("purchaseProfit").value
-        );
-
-        if(!date){
-
-            alert("Date দিন");
-
-            return;
-
-        }
-
-        if(!name){
-
-            alert("Product Name দিন");
-
-            return;
-
-        }
-
-        if(!Number.isFinite(qty)||qty<=0){
-
-            alert("Quantity সঠিকভাবে দিন");
-
-            return;
-
-        }
-
-        if(!Number.isFinite(price)||price<0){
-
-            alert("Buy Price সঠিকভাবে দিন");
-
-            return;
-
-        }
-
-        if(!Number.isFinite(profit)||profit<0){
-
-            profit=Math.max(0,sell-price);
-
-        }
-
-
-        /*
-         * EDIT PURCHASE
-         *
-         * পুরোনো purchase stock আগে বাদ,
-         * তারপর নতুন purchase stock যোগ।
-         * এতে Edit করলে stock double হবে না।
-         */
-
-        if(id){
-
-            const old=db.purchases.find(
-                p=>String(p.id)===String(id)
-            );
-
-            if(old){
-
-                const oldProduct=findProduct(
-                    old.product
-                );
-
-                if(oldProduct){
-
-                    oldProduct.stock=
-                        Math.max(
-                            0,
-                            Number(oldProduct.stock||0)-
-                            Number(old.qty||0)
-                        );
-
-                }
-
-            }
-
-        }
-
-
-        let product=findProduct(name);
-
-
-        if(!product){
-
-            product={
-
-                id:Date.now().toString(),
-
-                name:name,
-
-                code:"",
-
-                buy:price,
-
-                sell:sell||price,
-
-                profit:profit,
-
-                stock:qty,
-
-                unit:unit
-
-            };
-
-            db.products.push(product);
-
-        }else{
-
-            product.stock=
-                Number(product.stock||0)+qty;
-
-            product.buy=price;
-
-            if(sell>0){
-
-                product.sell=sell;
-
-            }
-
-            product.profit=profit;
-
-            product.unit=unit;
-
-        }
-
-
-        const purchase={
-
-            id:id||Date.now().toString(),
-
-            date:date,
-
-            product:name,
-
-            qty:qty,
-
-            unit:unit,
-
-            price:price,
-
-            total:qty*price,
-
-            supplier:supplier
-
-        };
-
-
-        if(id){
-
-            const index=db.purchases.findIndex(
-                p=>String(p.id)===String(id)
-            );
-
-            if(index!==-1){
-
-                db.purchases[index]=purchase;
-
-            }
-
-        }else{
-
-            db.purchases.push(purchase);
-
-        }
-
-
-        resetPurchaseForm();
-
-        save();
-
-        alert(
-            id
-            ?"Purchase Successfully Updated"
-            :"Purchase Successfully Saved"
-        );
-
-    }
-);
-
-
-/* =====================================================
-   EDIT PURCHASE
-===================================================== */
-
-function editPurchase(id){
-
-    const p=db.purchases.find(
-        x=>String(x.id)===String(id)
-    );
-
-    if(!p)return;
-
-    $("purchaseId").value=p.id;
-
-    $("purchaseDate").value=
-        p.date||today();
-
-    $("purchaseProduct").value=
-        p.product||"";
-
-    $("purchaseQty").value=
-        Number(p.qty||0);
-
-    $("purchasePrice").value=
-        Number(p.price||0);
-
-    $("purchaseSupplier").value=
-        p.supplier||"";
-
-    const product=findProduct(
-        p.product
-    );
-
-    $("purchaseSell").value=
-        product
-        ?Number(product.sell||0)
-        :"";
-
-    $("purchaseProfit").value=
-        product
-        ?getProductProfit(product)
-        :"";
-
-    $("purchaseUnit").value=
-        product &&
-        UNIT_OPTIONS.includes(product.unit)
-        ?product.unit
-        :
-        (
-            UNIT_OPTIONS.includes(p.unit)
-            ?p.unit
-            :"পিস"
-        );
-
-    $("purchaseSubmit").innerText=
-        "Update Purchase";
-
-    showPage(
-        "purchase",
-        document.querySelectorAll(
-            ".sidebar .menu button"
-        )[3]
-    );
-
-}
-
-
-/* =====================================================
-   DELETE PURCHASE
-===================================================== */
-
-function deletePurchase(id){
-
-    const purchase=db.purchases.find(
-        p=>String(p.id)===String(id)
-    );
-
-    if(!purchase)return;
-
-    if(!confirm(
-        "এই Purchase Delete করতে চান?\n\n"+
-        purchase.product+
-        " - "+
-        money(purchase.total)
-    )){
-        return;
-    }
-
-    const product=findProduct(
-        purchase.product
-    );
-
-    if(product){
-
-        product.stock=Math.max(
-            0,
-            Number(product.stock||0)-
-            Number(purchase.qty||0)
-        );
-
-    }
-
-    db.purchases=db.purchases.filter(
-        p=>String(p.id)!==String(id)
-    );
-
-    save();
-
-}
-
-
-/* =====================================================
-   RESET PURCHASE
-===================================================== */
-
-function resetPurchaseForm(){
-
-    $("purchaseForm").reset();
-
-    $("purchaseId").value="";
-
-    $("purchaseDate").value=today();
-
-    $("purchaseUnit").value="পিস";
-
-    $("purchaseProfit").value="";
-
-    $("purchaseSubmit").innerText=
-        "Add Purchase";
-
-}
-
-
 /* =====================================================
    CUSTOMER
 ===================================================== */
