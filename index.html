@@ -434,6 +434,133 @@ th{
     }
 }
 </style>
+    <style>
+/* ==========================================
+   SMART STORE - SMART DASHBOARD UI
+   Existing system untouched
+========================================== */
+
+/* Dashboard menu/container */
+.menu {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 18px !important;
+    padding: 20px !important;
+}
+
+/* Dashboard buttons */
+.menu button {
+    min-height: 125px !important;
+    padding: 18px 12px !important;
+    border: none !important;
+    border-radius: 18px !important;
+    background: linear-gradient(145deg, #ffffff, #eef2f7) !important;
+    box-shadow: 0 7px 18px rgba(0,0,0,.10) !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    gap: 10px !important;
+    cursor: pointer !important;
+
+    font-size: 16px !important;
+    font-weight: 700 !important;
+
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease,
+        background .2s ease !important;
+}
+
+/* Icon বড় */
+.menu button i,
+.menu button svg,
+.menu button .icon,
+.menu button .fa,
+.menu button .fas,
+.menu button .far,
+.menu button .fab {
+    font-size: 38px !important;
+    width: auto !important;
+    height: auto !important;
+    line-height: 1 !important;
+}
+
+/* Hover */
+.menu button:hover {
+    transform: translateY(-6px) scale(1.02) !important;
+    box-shadow: 0 14px 28px rgba(0,0,0,.16) !important;
+}
+
+/* Click */
+.menu button:active {
+    transform: scale(.96) !important;
+}
+
+/* Dashboard headings */
+.dashboard h1,
+.dashboard h2,
+.dashboard h3 {
+    font-weight: 800 !important;
+}
+
+/* Cards */
+.card,
+.dashboard-card,
+.stat-card {
+    border-radius: 18px !important;
+    box-shadow: 0 8px 22px rgba(0,0,0,.10) !important;
+    transition: transform .2s ease, box-shadow .2s ease !important;
+}
+
+.card:hover,
+.dashboard-card:hover,
+.stat-card:hover {
+    transform: translateY(-4px) !important;
+    box-shadow: 0 14px 30px rgba(0,0,0,.15) !important;
+}
+
+/* Buttons একটু smart */
+button {
+    transition: transform .15s ease, box-shadow .15s ease !important;
+}
+
+button:hover {
+    filter: brightness(1.03);
+}
+
+button:active {
+    transform: scale(.97);
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+
+    .menu {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 12px !important;
+        padding: 12px !important;
+    }
+
+    .menu button {
+        min-height: 105px !important;
+        border-radius: 15px !important;
+        font-size: 14px !important;
+    }
+
+    .menu button i,
+    .menu button svg,
+    .menu button .icon,
+    .menu button .fa,
+    .menu button .fas,
+    .menu button .far,
+    .menu button .fab {
+        font-size: 32px !important;
+    }
+}
+</style>
 </head>
 
 <body>
