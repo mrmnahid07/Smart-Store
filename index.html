@@ -10,7 +10,7 @@
 box-sizing:border-box;
 margin:0;
 padding:0;
-font-family:Arial,sans-serif;
+font-family:Arial, sans-serif;
 }
 
 body{
@@ -161,8 +161,7 @@ outline:none;
 width:100%;
 }
 
-input:focus,
-select:focus{
+input:focus,select:focus{
 border-color:#2e86de;
 }
 
@@ -260,16 +259,8 @@ font-weight:bold;
 margin-top:15px;
 }
 
-/* PROFIT INPUT */
-.profit-help{
-font-size:12px;
-color:#777;
-margin-top:5px;
-}
-
 /* MOBILE */
 @media(max-width:900px){
-
 .cards{
 grid-template-columns:repeat(2,1fr);
 }
@@ -282,11 +273,9 @@ width:200px;
 margin-left:200px;
 width:calc(100% - 200px);
 }
-
 }
 
 @media(max-width:650px){
-
 .sidebar{
 position:relative;
 width:100%;
@@ -318,11 +307,6 @@ display:block;
 .date{
 margin-top:8px;
 }
-
-.sale-row{
-grid-template-columns:1fr;
-}
-
 }
 </style>
 </head>
@@ -331,8 +315,7 @@ grid-template-columns:1fr;
 
 <div class="container">
 
-<!-- ================= SIDEBAR ================= -->
-
+<!-- SIDEBAR -->
 <aside class="sidebar">
 
 <div class="logo">
@@ -374,18 +357,12 @@ grid-template-columns:1fr;
 </aside>
 
 
-<!-- ================= MAIN ================= -->
-
+<!-- MAIN -->
 <main class="main">
 
 <div class="topbar">
-
-<h1 id="pageTitle">
-Dashboard
-</h1>
-
+<h1 id="pageTitle">Dashboard</h1>
 <div class="date" id="todayDate"></div>
-
 </div>
 
 
@@ -452,13 +429,11 @@ Dashboard
 <table>
 
 <thead>
-
 <tr>
 <th>Product</th>
 <th>Stock</th>
 <th>Minimum Stock</th>
 </tr>
-
 </thead>
 
 <tbody id="lowStockTable"></tbody>
@@ -483,141 +458,54 @@ Dashboard
 <div class="form-grid">
 
 <div class="form-group">
-
 <label>Product Name</label>
-
-<input
-id="productName"
-placeholder="Example: Coca Cola"
->
-
+<input id="productName" placeholder="Example: Coca Cola">
 </div>
 
-
 <div class="form-group">
-
 <label>Product Code</label>
-
-<input
-id="productCode"
-placeholder="Example: CC001"
->
-
+<input id="productCode" placeholder="Example: CC001">
 </div>
 
-
 <div class="form-group">
-
 <label>Category</label>
-
-<input
-id="productCategory"
-placeholder="Example: Drinks"
->
-
+<input id="productCategory" placeholder="Example: Drinks">
 </div>
 
-
 <div class="form-group">
-
 <label>Purchase Price</label>
-
-<input
-type="number"
-id="purchasePrice"
-placeholder="0"
-min="0"
-step="0.01"
->
-
+<input type="number" id="purchasePrice" placeholder="0">
 </div>
 
-
 <div class="form-group">
-
 <label>Selling Price</label>
-
-<input
-type="number"
-id="sellingPrice"
-placeholder="0"
-min="0"
-step="0.01"
->
-
+<input type="number" id="sellingPrice" placeholder="0">
 </div>
-
 
 <div class="form-group">
-
-<label>Profit Per Unit</label>
-
-<input
-type="number"
-id="productProfit"
-placeholder="Example: 10"
-min="0"
-step="0.01"
->
-
-<div class="profit-help">
-প্রতি Product বিক্রি করলে কত টাকা লাভ হবে
-</div>
-
-</div>
-
-
-<div class="form-group">
-
 <label>Stock Quantity</label>
-
-<input
-type="number"
-id="productStock"
-placeholder="0"
-min="0"
->
-
+<input type="number" id="productStock" placeholder="0">
 </div>
 
-
 <div class="form-group">
-
 <label>Unit</label>
-
 <select id="productUnit">
-
 <option value="pcs">Pieces</option>
 <option value="kg">KG</option>
 <option value="liter">Liter</option>
 <option value="packet">Packet</option>
 <option value="box">Box</option>
-
 </select>
-
 </div>
-
 
 <div class="form-group">
-
 <label>Minimum Stock</label>
-
-<input
-type="number"
-id="minimumStock"
-value="5"
-min="0"
->
-
+<input type="number" id="minimumStock" value="5">
 </div>
 
 </div>
 
-
-<button
-class="btn btn-primary"
-onclick="addProduct()"
->
+<button class="btn btn-primary" onclick="addProduct()">
 Save Product
 </button>
 
@@ -628,22 +516,16 @@ Save Product
 
 <h2>📦 Product List</h2>
 
-<input
-class="search"
-id="productSearch"
+<input class="search" id="productSearch"
 placeholder="🔎 Search product..."
-onkeyup="renderProducts()"
->
-
+onkeyup="renderProducts()">
 
 <div class="table-wrapper">
 
 <table>
 
 <thead>
-
 <tr>
-
 <th>Name</th>
 <th>Code</th>
 <th>Category</th>
@@ -652,9 +534,7 @@ onkeyup="renderProducts()"
 <th>Stock</th>
 <th>Profit/Unit</th>
 <th>Action</th>
-
 </tr>
-
 </thead>
 
 <tbody id="productTable"></tbody>
@@ -679,19 +559,11 @@ onkeyup="renderProducts()"
 <div class="form-grid">
 
 <div class="form-group">
-
 <label>Customer Name</label>
-
-<input
-id="saleCustomer"
-placeholder="Customer name"
->
-
+<input id="saleCustomer" placeholder="Customer name">
 </div>
 
-
 <div class="form-group">
-
 <label>Payment Method</label>
 
 <select id="paymentMethod">
@@ -708,60 +580,28 @@ placeholder="Customer name"
 
 </div>
 
-
 <br>
-
 
 <div id="saleItems"></div>
 
-
-<button
-class="btn btn-success"
-onclick="addSaleRow()"
->
+<button class="btn btn-success" onclick="addSaleRow()">
 + Add Product
 </button>
 
-
 <div class="sale-total">
-
-Total:
-৳<span id="saleTotal">0</span>
-
+Total: ৳<span id="saleTotal">0</span>
 </div>
 
-
-<div
-class="form-group"
-style="max-width:300px;margin-top:15px;"
->
-
+<div class="form-group" style="max-width:300px;margin-top:15px;">
 <label>Paid Amount</label>
-
-<input
-type="number"
-id="paidAmount"
-value="0"
-min="0"
-step="0.01"
-oninput="calculateSale()"
->
-
+<input type="number" id="paidAmount" value="0" oninput="calculateSale()">
 </div>
-
 
 <div class="sale-total">
-
-Due:
-৳<span id="saleDue">0</span>
-
+Due: ৳<span id="saleDue">0</span>
 </div>
 
-
-<button
-class="btn btn-primary"
-onclick="completeSale()"
->
+<button class="btn btn-primary" onclick="completeSale()">
 Complete Sale
 </button>
 
@@ -777,17 +617,14 @@ Complete Sale
 <table>
 
 <thead>
-
 <tr>
-
 <th>Date</th>
 <th>Customer</th>
 <th>Total</th>
 <th>Paid</th>
 <th>Due</th>
-
+<th>Profit</th>
 </tr>
-
 </thead>
 
 <tbody id="salesTable"></tbody>
@@ -812,60 +649,28 @@ Complete Sale
 <div class="form-grid">
 
 <div class="form-group">
-
 <label>Select Product</label>
-
 <select id="purchaseProduct"></select>
-
 </div>
 
-
 <div class="form-group">
-
 <label>Quantity</label>
-
-<input
-type="number"
-id="purchaseQty"
-value="1"
-min="1"
->
-
+<input type="number" id="purchaseQty" value="1">
 </div>
 
-
 <div class="form-group">
-
 <label>Purchase Price</label>
-
-<input
-type="number"
-id="purchaseBuyPrice"
-min="0"
-step="0.01"
->
-
+<input type="number" id="purchaseBuyPrice">
 </div>
-
 
 <div class="form-group">
-
 <label>Supplier</label>
-
-<input
-id="purchaseSupplier"
-placeholder="Supplier name"
->
-
+<input id="purchaseSupplier" placeholder="Supplier name">
 </div>
 
 </div>
 
-
-<button
-class="btn btn-primary"
-onclick="addPurchase()"
->
+<button class="btn btn-primary" onclick="addPurchase()">
 Save Purchase
 </button>
 
@@ -881,18 +686,14 @@ Save Purchase
 <table>
 
 <thead>
-
 <tr>
-
 <th>Date</th>
 <th>Product</th>
 <th>Quantity</th>
 <th>Price</th>
 <th>Total</th>
 <th>Supplier</th>
-
 </tr>
-
 </thead>
 
 <tbody id="purchaseTable"></tbody>
@@ -919,16 +720,12 @@ Save Purchase
 <table>
 
 <thead>
-
 <tr>
-
 <th>Customer</th>
 <th>Total Purchase</th>
 <th>Paid</th>
 <th>Due</th>
-
 </tr>
-
 </thead>
 
 <tbody id="customerTable"></tbody>
@@ -953,50 +750,23 @@ Save Purchase
 <div class="form-grid">
 
 <div class="form-group">
-
 <label>Expense Name</label>
-
-<input
-id="expenseName"
-placeholder="Example: Electricity Bill"
->
-
+<input id="expenseName" placeholder="Example: Electricity Bill">
 </div>
 
-
 <div class="form-group">
-
 <label>Amount</label>
-
-<input
-type="number"
-id="expenseAmount"
-placeholder="0"
-min="0"
-step="0.01"
->
-
+<input type="number" id="expenseAmount" placeholder="0">
 </div>
-
 
 <div class="form-group">
-
 <label>Note</label>
-
-<input
-id="expenseNote"
-placeholder="Optional"
->
-
+<input id="expenseNote" placeholder="Optional">
 </div>
 
 </div>
 
-
-<button
-class="btn btn-danger"
-onclick="addExpense()"
->
+<button class="btn btn-danger" onclick="addExpense()">
 Save Expense
 </button>
 
@@ -1012,16 +782,12 @@ Save Expense
 <table>
 
 <thead>
-
 <tr>
-
 <th>Date</th>
 <th>Expense</th>
 <th>Amount</th>
 <th>Note</th>
-
 </tr>
-
 </thead>
 
 <tbody id="expenseTable"></tbody>
@@ -1046,104 +812,42 @@ Save Expense
 <div class="cards">
 
 <div class="card">
-
 <h3>Total Sales</h3>
-
-<div
-class="value"
-id="reportSales"
->
-৳0
+<div class="value" id="reportSales">৳0</div>
 </div>
-
-</div>
-
 
 <div class="card">
-
 <h3>Total Purchase</h3>
-
-<div
-class="value"
-id="reportPurchase"
->
-৳0
+<div class="value" id="reportPurchase">৳0</div>
 </div>
-
-</div>
-
 
 <div class="card">
-
-<h3>Total Profit</h3>
-
-<div
-class="value"
-id="reportProfit"
->
-৳0
+<h3>Gross Profit</h3>
+<div class="value" id="reportProfit">৳0</div>
 </div>
-
-</div>
-
 
 <div class="card">
-
 <h3>Expenses</h3>
-
-<div
-class="value"
-id="reportExpense"
->
-৳0
+<div class="value" id="reportExpense">৳0</div>
 </div>
 
 </div>
-
-</div>
-
 
 <div class="cards">
 
 <div class="card">
-
 <h3>Net Profit</h3>
-
-<div
-class="value"
-id="reportNetProfit"
->
-৳0
+<div class="value" id="reportNetProfit">৳0</div>
 </div>
-
-</div>
-
 
 <div class="card">
-
 <h3>Total Due</h3>
-
-<div
-class="value"
-id="reportDue"
->
-৳0
+<div class="value" id="reportDue">৳0</div>
 </div>
-
-</div>
-
 
 <div class="card">
-
 <h3>Stock Value</h3>
-
-<div
-class="value"
-id="reportStock"
->
-৳0
-</div>
-
+<div class="value" id="reportStock">৳0</div>
 </div>
 
 </div>
@@ -1153,17 +857,10 @@ id="reportStock"
 </section>
 
 </main>
-
 </div>
 
 
 <script>
-
-/* =========================================================
-   SMART STORE
-   PRODUCT PROFIT + SALES + CUSTOMER + REPORT
-========================================================= */
-
 
 /* ================= DATA ================= */
 
@@ -1178,22 +875,6 @@ JSON.parse(localStorage.getItem("purchases")) || [];
 
 let expenses =
 JSON.parse(localStorage.getItem("expenses")) || [];
-
-
-/* ================= HELPER ================= */
-
-function num(value){
-
-return Number(value) || 0;
-
-}
-
-
-function money(value){
-
-return num(value).toFixed(2);
-
-}
 
 
 /* ================= SAVE DATA ================= */
@@ -1243,116 +924,61 @@ document.querySelectorAll(".section")
 section.classList.remove("active");
 });
 
-let section =
-document.getElementById(id);
-
-if(section){
-section.classList.add("active");
-}
+document.getElementById(id)
+.classList.add("active");
 
 document.querySelectorAll(".menu button")
 .forEach(btn=>{
 btn.classList.remove("active");
 });
 
-if(button){
 button.classList.add("active");
 
 let title =
-button.innerText
-.replace(/[^\w\s]/gi,"")
-.trim();
+button.innerText.replace(/[^\w\s]/gi,"").trim();
 
-document.getElementById("pageTitle")
-.innerText=title;
-}
+document.getElementById("pageTitle").innerText =
+title;
 
 renderAll();
 
 }
 
 
-/* =========================================================
-   PRODUCT
-========================================================= */
+/* ================= PRODUCT ================= */
 
 function addProduct(){
 
 let name =
-document.getElementById("productName")
-.value.trim();
+document.getElementById("productName").value.trim();
 
 let code =
-document.getElementById("productCode")
-.value.trim();
+document.getElementById("productCode").value.trim();
 
 let category =
-document.getElementById("productCategory")
-.value.trim();
+document.getElementById("productCategory").value.trim();
 
 let buy =
-num(document.getElementById("purchasePrice").value);
+Number(document.getElementById("purchasePrice").value);
 
 let sell =
-num(document.getElementById("sellingPrice").value);
-
-let profitInput =
-document.getElementById("productProfit").value;
+Number(document.getElementById("sellingPrice").value);
 
 let stock =
-num(document.getElementById("productStock").value);
+Number(document.getElementById("productStock").value);
 
 let unit =
 document.getElementById("productUnit").value;
 
 let minStock =
-num(document.getElementById("minimumStock").value);
+Number(document.getElementById("minimumStock").value);
 
 
-if(!name){
+if(!name || !buy || !sell){
 
-alert("Please enter Product Name.");
-
-return;
-
-}
-
-
-if(buy<=0){
-
-alert("Please enter Purchase Price.");
+alert("Please enter Product Name, Purchase Price and Selling Price.");
 
 return;
-
-}
-
-
-if(sell<=0){
-
-alert("Please enter Selling Price.");
-
-return;
-
-}
-
-
-/*
-যদি Profit/Unit না দেওয়া হয়,
-তাহলে Selling Price - Purchase Price
-অটোমেটিক Profit হিসেবে নেওয়া হবে।
-*/
-
-let profit;
-
-if(profitInput===""){
-
-profit =
-Math.max(0,sell-buy);
-
-}else{
-
-profit =
-Math.max(0,num(profitInput));
 
 }
 
@@ -1361,23 +987,14 @@ products.push({
 
 id:Date.now(),
 
-name:name,
-
-code:code,
-
-category:category,
-
-buy:buy,
-
-sell:sell,
-
-profit:profit,
-
-stock:stock,
-
-unit:unit,
-
-minStock:minStock
+name,
+code,
+category,
+buy,
+sell,
+stock,
+unit,
+minStock
 
 });
 
@@ -1393,53 +1010,15 @@ alert("Product added successfully!");
 }
 
 
-/* ================= CLEAR PRODUCT ================= */
-
 function clearProductForm(){
 
 document.getElementById("productName").value="";
-
 document.getElementById("productCode").value="";
-
 document.getElementById("productCategory").value="";
-
 document.getElementById("purchasePrice").value="";
-
 document.getElementById("sellingPrice").value="";
-
-document.getElementById("productProfit").value="";
-
 document.getElementById("productStock").value="";
-
-document.getElementById("productUnit").value="pcs";
-
 document.getElementById("minimumStock").value=5;
-
-}
-
-
-/* ================= GET PRODUCT PROFIT ================= */
-
-function getProductProfit(product){
-
-if(
-product.profit !== undefined &&
-product.profit !== null
-){
-
-return num(product.profit);
-
-}
-
-/*
-পুরোনো Product-এর জন্য
-Selling - Purchase
-*/
-
-return Math.max(
-0,
-num(product.sell)-num(product.buy)
-);
 
 }
 
@@ -1450,64 +1029,47 @@ function renderProducts(){
 
 let search =
 document.getElementById("productSearch")
-?.value
-.toLowerCase() || "";
+?.value.toLowerCase() || "";
 
 let html="";
 
-
 products
-.filter(p=>{
-
-let name =
-String(p.name || "")
-.toLowerCase();
-
-let code =
-String(p.code || "")
-.toLowerCase();
-
-return name.includes(search) ||
-code.includes(search);
-
-})
+.filter(p=>
+p.name.toLowerCase().includes(search) ||
+p.code.toLowerCase().includes(search)
+)
 .forEach(p=>{
 
 let profit =
-getProductProfit(p);
-
+p.sell-p.buy;
 
 html+=`
 
 <tr>
 
-<td>${p.name || ""}</td>
+<td>${p.name}</td>
 
-<td>${p.code || ""}</td>
+<td>${p.code}</td>
 
-<td>${p.category || ""}</td>
+<td>${p.category}</td>
 
-<td>৳${money(p.buy)}</td>
+<td>৳${p.buy.toFixed(2)}</td>
 
-<td>৳${money(p.sell)}</td>
+<td>৳${p.sell.toFixed(2)}</td>
 
-<td>${num(p.stock)} ${p.unit || ""}</td>
+<td>${p.stock} ${p.unit}</td>
 
-<td>৳${money(profit)}</td>
+<td>৳${profit.toFixed(2)}</td>
 
 <td>
 
-<button
-class="action-btn edit"
-onclick="editProduct(${p.id})"
->
+<button class="action-btn edit"
+onclick="editProduct(${p.id})">
 Edit
 </button>
 
-<button
-class="action-btn delete"
-onclick="deleteProduct(${p.id})"
->
+<button class="action-btn delete"
+onclick="deleteProduct(${p.id})">
 Delete
 </button>
 
@@ -1520,8 +1082,8 @@ Delete
 });
 
 
-document.getElementById("productTable")
-.innerHTML=html;
+document.getElementById("productTable").innerHTML =
+html;
 
 }
 
@@ -1530,12 +1092,8 @@ document.getElementById("productTable")
 
 function deleteProduct(id){
 
-if(!confirm("Delete this product?")){
-
+if(!confirm("Delete this product?"))
 return;
-
-}
-
 
 products =
 products.filter(p=>p.id!==id);
@@ -1554,129 +1112,26 @@ function editProduct(id){
 let p =
 products.find(x=>x.id===id);
 
-if(!p){
-
-alert("Product not found.");
-
-return;
-
-}
-
-
-let newName =
-prompt("Product Name:",p.name);
-
-if(newName===null){
-
-return;
-
-}
-
-
-let newBuy =
-prompt(
-"Purchase Price:",
-num(p.buy)
-);
-
-if(newBuy===null){
-
-return;
-
-}
-
+if(!p)return;
 
 let newSell =
-prompt(
-"Selling Price:",
-num(p.sell)
-);
+prompt("Selling Price:",p.sell);
 
-if(newSell===null){
+if(newSell===null)return;
 
-return;
-
-}
-
-
-let oldProfit =
-getProductProfit(p);
-
-
-let newProfit =
-prompt(
-"Profit Per Unit:",
-oldProfit
-);
-
-if(newProfit===null){
-
-return;
-
-}
-
-
-let buy =
-num(newBuy);
-
-let sell =
-num(newSell);
-
-let profit =
-num(newProfit);
-
-
-if(buy<=0 || sell<=0){
-
-alert("Invalid price.");
-
-return;
-
-}
-
-
-if(profit<0){
-
-profit=0;
-
-}
-
-
-p.name =
-newName.trim();
-
-p.buy=buy;
-
-p.sell=sell;
-
-p.profit=profit;
-
+p.sell =
+Number(newSell);
 
 saveData();
 
 renderAll();
 
-alert("Product updated successfully!");
-
 }
 
 
-/* =========================================================
-   SALES ROW
-========================================================= */
+/* ================= SALES ROW ================= */
 
 function addSaleRow(){
-
-if(products.length===0){
-
-alert(
-"Please add a product first."
-);
-
-return;
-
-}
-
 
 let container =
 document.getElementById("saleItems");
@@ -1686,83 +1141,59 @@ document.createElement("div");
 
 row.className="sale-row";
 
-
 let options =
-products.map(p=>`
-
-<option value="${p.id}">
-
-${p.name} - ৳${money(p.sell)}
-
-</option>
-
-`).join("");
-
+products.map(p=>
+`<option value="${p.id}">
+${p.name} - ৳${p.sell}
+</option>`
+).join("");
 
 row.innerHTML=`
 
-<select
-class="sale-product"
-onchange="calculateSale()"
->
+<select class="sale-product"
+onchange="calculateSale()">
 
-<option value="">
-Select Product
-</option>
+<option value="">Select Product</option>
 
 ${options}
 
 </select>
-
 
 <input
 type="number"
 class="sale-qty"
 value="1"
 min="1"
-oninput="calculateSale()"
->
-
+oninput="calculateSale()">
 
 <input
 class="sale-price"
 type="number"
 value="0"
-readonly
->
-
+readonly>
 
 <input
 class="sale-subtotal"
 type="number"
 value="0"
-readonly
->
-
+readonly>
 
 <button
 class="action-btn delete"
-onclick="
-this.parentElement.remove();
-calculateSale();
-"
->
+onclick="this.parentElement.remove();calculateSale()">
+
 X
+
 </button>
 
 `;
 
-
 container.appendChild(row);
-
-calculateSale();
 
 }
 
 
-/* =========================================================
-   CALCULATE SALE
-========================================================= */
+/* ================= CALCULATE SALE ================= */
 
 function calculateSale(){
 
@@ -1771,53 +1202,29 @@ document.querySelectorAll(".sale-row");
 
 let total=0;
 
-
 rows.forEach(row=>{
 
 let productId =
-num(
-row.querySelector(
-".sale-product"
-).value
-);
+Number(row.querySelector(".sale-product").value);
 
 let qty =
-Math.max(
-1,
-num(
-row.querySelector(
-".sale-qty"
-).value
-)
-);
-
+Number(row.querySelector(".sale-qty").value);
 
 let product =
-products.find(
-p=>p.id===productId
-);
-
+products.find(p=>p.id===productId);
 
 if(product){
 
-let price =
-num(product.sell);
+let price=product.sell;
 
 let subtotal =
 price*qty;
 
-
-row.querySelector(
-".sale-price"
-).value=
+row.querySelector(".sale-price").value =
 price;
 
-
-row.querySelector(
-".sale-subtotal"
-).value=
+row.querySelector(".sale-subtotal").value =
 subtotal;
-
 
 total+=subtotal;
 
@@ -1825,225 +1232,99 @@ total+=subtotal;
 
 });
 
-
-document.getElementById(
-"saleTotal"
-).innerText=
-money(total);
-
+document.getElementById("saleTotal").innerText =
+total.toFixed(2);
 
 let paid =
-Math.max(
-0,
-num(
-document.getElementById(
-"paidAmount"
-).value
-)
-);
+Number(document.getElementById("paidAmount").value)||0;
 
-
-document.getElementById(
-"saleDue"
-).innerText=
-money(
-Math.max(0,total-paid)
-);
+document.getElementById("saleDue").innerText =
+Math.max(0,total-paid).toFixed(2);
 
 }
 
 
-/* =========================================================
-   COMPLETE SALE
-========================================================= */
+/* ================= COMPLETE SALE ================= */
 
 function completeSale(){
 
 let rows =
 document.querySelectorAll(".sale-row");
 
-
 if(rows.length===0){
 
-alert(
-"Please add a product."
-);
+alert("Please add a product.");
 
 return;
 
 }
-
 
 let items=[];
 
 let total=0;
 
-let totalProfit=0;
+let profit=0;
 
-
-/* ================= CHECK FIRST ================= */
 
 for(let row of rows){
 
 let productId =
-num(
-row.querySelector(
-".sale-product"
-).value
-);
+Number(row.querySelector(".sale-product").value);
 
 let qty =
-num(
-row.querySelector(
-".sale-qty"
-).value
-);
-
+Number(row.querySelector(".sale-qty").value);
 
 let product =
-products.find(
-p=>p.id===productId
-);
-
+products.find(p=>p.id===productId);
 
 if(!product){
 
-alert(
-"Please select a product."
-);
+alert("Please select a product.");
 
 return;
 
 }
 
-
-if(qty<=0){
+if(qty>product.stock){
 
 alert(
-"Quantity must be greater than 0."
+"Not enough stock for "+product.name
 );
 
 return;
 
 }
-
-
-if(qty>num(product.stock)){
-
-alert(
-"Not enough stock for "+
-product.name
-);
-
-return;
-
-}
-
-}
-
-
-/* ================= SAVE SALE ================= */
-
-for(let row of rows){
-
-let productId =
-num(
-row.querySelector(
-".sale-product"
-).value
-);
-
-let qty =
-num(
-row.querySelector(
-".sale-qty"
-).value
-);
-
-
-let product =
-products.find(
-p=>p.id===productId
-);
-
 
 let subtotal =
-num(product.sell)*qty;
-
-
-/*
-IMPORTANT:
-Product-এর Profit/Unit × Quantity
-*/
+product.sell*qty;
 
 let itemProfit =
-getProductProfit(product)*qty;
+(product.sell-product.buy)*qty;
 
+product.stock-=qty;
 
-/* STOCK কমবে */
+total+=subtotal;
 
-product.stock -= qty;
-
-
-/* TOTAL */
-
-total += subtotal;
-
-
-/* TOTAL PROFIT */
-
-totalProfit += itemProfit;
-
-
-/* ITEM */
+profit+=itemProfit;
 
 items.push({
 
-productId:productId,
-
+productId,
 name:product.name,
-
-qty:qty,
-
-price:num(product.sell),
-
-subtotal:subtotal,
-
-profit:itemProfit
+qty,
+price:product.sell,
+subtotal
 
 });
 
 }
 
 
-/* ================= PAYMENT ================= */
-
 let paid =
-Math.max(
-0,
-num(
-document.getElementById(
-"paidAmount"
-).value
-)
-);
-
-
-if(paid>total){
-
-paid=total;
-
-}
-
+Number(document.getElementById("paidAmount").value)||0;
 
 let due =
-Math.max(
-0,
-total-paid
-);
-
-
-/* ================= SALE OBJECT ================= */
+Math.max(0,total-paid);
 
 sales.push({
 
@@ -2052,98 +1333,52 @@ id:Date.now(),
 date:new Date().toISOString(),
 
 customer:
-document.getElementById(
-"saleCustomer"
-).value.trim()
+document.getElementById("saleCustomer").value
 ||"Walk-in Customer",
 
-paymentMethod:
-document.getElementById(
-"paymentMethod"
-).value,
+items,
 
-items:items,
-
-total:total,
-
-paid:paid,
-
-due:due,
-
-/*
-এটাই Total Profit
-*/
-
-profit:totalProfit
+total,
+paid,
+due,
+profit
 
 });
 
 
-/* ================= SAVE ================= */
-
 saveData();
 
+document.getElementById("saleItems").innerHTML="";
 
-/* ================= RESET ================= */
+document.getElementById("saleCustomer").value="";
 
-document.getElementById(
-"saleItems"
-).innerHTML="";
-
-
-document.getElementById(
-"saleCustomer"
-).value="";
-
-
-document.getElementById(
-"paidAmount"
-).value=0;
-
-
-document.getElementById(
-"paymentMethod"
-).value="Cash";
-
+document.getElementById("paidAmount").value=0;
 
 calculateSale();
 
 renderAll();
 
-
-alert(
-"Sale completed successfully!\n"+
-"Total Profit: ৳"+
-money(totalProfit)
-);
+alert("Sale completed successfully!");
 
 }
 
 
-/* =========================================================
-   PURCHASE
-========================================================= */
+/* ================= PURCHASE ================= */
 
 function renderPurchaseProducts(){
 
 let select =
-document.getElementById(
-"purchaseProduct"
-);
-
+document.getElementById("purchaseProduct");
 
 select.innerHTML =
 '<option value="">Select Product</option>';
-
 
 products.forEach(p=>{
 
 select.innerHTML+=`
 
 <option value="${p.id}">
-
 ${p.name}
-
 </option>
 
 `;
@@ -2153,114 +1388,60 @@ ${p.name}
 }
 
 
-/* ================= PURCHASE SELECT ================= */
-
-document.getElementById(
-"purchaseProduct"
-)
-.addEventListener(
-"change",
-function(){
+document.getElementById("purchaseProduct")
+.addEventListener("change",function(){
 
 let p =
-products.find(
-x=>x.id===num(this.value)
-);
-
+products.find(x=>x.id===Number(this.value));
 
 if(p){
 
-document.getElementById(
-"purchaseBuyPrice"
-).value=
-num(p.buy);
+document.getElementById("purchaseBuyPrice")
+.value=p.buy;
 
 }
 
-}
-);
+});
 
-
-/* ================= ADD PURCHASE ================= */
 
 function addPurchase(){
 
 let productId =
-num(
-document.getElementById(
-"purchaseProduct"
-).value
-);
+Number(document.getElementById("purchaseProduct").value);
 
 let qty =
-num(
-document.getElementById(
-"purchaseQty"
-).value
-);
+Number(document.getElementById("purchaseQty").value);
 
 let price =
-num(
-document.getElementById(
-"purchaseBuyPrice"
-).value
-);
+Number(document.getElementById("purchaseBuyPrice").value);
 
 let supplier =
-document.getElementById(
-"purchaseSupplier"
-).value.trim()
+document.getElementById("purchaseSupplier").value
 ||"Unknown";
 
 
 let product =
-products.find(
-p=>p.id===productId
-);
+products.find(p=>p.id===productId);
 
 
 if(!product){
 
-alert(
-"Please select product."
-);
+alert("Please select product.");
+
+return;
+
+}
+
+if(qty<=0 || price<=0){
+
+alert("Enter valid quantity and price.");
 
 return;
 
 }
 
 
-if(qty<=0){
-
-alert(
-"Enter valid quantity."
-);
-
-return;
-
-}
-
-
-if(price<=0){
-
-alert(
-"Enter valid purchase price."
-);
-
-return;
-
-}
-
-
-/*
-Purchase করলে শুধু stock এবং buy price update হবে।
-Profit/Unit পরিবর্তন হবে না।
-*/
-
-product.stock += qty;
-
-product.buy = price;
-
+product.stock+=qty;
 
 purchases.push({
 
@@ -2270,13 +1451,12 @@ date:new Date().toISOString(),
 
 product:product.name,
 
-qty:qty,
-
-price:price,
+qty,
+price,
 
 total:qty*price,
 
-supplier:supplier
+supplier
 
 });
 
@@ -2285,63 +1465,28 @@ saveData();
 
 renderAll();
 
-
-document.getElementById(
-"purchaseQty"
-).value=1;
-
-document.getElementById(
-"purchaseSupplier"
-).value="";
-
-
-alert(
-"Purchase added successfully!"
-);
+alert("Purchase added successfully!");
 
 }
 
 
-/* =========================================================
-   EXPENSE
-========================================================= */
+/* ================= EXPENSE ================= */
 
 function addExpense(){
 
 let name =
-document.getElementById(
-"expenseName"
-).value.trim();
+document.getElementById("expenseName").value.trim();
 
 let amount =
-num(
-document.getElementById(
-"expenseAmount"
-).value
-);
+Number(document.getElementById("expenseAmount").value);
 
 let note =
-document.getElementById(
-"expenseNote"
-).value.trim();
+document.getElementById("expenseNote").value;
 
 
-if(!name){
+if(!name || amount<=0){
 
-alert(
-"Enter expense name."
-);
-
-return;
-
-}
-
-
-if(amount<=0){
-
-alert(
-"Enter valid expense amount."
-);
+alert("Enter expense name and amount.");
 
 return;
 
@@ -2354,47 +1499,27 @@ id:Date.now(),
 
 date:new Date().toISOString(),
 
-name:name,
-
-amount:amount,
-
-note:note
+name,
+amount,
+note
 
 });
 
 
 saveData();
 
-
-document.getElementById(
-"expenseName"
-).value="";
-
-
-document.getElementById(
-"expenseAmount"
-).value="";
-
-
-document.getElementById(
-"expenseNote"
-).value="";
-
+document.getElementById("expenseName").value="";
+document.getElementById("expenseAmount").value="";
+document.getElementById("expenseNote").value="";
 
 renderAll();
 
-
-alert(
-"Expense added!"
-);
+alert("Expense added!");
 
 }
 
 
-/* =========================================================
-   CUSTOMER
-   PROFIT WILL NOT SHOW HERE
-========================================================= */
+/* ================= CUSTOMER ================= */
 
 function renderCustomers(){
 
@@ -2403,47 +1528,28 @@ let customers={};
 
 sales.forEach(s=>{
 
-let customer =
-s.customer ||
-"Walk-in Customer";
+if(!customers[s.customer]){
 
-
-if(!customers[customer]){
-
-customers[customer]={
-
+customers[s.customer]={
 total:0,
-
 paid:0,
-
 due:0
-
 };
 
 }
 
-
-customers[customer].total +=
-num(s.total);
-
-customers[customer].paid +=
-num(s.paid);
-
-customers[customer].due +=
-num(s.due);
+customers[s.customer].total+=s.total;
+customers[s.customer].paid+=s.paid;
+customers[s.customer].due+=s.due;
 
 });
 
 
 let html="";
 
+Object.keys(customers).forEach(name=>{
 
-Object.keys(customers)
-.forEach(name=>{
-
-let c =
-customers[name];
-
+let c=customers[name];
 
 html+=`
 
@@ -2451,11 +1557,11 @@ html+=`
 
 <td>${name}</td>
 
-<td>৳${money(c.total)}</td>
+<td>৳${c.total.toFixed(2)}</td>
 
-<td>৳${money(c.paid)}</td>
+<td>৳${c.paid.toFixed(2)}</td>
 
-<td>৳${money(c.due)}</td>
+<td>৳${c.due.toFixed(2)}</td>
 
 </tr>
 
@@ -2464,51 +1570,35 @@ html+=`
 });
 
 
-document.getElementById(
-"customerTable"
-).innerHTML=html;
+document.getElementById("customerTable")
+.innerHTML=html;
 
 }
 
 
-/* =========================================================
-   SALES TABLE
-   PROFIT INTENTIONALLY HIDDEN
-========================================================= */
+/* ================= SALES TABLE ================= */
 
 function renderSales(){
 
 let html="";
 
-
-sales
-.slice()
-.reverse()
-.forEach(s=>{
+sales.slice().reverse().forEach(s=>{
 
 html+=`
 
 <tr>
 
-<td>
-${formatDate(s.date)}
-</td>
+<td>${formatDate(s.date)}</td>
 
-<td>
-${s.customer || "Walk-in Customer"}
-</td>
+<td>${s.customer}</td>
 
-<td>
-৳${money(s.total)}
-</td>
+<td>৳${s.total.toFixed(2)}</td>
 
-<td>
-৳${money(s.paid)}
-</td>
+<td>৳${s.paid.toFixed(2)}</td>
 
-<td>
-৳${money(s.due)}
-</td>
+<td>৳${s.due.toFixed(2)}</td>
+
+<td>৳${s.profit.toFixed(2)}</td>
 
 </tr>
 
@@ -2517,54 +1607,35 @@ ${s.customer || "Walk-in Customer"}
 });
 
 
-document.getElementById(
-"salesTable"
-).innerHTML=html;
+document.getElementById("salesTable")
+.innerHTML=html;
 
 }
 
 
-/* =========================================================
-   PURCHASE TABLE
-========================================================= */
+/* ================= PURCHASE TABLE ================= */
 
 function renderPurchases(){
 
 let html="";
 
-
-purchases
-.slice()
-.reverse()
-.forEach(p=>{
+purchases.slice().reverse().forEach(p=>{
 
 html+=`
 
 <tr>
 
-<td>
-${formatDate(p.date)}
-</td>
+<td>${formatDate(p.date)}</td>
 
-<td>
-${p.product || ""}
-</td>
+<td>${p.product}</td>
 
-<td>
-${num(p.qty)}
-</td>
+<td>${p.qty}</td>
 
-<td>
-৳${money(p.price)}
-</td>
+<td>৳${p.price.toFixed(2)}</td>
 
-<td>
-৳${money(p.total)}
-</td>
+<td>৳${p.total.toFixed(2)}</td>
 
-<td>
-${p.supplier || ""}
-</td>
+<td>${p.supplier}</td>
 
 </tr>
 
@@ -2573,46 +1644,31 @@ ${p.supplier || ""}
 });
 
 
-document.getElementById(
-"purchaseTable"
-).innerHTML=html;
+document.getElementById("purchaseTable")
+.innerHTML=html;
 
 }
 
 
-/* =========================================================
-   EXPENSE TABLE
-========================================================= */
+/* ================= EXPENSE TABLE ================= */
 
 function renderExpenses(){
 
 let html="";
 
-
-expenses
-.slice()
-.reverse()
-.forEach(e=>{
+expenses.slice().reverse().forEach(e=>{
 
 html+=`
 
 <tr>
 
-<td>
-${formatDate(e.date)}
-</td>
+<td>${formatDate(e.date)}</td>
 
-<td>
-${e.name || ""}
-</td>
+<td>${e.name}</td>
 
-<td>
-৳${money(e.amount)}
-</td>
+<td>৳${e.amount.toFixed(2)}</td>
 
-<td>
-${e.note || ""}
-</td>
+<td>${e.note}</td>
 
 </tr>
 
@@ -2621,219 +1677,74 @@ ${e.note || ""}
 });
 
 
-document.getElementById(
-"expenseTable"
-).innerHTML=html;
+document.getElementById("expenseTable")
+.innerHTML=html;
 
 }
 
 
-/* =========================================================
-   TOTAL PROFIT
-========================================================= */
-
-function getTotalProfit(){
-
-return sales.reduce(
-(sum,s)=>{
-
-/*
-নতুন sale হলে s.profit থাকবে।
-
-পুরোনো sale হলে:
-Total - Cost
-অথবা item-wise profit হিসাব করার চেষ্টা করবে।
-*/
-
-if(
-s.profit !== undefined &&
-s.profit !== null
-){
-
-return sum+num(s.profit);
-
-}
-
-
-/* OLD DATA SUPPORT */
-
-if(
-Array.isArray(s.items)
-){
-
-let itemProfit =
-s.items.reduce(
-(itemSum,item)=>{
-
-if(
-item.profit !== undefined
-){
-
-return itemSum+
-num(item.profit);
-
-}
-
-
-let product =
-products.find(
-p=>p.id===num(item.productId)
-);
-
-
-if(product){
-
-return itemSum+
-getProductProfit(product)*
-num(item.qty);
-
-}
-
-
-return itemSum;
-
-},
-0
-);
-
-return sum+itemProfit;
-
-}
-
-
-return sum;
-
-},
-0
-);
-
-}
-
-
-/* =========================================================
-   DASHBOARD
-========================================================= */
+/* ================= DASHBOARD ================= */
 
 function updateDashboard(){
 
-let expense =
-expenses.reduce(
-(sum,e)=>
-sum+num(e.amount),
-0
-);
+let salesTotal =
+sales.reduce((sum,s)=>sum+s.total,0);
 
+let profit =
+sales.reduce((sum,s)=>sum+s.profit,0);
+
+let expense =
+expenses.reduce((sum,e)=>sum+e.amount,0);
 
 let due =
-sales.reduce(
-(sum,s)=>
-sum+num(s.due),
-0
-);
-
+sales.reduce((sum,s)=>sum+s.due,0);
 
 let stockValue =
 products.reduce(
-(sum,p)=>
-sum+
-(
-num(p.buy)*
-num(p.stock)
-),
+(sum,p)=>sum+(p.buy*p.stock),
 0
 );
 
-
-let totalProfit =
-getTotalProfit();
-
-
 let low =
 products.filter(
-p=>
-num(p.stock)<=
-num(p.minStock)
+p=>p.stock<=p.minStock
 );
 
 
-/* TODAY SALES */
+document.getElementById("todaySales")
+.innerText=
+"৳"+getTodaySales().toFixed(2);
 
-document.getElementById(
-"todaySales"
-).innerText=
-"৳"+
-money(
-getTodaySales()
-);
-
-
-/* PRODUCTS */
-
-document.getElementById(
-"totalProducts"
-).innerText=
+document.getElementById("totalProducts")
+.innerText=
 products.length;
 
+document.getElementById("totalProfit")
+.innerText=
+"৳"+profit.toFixed(2);
 
-/* TOTAL PROFIT */
+document.getElementById("totalExpense")
+.innerText=
+"৳"+expense.toFixed(2);
 
-document.getElementById(
-"totalProfit"
-).innerText=
-"৳"+
-money(totalProfit);
+document.getElementById("totalDue")
+.innerText=
+"৳"+due.toFixed(2);
 
+document.getElementById("stockValue")
+.innerText=
+"৳"+stockValue.toFixed(2);
 
-/* EXPENSE */
-
-document.getElementById(
-"totalExpense"
-).innerText=
-"৳"+
-money(expense);
-
-
-/* DUE */
-
-document.getElementById(
-"totalDue"
-).innerText=
-"৳"+
-money(due);
-
-
-/* STOCK */
-
-document.getElementById(
-"stockValue"
-).innerText=
-"৳"+
-money(stockValue);
-
-
-/* LOW STOCK */
-
-document.getElementById(
-"lowStock"
-).innerText=
+document.getElementById("lowStock")
+.innerText=
 low.length;
 
+document.getElementById("netProfit")
+.innerText=
+"৳"+(profit-expense).toFixed(2);
 
-/* NET PROFIT */
-
-document.getElementById(
-"netProfit"
-).innerText=
-"৳"+
-money(
-totalProfit-expense
-);
-
-
-/* LOW STOCK TABLE */
 
 let html="";
-
 
 low.forEach(p=>{
 
@@ -2841,17 +1752,11 @@ html+=`
 
 <tr>
 
-<td>
-${p.name || ""}
-</td>
+<td>${p.name}</td>
 
-<td>
-${num(p.stock)}
-</td>
+<td>${p.stock}</td>
 
-<td>
-${num(p.minStock)}
-</td>
+<td>${p.minStock}</td>
 
 </tr>
 
@@ -2859,196 +1764,91 @@ ${num(p.minStock)}
 
 });
 
-
-document.getElementById(
-"lowStockTable"
-).innerHTML=html;
+document.getElementById("lowStockTable")
+.innerHTML=html;
 
 }
 
 
-/* =========================================================
-   TODAY SALES
-========================================================= */
+/* ================= TODAY SALES ================= */
 
 function getTodaySales(){
 
 let today =
 new Date().toDateString();
 
+return sales.reduce((sum,s)=>{
 
-return sales.reduce(
-(sum,s)=>{
+if(new Date(s.date).toDateString()===today){
 
-if(
-new Date(s.date)
-.toDateString()
-===today
-){
-
-return sum+
-num(s.total);
+return sum+s.total;
 
 }
-
 
 return sum;
 
-},
-0
-);
+},0);
 
 }
 
 
-/* =========================================================
-   REPORT
-========================================================= */
+/* ================= REPORT ================= */
 
 function updateReport(){
 
 let totalSales =
-sales.reduce(
-(sum,s)=>
-sum+num(s.total),
-0
-);
-
+sales.reduce((sum,s)=>sum+s.total,0);
 
 let totalPurchase =
-purchases.reduce(
-(sum,p)=>
-sum+num(p.total),
-0
-);
+purchases.reduce((sum,p)=>sum+p.total,0);
 
-
-let totalProfit =
-getTotalProfit();
-
+let profit =
+sales.reduce((sum,s)=>sum+s.profit,0);
 
 let expense =
-expenses.reduce(
-(sum,e)=>
-sum+num(e.amount),
-0
-);
-
+expenses.reduce((sum,e)=>sum+e.amount,0);
 
 let due =
-sales.reduce(
-(sum,s)=>
-sum+num(s.due),
-0
-);
-
+sales.reduce((sum,s)=>sum+s.due,0);
 
 let stock =
 products.reduce(
-(sum,p)=>
-sum+
-(
-num(p.buy)*
-num(p.stock)
-),
-0
+(sum,p)=>sum+(p.buy*p.stock),0
 );
 
 
-/* SALES */
+document.getElementById("reportSales")
+.innerText="৳"+totalSales.toFixed(2);
 
-document.getElementById(
-"reportSales"
-).innerText=
-"৳"+
-money(totalSales);
+document.getElementById("reportPurchase")
+.innerText="৳"+totalPurchase.toFixed(2);
 
+document.getElementById("reportProfit")
+.innerText="৳"+profit.toFixed(2);
 
-/* PURCHASE */
+document.getElementById("reportExpense")
+.innerText="৳"+expense.toFixed(2);
 
-document.getElementById(
-"reportPurchase"
-).innerText=
-"৳"+
-money(totalPurchase);
+document.getElementById("reportNetProfit")
+.innerText=
+"৳"+(profit-expense).toFixed(2);
 
+document.getElementById("reportDue")
+.innerText=
+"৳"+due.toFixed(2);
 
-/* PROFIT */
-
-document.getElementById(
-"reportProfit"
-).innerText=
-"৳"+
-money(totalProfit);
-
-
-/* EXPENSE */
-
-document.getElementById(
-"reportExpense"
-).innerText=
-"৳"+
-money(expense);
-
-
-/* NET PROFIT */
-
-document.getElementById(
-"reportNetProfit"
-).innerText=
-"৳"+
-money(
-totalProfit-expense
-);
-
-
-/* DUE */
-
-document.getElementById(
-"reportDue"
-).innerText=
-"৳"+
-money(due);
-
-
-/* STOCK */
-
-document.getElementById(
-"reportStock"
-).innerText=
-"৳"+
-money(stock);
+document.getElementById("reportStock")
+.innerText=
+"৳"+stock.toFixed(2);
 
 }
 
 
-/* =========================================================
-   DATE FORMAT
-========================================================= */
+/* ================= DATE FORMAT ================= */
 
 function formatDate(date){
 
-if(!date){
-
-return "";
-
-}
-
-
-let d =
-new Date(date);
-
-
-if(
-isNaN(d.getTime())
-){
-
-return "";
-
-}
-
-
-return d.toLocaleDateString(
+return new Date(date).toLocaleDateString(
 "en-BD",
 {
 year:"numeric",
@@ -3060,9 +1860,7 @@ day:"numeric"
 }
 
 
-/* =========================================================
-   RENDER ALL
-========================================================= */
+/* ================= RENDER ALL ================= */
 
 function renderAll(){
 
@@ -3085,12 +1883,9 @@ updateReport();
 }
 
 
-/* =========================================================
-   START
-========================================================= */
+/* ================= START ================= */
 
 renderAll();
-
 
 </script>
 
